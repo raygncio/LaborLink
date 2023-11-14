@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1090031259543",
+    "firebase_url": "https://laborlink-66319-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "laborlink-66319",
+    "storage_bucket": "laborlink-66319.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1090031259543:android:b6c3a21101ffcc17937ed2",
+        "android_client_info": {
+          "package_name": "com.example.laborlink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVft1HQZ-tSm2LjSFD5t3NnG3tyCTILjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

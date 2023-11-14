@@ -1,0 +1,469 @@
+import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
+import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
+import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
+import 'package:laborlink/Widgets/Dialogs.dart';
+import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
+import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/styles.dart';
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final _fullNameController = TextEditingController();
+  final _birthdateController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  final _labelTextStyle = getTextStyle(
+      textColor: AppColors.black,
+      fontFamily: AppFonts.montserrat,
+      fontWeight: AppFontWeights.semiBold,
+      fontSize: 11);
+
+  final _inputTextStyle = getTextStyle(
+      textColor: AppColors.black,
+      fontFamily: AppFonts.montserrat,
+      fontWeight: AppFontWeights.semiBold,
+      fontSize: 12);
+
+  final _defaultBorder = Border.all(color: AppColors.secondaryBlue, width: 1);
+
+  @override
+  void initState() {
+    _fullNameController.text = "Allan Ray C. Escueta";
+    _birthdateController.text = "August 8, 2023";
+    _emailController.text = "customer@gmail.com";
+    _phoneNumberController.text = "09171234567";
+    _addressController.text = "Tønsberg, Norway";
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _birthdateController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _addressController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+
+    return Scaffold(
+      backgroundColor: AppColors.secondaryBlue,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SizedBox(
+            width: deviceWidth,
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Text(
+                        "Profile",
+                        style: getTextStyle(
+                            textColor: AppColors.secondaryYellow,
+                            fontFamily: AppFonts.montserrat,
+                            fontWeight: AppFontWeights.bold,
+                            fontSize: 30),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 27),
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(7),
+                            child: ClipOval(
+                              child: Image.network(
+                                imgUrl,
+                                width: 75,
+                                height: 75,
+                              ),
+                            ),
+                          ),
+                          const Positioned(
+                            bottom: 10,
+                            right: 13,
+                            child: CircleAvatar(
+                              backgroundColor: AppColors.secondaryBlue,
+                              maxRadius: 8,
+                              child: Icon(
+                                Icons.edit,
+                                size: 7,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        "Name",
+                        style: getTextStyle(
+                            textColor: AppColors.white,
+                            fontFamily: AppFonts.montserrat,
+                            fontWeight: AppFontWeights.bold,
+                            fontSize: 15),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        "temp@gmail.com",
+                        style: getTextStyle(
+                            textColor: AppColors.white,
+                            fontFamily: AppFonts.montserrat,
+                            fontWeight: AppFontWeights.regular,
+                            fontSize: 10),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 11),
+                      child: SizedBox(
+                        width: 155,
+                        child: Row(
+                          children: [
+                            AppFilledButton(
+                              height: 27,
+                              text: "Reviews and Ratings",
+                              fontSize: 12,
+                              fontFamily: AppFonts.montserrat,
+                              color: AppColors.secondaryYellow,
+                              command: onViewReviewsAndRatings,
+                              borderRadius: 8,
+                              textColor: AppColors.secondaryBlue,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Container(
+                    width: deviceWidth,
+                    color: AppColors.white,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 34, right: 52, top: 31),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "My Information",
+                                style: getTextStyle(
+                                    textColor: AppColors.black,
+                                    fontFamily: AppFonts.montserrat,
+                                    fontWeight: AppFontWeights.bold,
+                                    fontSize: 14),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 22, left: 18),
+                                child: Column(
+                                  children: [
+                                    AppNormalTextFormField(
+                                        label: "Full Name",
+                                        labelTextStyle: _labelTextStyle,
+                                        labelPadding: const EdgeInsets.only(
+                                            left: 8, bottom: 5),
+                                        borderRadius: 8,
+                                        controller: _fullNameController,
+                                        contentPadding: const EdgeInsets.only(
+                                            left: 17, right: 11),
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.only(right: 10),
+                                          child: Image.asset(
+                                              "assets/icons/person-circle-blue.png",
+                                              height: 24,
+                                              width: 24),
+                                        ),
+                                        suffixIcon: Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: Image.asset(
+                                              "assets/icons/edit-filled-blue.png",
+                                              height: 16,
+                                              width: 16),
+                                        ),
+                                        height: 35,
+                                        inputTextStyle: _inputTextStyle,
+                                        textAlign: TextAlign.center,
+                                        defaultBorder: _defaultBorder,
+                                        errorBorder: _defaultBorder),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: AppNormalTextFormField(
+                                          label: "Birthdate",
+                                          labelTextStyle: _labelTextStyle,
+                                          labelPadding: const EdgeInsets.only(
+                                              left: 8, bottom: 5),
+                                          borderRadius: 8,
+                                          controller: _birthdateController,
+                                          contentPadding: const EdgeInsets.only(
+                                              left: 17, right: 11),
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: Image.asset(
+                                                "assets/icons/calendar-filled-blue.png",
+                                                height: 21,
+                                                width: 21),
+                                          ),
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Image.asset(
+                                                "assets/icons/edit-filled-blue.png",
+                                                height: 16,
+                                                width: 16),
+                                          ),
+                                          height: 35,
+                                          inputTextStyle: _inputTextStyle,
+                                          textAlign: TextAlign.center,
+                                          defaultBorder: _defaultBorder,
+                                          errorBorder: _defaultBorder),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: AppNormalTextFormField(
+                                          label: "Email",
+                                          labelTextStyle: _labelTextStyle,
+                                          labelPadding: const EdgeInsets.only(
+                                              left: 8, bottom: 5),
+                                          borderRadius: 8,
+                                          controller: _emailController,
+                                          contentPadding: const EdgeInsets.only(
+                                              left: 17, right: 11),
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: Image.asset(
+                                                "assets/icons/email-filled-blue.png",
+                                                height: 24,
+                                                width: 24),
+                                          ),
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Image.asset(
+                                                "assets/icons/edit-filled-blue.png",
+                                                height: 16,
+                                                width: 16),
+                                          ),
+                                          height: 35,
+                                          inputTextStyle: _inputTextStyle,
+                                          textAlign: TextAlign.center,
+                                          defaultBorder: _defaultBorder,
+                                          errorBorder: _defaultBorder),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: AppNormalTextFormField(
+                                          label: "Phone Number",
+                                          labelTextStyle: _labelTextStyle,
+                                          labelPadding: const EdgeInsets.only(
+                                              left: 8, bottom: 5),
+                                          borderRadius: 8,
+                                          controller: _phoneNumberController,
+                                          contentPadding: const EdgeInsets.only(
+                                              left: 17, right: 11),
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: Image.asset(
+                                                "assets/icons/phone-filled-blue.png",
+                                                height: 24,
+                                                width: 24),
+                                          ),
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Image.asset(
+                                                "assets/icons/edit-filled-blue.png",
+                                                height: 16,
+                                                width: 16),
+                                          ),
+                                          height: 35,
+                                          inputTextStyle: _inputTextStyle,
+                                          textAlign: TextAlign.center,
+                                          defaultBorder: _defaultBorder,
+                                          errorBorder: _defaultBorder),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: AppNormalTextFormField(
+                                          label: "Address",
+                                          labelTextStyle: _labelTextStyle,
+                                          labelPadding: const EdgeInsets.only(
+                                              left: 8, bottom: 5),
+                                          borderRadius: 8,
+                                          controller: _addressController,
+                                          contentPadding: const EdgeInsets.only(
+                                              left: 21, right: 11),
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: Image.asset(
+                                                "assets/icons/address-filled-blue.png",
+                                                height: 21,
+                                                width: 16),
+                                          ),
+                                          suffixIcon: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Image.asset(
+                                                "assets/icons/edit-filled-blue.png",
+                                                height: 16,
+                                                width: 16),
+                                          ),
+                                          height: 35,
+                                          inputTextStyle: _inputTextStyle,
+                                          textAlign: TextAlign.center,
+                                          defaultBorder: _defaultBorder,
+                                          errorBorder: _defaultBorder),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 38),
+                                child: Text(
+                                  "Others",
+                                  style: getTextStyle(
+                                      textColor: AppColors.black,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.bold,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 16, left: 18),
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 35,
+                                      child: Stack(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              AppOutlinedButton(
+                                                text: "Change Password",
+                                                textStyle: getTextStyle(
+                                                    textColor: AppColors.black,
+                                                    fontFamily:
+                                                        AppFonts.montserrat,
+                                                    fontWeight:
+                                                        AppFontWeights.semiBold,
+                                                    fontSize: 12),
+                                                color: AppColors.secondaryBlue,
+                                                command: onChangePassword,
+                                                borderRadius: 8,
+                                                borderWidth: 1,
+                                              ),
+                                            ],
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20),
+                                              child: Image.asset(
+                                                  "assets/icons/lock-filled-blue.png",
+                                                  width: 18),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 16, left: 18),
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 35,
+                                      child: Stack(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              AppOutlinedButton(
+                                                text: "Report an Issue",
+                                                textStyle: getTextStyle(
+                                                    textColor: AppColors.black,
+                                                    fontFamily:
+                                                        AppFonts.montserrat,
+                                                    fontWeight:
+                                                        AppFontWeights.semiBold,
+                                                    fontSize: 12),
+                                                color: AppColors.secondaryBlue,
+                                                command: onReportAnIssue,
+                                                borderRadius: 8,
+                                                borderWidth: 1,
+                                              ),
+                                            ],
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20),
+                                              child: Image.asset(
+                                                  "assets/icons/flag-filled-blue.png",
+                                                  width: 18),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 31, bottom: 16),
+                          child: Center(
+                            child: LogoutButton(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void onViewReviewsAndRatings() {}
+
+  void onChangePassword() {}
+
+  void onReportAnIssue() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const ReportIssuePage(),
+      ));
+}
