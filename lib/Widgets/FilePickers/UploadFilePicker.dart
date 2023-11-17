@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
 class UploadFilePicker extends StatefulWidget {
   final label;
 
   final GlobalKey<UploadFilePickerState> key;
+  final void Function(File pickedImage)? onPickImage;
 
-  const UploadFilePicker({required this.key, required this.label})
+  const UploadFilePicker({required this.key, this.label, this.onPickImage})
       : super(key: key);
 
   @override
@@ -15,9 +19,31 @@ class UploadFilePicker extends StatefulWidget {
 
 class UploadFilePickerState extends State<UploadFilePicker> {
   String _fileName = "";
+  File? _pickedImageFile;
 
   String get getFileName => _fileName;
   bool get hasFile => _fileName.isNotEmpty;
+
+  void _uploadFile() async {
+    // image quality -> 50 for small fize
+    // max width: 150 -> small frame
+    // -> lower bandwidth
+    final pickedImage = await ImagePicker().pickImage(
+        source: ImageSource.gallery, imageQuality: 50, maxWidth: 150);
+
+    // check if there's an image
+    if (pickedImage == null) return;
+
+    // stores and updates image preview
+    setState(() {
+      // creates a File object based on the path of the XFile image
+      _pickedImageFile = File(pickedImage.path);
+      _fileName = basename(pickedImage.path);
+    });
+
+    // pass image file between screen
+    widget.onPickImage!(_pickedImageFile!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +51,7 @@ class UploadFilePickerState extends State<UploadFilePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.label,
+          '',
           style: getTextStyle(
               textColor: AppColors.tertiaryBlue,
               fontFamily: AppFonts.poppins,
@@ -56,7 +82,7 @@ class UploadFilePickerState extends State<UploadFilePicker> {
                   ),
                 ),
                 FilledButton(
-                    onPressed: uploadFile,
+                    onPressed: _uploadFile,
                     style: ButtonStyle(
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5))),
@@ -77,11 +103,5 @@ class UploadFilePickerState extends State<UploadFilePicker> {
         )
       ],
     );
-  }
-
-  void uploadFile() {
-    setState(() {
-      _fileName = "Test.png";
-    });
   }
 }

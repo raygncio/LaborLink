@@ -10,6 +10,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/client.dart';
+import 'dart:io';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
@@ -138,8 +141,6 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
   }
 
   Future<void> onProceed() async {
-    Uuid uuid = Uuid();
-
     setState(() {
       basicInformationFormKey.currentState!.isAutoValidationEnabled = true;
       accountDetailsFormKey.currentState!.isAutoValidationEnabled = true;
@@ -169,82 +170,67 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
             clientRequirementFormKey.currentState!.getFormData;
 
         // Check if the email is unique
-        QuerySnapshot emailSnapshot = await _firestore
-            .collection("users")
-            .where("email_add", isEqualTo: accountInfo["email"])
-            .get();
 
-        if (emailSnapshot.docs.isNotEmpty) {
-          // Email already exists, show an error or handle accordingly
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Email already exists"),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+        // if (emailSnapshot.docs.isNotEmpty) {
+        //   // Email already exists, show an error or handle accordingly
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text("Email already exists"),
+        //       backgroundColor: Colors.red,
+        //     ),
+        //   );
+        //   return;
+        // }
 
         // Check if the username is unique
-        QuerySnapshot usernameSnapshot = await _firestore
-            .collection("users")
-            .where("username", isEqualTo: accountInfo["username"])
-            .get();
 
-        if (usernameSnapshot.docs.isNotEmpty) {
-          // Username already exists, show an error or handle accordingly
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Username already exists"),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+        // if (usernameSnapshot.docs.isNotEmpty) {
+        //   // Username already exists, show an error or handle accordingly
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text("Username already exists"),
+        //       backgroundColor: Colors.red,
+        //     ),
+        //   );
+        //   return;
+        // }
 
         try {
           // Create a user in Firebase Authentication
+          DatabaseService service = DatabaseService();
           UserCredential userCredential =
               await _firebase.createUserWithEmailAndPassword(
                   email: accountInfo["email"],
                   password: accountInfo["password"]);
 
-          // Get the UID of the newly created user
-          String userId = userCredential.user!.uid;
-
           // Get the current date and time
-          DateTime now = DateTime.now();
+          // DateTime now = DateTime.now();
           // Convert the DateTime to a string in a suitable format
-          String currentDate =
-              "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          // String currentDate =
+          //     "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          // Upload files to Firebase Storage
+          String imageUrl = await service.uploadNBIClearance(
+              userCredential.user!.uid, clientInfo["idFile"]);
 
-          CollectionReference userCollection = _firestore.collection("users");
+          Client client = Client(
+              userRole: "client",
+              firstName: basicInfo["first_name"],
+              lastName: basicInfo["last_name"],
+              middleName: basicInfo["middle_name"],
+              suffix: basicInfo["suffix"],
+              dob: basicInfo["birthday"],
+              sex: basicInfo["gender"],
+              streetAddress: addressInfo["street"],
+              state: addressInfo["state"],
+              city: addressInfo["city"],
+              zipCode: int.parse(addressInfo["zip"]),
+              emailAdd: accountInfo["email"],
+              username: accountInfo["username"],
+              phoneNumber: accountInfo["phone"],
+              validId: clientInfo["idType"],
+              idProof: imageUrl);
 
-          // Add user data to Firestore
-          await userCollection.doc(userId).set({
-            "city": addressInfo["city"] ?? "",
-            "created_at": currentDate,
-            "dob": basicInfo["birthday"] ?? "",
-            "email_add": accountInfo["email"] ?? "",
-            "first_name": basicInfo["first_name"] ?? "",
-            "id_proof": clientInfo["idFileName"] ?? "",
-            "last_name": basicInfo["last_name"] ?? "",
-            "middle_name": basicInfo["middle_name"] ?? "",
-            "password": accountInfo["password"] ?? "",
-            "phone_number": accountInfo["phone"] ?? "",
-            "profile_pic": "",
-            "sex": basicInfo["gender"] ?? "",
-            "state": addressInfo["state"] ?? "",
-            "status": "active",
-            "street_address": addressInfo["street"] ?? "",
-            "suffix": basicInfo["suffix"] ?? "",
-            "user_id": userId,
-            "user_role": "client",
-            "username": accountInfo["username"] ?? "",
-            "valid_id": clientInfo["idType"] ?? "",
-            "zip_code": addressInfo["zip"] ?? ""
-          });
-
+          await service.addUser(client);
           // Continue with your navigation or any other logic
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => const FaceDetectionPage(),
@@ -259,6 +245,15 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
             ),
           );
         }
+      } else {
+        // Show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text("Invalid Error! Please double check your information."),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } else {
       // Show an error message for not uploading a file

@@ -102,7 +102,7 @@ class RequestFormState extends State<RequestForm> {
                   child: AppNormalTextFormField(
                     controller: _titleController,
                     height: 27,
-                    label: "Title",
+                    label: "Title *",
                     labelTextStyle: _labelTextStyle,
                     defaultBorder: _defaultBorder,
                     errorBorder: _errorBorder,
@@ -116,7 +116,7 @@ class RequestFormState extends State<RequestForm> {
               AppDropdown(
                 height: 27,
                 width: 110,
-                label: "Category",
+                label: "Category *",
                 labelTextStyle: getTextStyle(
                     textColor: AppColors.secondaryBlue,
                     fontFamily: AppFonts.montserrat,
@@ -135,7 +135,7 @@ class RequestFormState extends State<RequestForm> {
           Padding(
             padding: const EdgeInsets.only(top: 7),
             child: TextAreaFormField(
-                label: "Description",
+                label: "Description *",
                 validator: validateDescription,
                 labelPadding: const EdgeInsets.only(bottom: 4),
                 labelTextStyle: _labelTextStyle,
@@ -173,7 +173,7 @@ class RequestFormState extends State<RequestForm> {
                   child: AppDropdown(
                     height: 27,
                     width: 113,
-                    label: "Date needed",
+                    label: "Date needed *",
                     labelTextStyle: getTextStyle(
                         textColor: AppColors.secondaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -191,7 +191,7 @@ class RequestFormState extends State<RequestForm> {
                 AppDropdown(
                   height: 27,
                   width: 113,
-                  label: "Time needed",
+                  label: "Time needed *",
                   labelTextStyle: getTextStyle(
                       textColor: AppColors.secondaryBlue,
                       fontFamily: AppFonts.montserrat,
@@ -217,7 +217,7 @@ class RequestFormState extends State<RequestForm> {
                   child: AppNormalTextFormField(
                     controller: _addressController,
                     height: 27,
-                    label: "Address",
+                    label: "Address *",
                     labelTextStyle: _labelTextStyle,
                     defaultBorder: _defaultBorder,
                     errorBorder: _errorBorder,

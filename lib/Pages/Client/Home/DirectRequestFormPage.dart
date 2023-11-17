@@ -70,6 +70,12 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
           addressError != null) {
         // Handle validation errors
         // Show error messages or perform actions accordingly
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please fill out all the required fields."),
+            backgroundColor: Color.fromARGB(255, 245, 27, 11),
+          ),
+        );
       } else {
         // Proceed with the form data
         // Your logic here...

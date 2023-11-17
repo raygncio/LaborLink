@@ -15,6 +15,7 @@ class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _usernameEmailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final bool obscureText = true;
 
   // Style
   final _defaultBorder = Border.all(width: 1, color: AppColors.accentOrange);
@@ -82,6 +83,7 @@ class LoginFormState extends State<LoginForm> {
             Padding(
               padding: const EdgeInsets.only(top: 14),
               child: AppNormalTextFormField(
+                obscureText: true,
                 controller: _passwordController,
                 height: 42,
                 contentPadding: const EdgeInsets.only(

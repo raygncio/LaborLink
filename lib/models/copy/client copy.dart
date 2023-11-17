@@ -6,16 +6,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 final formatter = DateFormat.yMd();
 final authenticatedUser = FirebaseAuth.instance.currentUser!;
 
-class User {
+class Client {
   // CONSTRUCTORS
 
-  User({
+  Client({
     this.userId,
     required this.userRole,
     required this.firstName,
     required this.lastName,
     required this.middleName,
-    required this.suffix,
+    this.suffix,
     required this.dob,
     required this.sex,
     required this.streetAddress,
@@ -28,12 +28,12 @@ class User {
     this.status,
     required this.validId,
     required this.idProof,
-    required this.profilePic,
+    this.profilePic,
     this.createdAt,
   });
 
   // for getting all
-  User.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
+  Client.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
       : userId = doc.id,
         userRole = doc.data()!['userRole'],
         firstName = doc.data()!['firstName'],
@@ -62,7 +62,7 @@ class User {
   final String firstName;
   final String lastName;
   final String middleName;
-  final String suffix;
+  final String? suffix;
   final DateTime dob;
   final String sex;
   final String streetAddress;
@@ -75,12 +75,12 @@ class User {
   final String? status;
   final File validId; // file attachment
   final File idProof; // file attachment
-  final File profilePic;
+  final File? profilePic;
   final DateTime? createdAt;
 
   // METHODS
 
-  // for adding, updating, deleting
+  // for adding
   Map<String, dynamic> toMap() {
     return {
       'userId': authenticatedUser.uid,
@@ -101,7 +101,8 @@ class User {
       'status': userRole == 'handyman' ? 'pending' : 'active',
       'validId': validId,
       'idProof': idProof,
-      'createdAt': DateTime.now(),
+      'profilePic': profilePic,
+      'createdAt': createdAt ?? DateTime.now(),
     };
   }
 

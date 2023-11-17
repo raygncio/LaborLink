@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
+import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
+import 'package:laborlink/Pages/LandingPage.dart';
+import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Forms/LoginForm.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
-
 import '../Widgets/Buttons/FilledButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+
+final _firebase = FirebaseAuth.instance;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -81,8 +89,45 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
-  void onLogin() {
-    print("LOGIN");
+  void onLogin() async {
+    Map<String, dynamic> logInfo = loginFormKey.currentState!.getFormData;
+
+    final enteredEmail = logInfo["username"]?.toString().trim() ?? "";
+    final enteredPassword = logInfo["password"]?.toString().trim() ?? "";
+    DatabaseService service = DatabaseService();
+
+    // identify kung sino nag log in
+    // username, email, password
+
+    try {
+      final UserCredential userCredential =
+          await _firebase.signInWithEmailAndPassword(
+        email: enteredEmail,
+        password: enteredPassword,
+      );
+
+      print(userCredential.user!.uid);
+
+      Map<String, dynamic> clientInfo =
+          await service.getUserData(userCredential.user!.uid);
+
+      if (clientInfo["userRole"] == "handyman") {
+        // User is a handyman, navigate to the handyman page.
+        // Navigator.of(context).push(MaterialPageRoute(
+        //   builder: (context) => HandymanPage(),
+        // ));
+      } else if (clientInfo["userRole"] == "client") {
+        // User is a client, navigate to the client page.
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ClientMainPage(),
+        ));
+      } else {
+        print("errorrr");
+      }
+    } catch (e) {
+      // Handle login errors, e.g., show an error message.
+      print("Login error: $e");
+    }
   }
 
   void onBack() {

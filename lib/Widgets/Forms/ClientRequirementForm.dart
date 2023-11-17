@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
 
 const List<String> validIds = <String>[
   'PhilHealth',
@@ -21,6 +22,9 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
   bool isAutoValidationEnabled = false;
   final _formKey = GlobalKey<FormState>();
   final _idTypeController = TextEditingController();
+
+  //file
+  File? _selectedImage;
 
   final _idFilePickerKey = GlobalKey<UploadFilePickerState>();
 
@@ -50,7 +54,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
   Map<String, dynamic> get getFormData {
     return {
       "idType": _idTypeController.text,
-      "idFileName": _idFilePickerKey.currentState!.getFileName,
+      "idFile": _selectedImage,
     };
   }
 
@@ -132,7 +136,10 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                 padding: const EdgeInsets.only(top: 9.25),
                 child: UploadFilePicker(
                   key: _idFilePickerKey,
-                  label: "ATTACH FILE*",
+                  onPickImage: (pickedImage) {
+                    // receive image file
+                    _selectedImage = pickedImage;
+                  },
                 ),
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
 
 const List<String> specializations = <String>[
   'Plumbing',
@@ -44,6 +45,12 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
   final _certProofFilePickerKey = GlobalKey<UploadFilePickerState>();
   final _nbiClearanceFilePickerKey = GlobalKey<UploadFilePickerState>();
 
+  //file
+  File? _recLetterImage;
+  File? idFile;
+  File? certProofFile;
+  File? nbiClearanceFile;
+
   // Style
   final _defaultBorder = Border.all(width: 1, color: AppColors.tertiaryBlue);
   final _errorBorder = Border.all(width: 1, color: AppColors.red);
@@ -73,7 +80,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
       'employer': _employerController.text,
       'idType': _idTypeController.text,
       'certificateName': _certificateNameController.text,
-      'recLetterFile': _recLetterFilePickerKey.currentState!.getFileName,
+      'recLetterFile': _recLetterImage,
       'idFile': _idFilePickerKey.currentState!.getFileName,
       'certProofFile': _certProofFilePickerKey.currentState!.getFileName,
       'nbiClearanceFile': _nbiClearanceFilePickerKey.currentState!.getFileName,
@@ -186,7 +193,10 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                       padding: const EdgeInsets.only(top: 9.25),
                       child: UploadFilePicker(
                         key: _recLetterFilePickerKey,
-                        label: "RECOMMENDATION LETTER",
+                        onPickImage: (pickedImage) {
+                          // receive image file
+                          _recLetterImage = pickedImage;
+                        },
                       ),
                     ),
                     Padding(
@@ -243,6 +253,9 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                       child: UploadFilePicker(
                         key: _idFilePickerKey,
                         label: "ATTACH ID*",
+                        onPickImage: (pickedImage) {
+                          idFile = pickedImage;
+                        },
                       ),
                     ),
                     Padding(
@@ -264,6 +277,9 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                       child: UploadFilePicker(
                         key: _certProofFilePickerKey,
                         label: "ATTACH PROOF OF CERTIFICATION*",
+                        onPickImage: (pickedImage) {
+                          certProofFile = pickedImage;
+                        },
                       ),
                     ),
                     Padding(
@@ -271,6 +287,9 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                       child: UploadFilePicker(
                         key: _nbiClearanceFilePickerKey,
                         label: "UPLOAD AN NBI CLEARANCE*",
+                        onPickImage: (pickedImage) {
+                          nbiClearanceFile = pickedImage;
+                        },
                       ),
                     ),
                   ],

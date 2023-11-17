@@ -83,6 +83,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   void onHistoryButtonClick() {}
 
   void submitRequest(requestType) {
+    // requestType can be direct and open
     print(requestType);
 
     // TODO Add submit request processing

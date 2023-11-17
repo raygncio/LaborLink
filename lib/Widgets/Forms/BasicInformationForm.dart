@@ -52,16 +52,12 @@ class BasicInformationFormState extends State<BasicInformationForm> {
     String suffix = _suffixController.text;
     String gender = _genderController.text;
 
-    String birthday = _selectedDate != null
-        ? formatter.format(_selectedDate!)
-        : ''; // Format the date if available
-
     return {
       "first_name": firstName,
       "last_name": lastName,
       "middle_name": middleName,
       "suffix": suffix,
-      "birthday": birthday,
+      "birthday": _selectedDate,
       "gender": gender
     };
   }
