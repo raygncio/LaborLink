@@ -18,6 +18,7 @@ const List<String> specializations = <String>[
 ];
 
 const List<String> validIds = <String>[
+  'NBI',
   'PhilHealth',
   'SSS',
   'Postal ID',
@@ -43,13 +44,13 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
   final _recLetterFilePickerKey = GlobalKey<UploadFilePickerState>();
   final _idFilePickerKey = GlobalKey<UploadFilePickerState>();
   final _certProofFilePickerKey = GlobalKey<UploadFilePickerState>();
-  final _nbiClearanceFilePickerKey = GlobalKey<UploadFilePickerState>();
+  //final _nbiClearanceFilePickerKey = GlobalKey<UploadFilePickerState>();
 
   //file
   File? _recLetterImage;
   File? idFile;
   File? certProofFile;
-  File? nbiClearanceFile;
+  //File? nbiClearanceFile;
 
   // Style
   final _defaultBorder = Border.all(width: 1, color: AppColors.tertiaryBlue);
@@ -83,7 +84,6 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
       'recLetterFile': _recLetterImage,
       'idFile': idFile,
       'certProofFile': certProofFile,
-      'nbiClearanceFile': nbiClearanceFile,
     };
   }
 
@@ -208,14 +208,16 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                             : validIds[0],
                         items: validIds.map((String value) {
                           return DropdownMenuItem<String>(
-                            value: value,
+                            value: value == 'nbi' ? value : null,
                             child: Text(value),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {
-                          setState(() {
-                            _idTypeController.text = newValue!;
-                          });
+                          if (newValue!.toLowerCase() == 'nbi') {
+                            setState(() {
+                              _idTypeController.text = newValue.toLowerCase();
+                            });
+                          }
                         },
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
@@ -283,16 +285,16 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 9.25),
-                      child: UploadFilePicker(
-                        key: _nbiClearanceFilePickerKey,
-                        label: "UPLOAD AN NBI CLEARANCE*",
-                        onPickImage: (pickedImage) {
-                          nbiClearanceFile = pickedImage;
-                        },
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 9.25),
+                    //   child: UploadFilePicker(
+                    //     key: _nbiClearanceFilePickerKey,
+                    //     label: "UPLOAD AN NBI CLEARANCE*",
+                    //     onPickImage: (pickedImage) {
+                    //       nbiClearanceFile = pickedImage;
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ],

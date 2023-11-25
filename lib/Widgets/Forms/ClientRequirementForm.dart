@@ -5,6 +5,7 @@ import 'package:laborlink/styles.dart';
 import 'dart:io';
 
 const List<String> validIds = <String>[
+  'NBI',
   'PhilHealth',
   'SSS',
   'Postal ID',
@@ -93,14 +94,16 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                     : validIds[0],
                 items: validIds.map((String value) {
                   return DropdownMenuItem<String>(
-                    value: value,
+                    value: value == 'nbi' ? value : null,
                     child: Text(value),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
-                  setState(() {
-                    _idTypeController.text = newValue!;
-                  });
+                  if (newValue!.toLowerCase() == 'nbi') {
+                    setState(() {
+                      _idTypeController.text = newValue.toLowerCase();
+                    });
+                  }
                 },
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(

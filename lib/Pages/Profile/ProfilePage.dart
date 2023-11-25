@@ -42,6 +42,12 @@ class _ProfilePageState extends State<ProfilePage> {
       fontSize: 12);
 
   final _defaultBorder = Border.all(color: AppColors.secondaryBlue, width: 1);
+  GestureDetector buildClickableIcon(Widget iconWidget, Function() onPressed) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: iconWidget,
+    );
+  }
 
   @override
   void initState() {
@@ -243,10 +249,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                         suffixIcon: Padding(
                                           padding:
                                               const EdgeInsets.only(left: 10),
-                                          child: Image.asset(
+                                          child: buildClickableIcon(
+                                            Image.asset(
                                               "assets/icons/edit-filled-blue.png",
                                               height: 16,
-                                              width: 16),
+                                              width: 16,
+                                            ),
+                                            () {
+                                              print("Edit icon clicked");
+                                            },
+                                          ),
                                         ),
                                         height: 35,
                                         inputTextStyle: _inputTextStyle,

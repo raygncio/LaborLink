@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:camera/camera.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
-import 'package:laborlink/Pages/LandingPage.dart';
+import 'package:camera/camera.dart';
+import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/face_verification.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   // initialize camera upon start
   cameras = await availableCameras();
@@ -28,15 +23,13 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'LaborLink',
       debugShowCheckedModeBanner: false,
-      home: LandingPage(),
+      home: DummyPage(),
     );
   }
 }

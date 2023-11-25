@@ -282,7 +282,9 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
             return Padding(
               padding: EdgeInsets.only(
                   top: index == 0 ? 15 : 9, bottom: index == 9 ? 75 : 0),
-              child: OpenRequestCard(clientRequestInfo: currentClientRequest),
+              child: OpenRequestCard(
+                  clientRequestInfo: currentClientRequest,
+                  userId: widget.userId),
             );
           },
         ),

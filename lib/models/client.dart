@@ -85,8 +85,8 @@ class Client {
     return {
       'userId': userId,
       'userRole': userRole,
-      'firstName': firstName,
-      'lastName': lastName,
+      'firstName': firstName.toLowerCase(),
+      'lastName': lastName.toLowerCase(),
       'middleName': middleName,
       'suffix': suffix,
       'dob': dob,

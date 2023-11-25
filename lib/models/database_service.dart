@@ -463,6 +463,23 @@ class DatabaseService {
     }
   }
 
+  //get the document id tapos siya mag se serve as foreign key na
+  // Update the request, handyman is interested with the request // handyman approval dapat itoooo
+  // handymanId progress to waiting
+  Future<void> handymanInterested(String handymanId, String requestId) async {
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: requestId)
+        .get();
+
+    for (var doc in requestQuery.docs) {
+      await doc.reference.update({
+        'handymanId': handymanId,
+        'progress': 'waiting',
+      });
+    }
+  }
+
   // HANDYMAN_APPROVAL
 
   addHandymanApproval(HandymanApproval approvalData) async {

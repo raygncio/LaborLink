@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Forms/AccountDetailsForm.dart';
 import 'package:laborlink/Widgets/Forms/AddressForm.dart';
@@ -8,11 +7,12 @@ import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
 import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
-import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
-import 'dart:io';
+import 'dart:async';
+import 'package:laborlink/ai/screens/id_verification.dart';
+import 'package:laborlink/splash/splash_one.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
@@ -33,9 +33,15 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
   GlobalKey<ClientRequirementFormState> clientRequirementFormKey =
       GlobalKey<ClientRequirementFormState>();
 
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+
+    if (_isLoading) {
+      return const SplashOnePage();
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -140,6 +146,24 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
     Navigator.of(context).pop();
   }
 
+  void _toIdVerification(List<Map<String, dynamic>> data) {
+    setState(() {
+      _isLoading = true;
+    });
+    Timer(
+      const Duration(seconds: 5),
+      () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => IdVerification(
+              data: data,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> onProceed() async {
     setState(() {
       basicInformationFormKey.currentState!.isAutoValidationEnabled = true;
@@ -232,10 +256,22 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
               idProof: imageUrl);
 
           await service.addUser(client);
+
           // Continue with your navigation or any other logic
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const FaceDetectionPage(),
-          ));
+          List<Map<String, dynamic>> fileAttachments;
+
+          fileAttachments = [
+            {
+              'type': clientInfo['idType'],
+              'file': clientInfo['idFile'],
+            }
+          ];
+
+          _toIdVerification(fileAttachments);
+
+          // Navigator.of(context).push(MaterialPageRoute(
+          //   builder: (context) => const FaceDetectionPage(),
+          // ));
         } catch (e) {
           // Handle errors during user creation
           ScaffoldMessenger.of(context).showSnackBar(

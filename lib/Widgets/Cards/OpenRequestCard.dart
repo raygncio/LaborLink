@@ -7,12 +7,15 @@ import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/database_service.dart';
 
 import '../Dialogs.dart';
 
 class OpenRequestCard extends StatefulWidget {
   final Map<String, dynamic> clientRequestInfo;
-  const OpenRequestCard({Key? key, required this.clientRequestInfo})
+  final String userId;
+  const OpenRequestCard(
+      {Key? key, required this.clientRequestInfo, required this.userId})
       : super(key: key);
 
   @override
@@ -269,7 +272,18 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     );
   }
 
-  void onAccept() {}
+  void onAccept() async {
+    // need to update the request and put the document id of handyman to the database
+    DatabaseService service = DatabaseService();
+    try {
+      await service.handymanInterested(
+          widget.userId, widget.clientRequestInfo['userId']);
+      // need to put a pop up kapag nag update
+      print('Document updated successfully');
+    } catch (e) {
+      print('Error updating document: $e');
+    }
+  }
 
   void onMakeOffer() {
     makeOfferDialog(context).then((value) {
