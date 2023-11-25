@@ -5,8 +5,15 @@ import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laborlink/providers/saved_client_provider.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class VerdictPage extends StatefulWidget {
+final _firebase = FirebaseAuth.instance;
+
+class VerdictPage extends ConsumerStatefulWidget {
   const VerdictPage(
       {super.key,
       required this.outputs,
@@ -18,10 +25,10 @@ class VerdictPage extends StatefulWidget {
   final bool isSuccessful;
 
   @override
-  State<VerdictPage> createState() => _VerdictPageState();
+  ConsumerState<VerdictPage> createState() => _VerdictPageState();
 }
 
-class _VerdictPageState extends State<VerdictPage> {
+class _VerdictPageState extends ConsumerState<VerdictPage> {
   Widget button = const SizedBox();
 
   String processOutputs() {
@@ -101,11 +108,49 @@ class _VerdictPageState extends State<VerdictPage> {
     });
   }
 
+  createClientAccount() async {
+    Map<String, dynamic> savedUserData;
+    savedUserData = ref.watch(savedClientDataProvider);
+
+    // Create a user in Firebase Authentication
+    DatabaseService service = DatabaseService();
+    UserCredential userCredential =
+        await _firebase.createUserWithEmailAndPassword(
+            email: savedUserData["email"], password: savedUserData["password"]);
+
+    // Upload files to Firebase Storage
+    String imageUrl = await service.uploadNBIClearance(
+        userCredential.user!.uid, savedUserData["idFile"]);
+
+    Client client = Client(
+        userId: userCredential.user!.uid,
+        userRole: "client",
+        firstName: savedUserData["first_name"],
+        lastName: savedUserData["last_name"],
+        middleName: savedUserData["middle_name"],
+        suffix: savedUserData["suffix"],
+        dob: savedUserData["birthday"],
+        sex: savedUserData["gender"],
+        streetAddress: savedUserData["street"],
+        state: savedUserData["savedUserData"],
+        city: savedUserData["city"],
+        zipCode: int.parse(savedUserData["zip"]),
+        emailAdd: savedUserData["email"],
+        username: savedUserData["username"],
+        phoneNumber: savedUserData["phone"],
+        validId: savedUserData["idType"],
+        idProof: imageUrl);
+
+    // Firestore
+    await service.addUser(client);
+  }
+
   @override
   void initState() {
     Timer(const Duration(seconds: 4), () {
       showButton();
     });
+    if (widget.isSuccessful) createClientAccount();
     super.initState();
   }
 

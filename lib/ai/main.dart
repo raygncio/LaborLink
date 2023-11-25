@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/face_verification.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,7 @@ Future main() async {
     ],
   );
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

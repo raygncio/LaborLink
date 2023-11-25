@@ -77,7 +77,8 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                         Padding(
                           padding: const EdgeInsets.only(right: 6),
                           child: AppBadge(
-                              label: widget.handymanInfo["specialization"],
+                              label:
+                                  widget.handymanInfo["specialization"] ?? '',
                               type: BadgeType.normal),
                         ),
                         AppBadge(

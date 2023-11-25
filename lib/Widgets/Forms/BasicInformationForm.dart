@@ -214,13 +214,17 @@ class BasicInformationFormState extends State<BasicInformationForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 9.25),
+                  padding: const EdgeInsets.only(top: 7.25),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const SizedBox(
+                              height: 5,
+                            ),
                             Text(
                               "BIRTHDATE (MM/DD/YY)*",
                               style: getTextStyle(
@@ -229,90 +233,32 @@ class BasicInformationFormState extends State<BasicInformationForm> {
                                   fontWeight: AppFontWeights.semiBold,
                                   fontSize: 11),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 3.5),
-                                      child: Text(
-                                        _selectedDate == null
-                                            ? 'No date selected'
-                                            : formatter.format(_selectedDate!),
-                                        style: getTextStyle(
-                                            textColor: AppColors.tertiaryBlue,
-                                            fontFamily: AppFonts.poppins,
-                                            fontWeight: AppFontWeights.semiBold,
-                                            fontSize: 11),
-                                      ),
-                                    ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 3.5),
+                                  child: Text(
+                                    _selectedDate == null
+                                        ? 'No date selected'
+                                        : formatter.format(_selectedDate!),
+                                    style: getTextStyle(
+                                        textColor: AppColors.tertiaryBlue,
+                                        fontFamily: AppFonts.poppins,
+                                        fontWeight: AppFontWeights.semiBold,
+                                        fontSize: 11),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 3.5),
-                                      child: IconButton(
-                                          onPressed: _presentDatePicker,
-                                          icon: const Icon(
-                                            Icons.calendar_month,
-                                            color: AppColors.tertiaryBlue,
-                                          )),
-                                    ),
-                                  ),
-
-                                  /*
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 3.5),
-                                child: AppNormalTextFormField(
-                                  controller: _birthdayMonthController,
-                                  height: 32,
-                                  defaultBorder: _defaultBorder,
-                                  errorBorder: _errorBorder,
-                                  borderRadius: _borderRadius,
-                                  inputTextStyle: _inputTextStyle,
-                                  fillColor: AppColors.white,
-                                  validator: validateField,
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 3.5),
+                                  child: IconButton(
+                                      onPressed: _presentDatePicker,
+                                      icon: const Icon(
+                                        Icons.calendar_month,
+                                        color: AppColors.tertiaryBlue,
+                                      )),
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 3.5, left: 3.5),
-                                child: AppNormalTextFormField(
-                                  controller: _birthdayDayController,
-                                  height: 32,
-                                  defaultBorder: _defaultBorder,
-                                  errorBorder: _errorBorder,
-                                  borderRadius: _borderRadius,
-                                  inputTextStyle: _inputTextStyle,
-                                  fillColor: AppColors.white,
-                                  validator: validateField,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 3.5),
-                                child: AppNormalTextFormField(
-                                  controller: _birthdayYearController,
-                                  height: 32,
-                                  defaultBorder: _defaultBorder,
-                                  errorBorder: _errorBorder,
-                                  borderRadius: _borderRadius,
-                                  inputTextStyle: _inputTextStyle,
-                                  fillColor: AppColors.white,
-                                  validator: validateField,
-                                ),
-                              ),
-                            ),*/
-                                ],
-                              ),
-                            )
                           ],
                         ),
                       ),

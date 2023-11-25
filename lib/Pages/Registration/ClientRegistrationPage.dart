@@ -13,18 +13,22 @@ import 'package:laborlink/models/client.dart';
 import 'dart:async';
 import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/splash/splash_one.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laborlink/providers/saved_client_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
 
-class ClientRegistrationPage extends StatefulWidget {
+class ClientRegistrationPage extends ConsumerStatefulWidget {
   const ClientRegistrationPage({Key? key}) : super(key: key);
 
   @override
-  State<ClientRegistrationPage> createState() => _ClientRegistrationPageState();
+  ConsumerState<ClientRegistrationPage> createState() =>
+      _ClientRegistrationPageState();
 }
 
-class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
+class _ClientRegistrationPageState
+    extends ConsumerState<ClientRegistrationPage> {
   GlobalKey<BasicInformationFormState> basicInformationFormKey =
       GlobalKey<BasicInformationFormState>();
   GlobalKey<AddressFormState> addressFormKey = GlobalKey<AddressFormState>();
@@ -220,6 +224,32 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
         // }
 
         try {
+          // save entered registration data
+          Map<String, dynamic> savedClientDataMap = {
+            ...basicInfo,
+            ...addressInfo,
+            ...accountInfo,
+            ...clientInfo,
+          };
+          ref
+              .read(savedClientDataProvider.notifier)
+              .saveRegistrationData(savedClientDataMap);
+
+          // Verify Credentials First before creating user and storing user data
+          List<Map<String, dynamic>> fileAttachments;
+
+          fileAttachments = [
+            {
+              'type': clientInfo['idType'],
+              'file': clientInfo['idFile'],
+            }
+          ];
+
+          // jumps to id verification
+          _toIdVerification(fileAttachments);
+
+          // Dead code below
+
           // Create a user in Firebase Authentication
           DatabaseService service = DatabaseService();
           UserCredential userCredential =
@@ -256,18 +286,6 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
               idProof: imageUrl);
 
           await service.addUser(client);
-
-          // Continue with your navigation or any other logic
-          List<Map<String, dynamic>> fileAttachments;
-
-          fileAttachments = [
-            {
-              'type': clientInfo['idType'],
-              'file': clientInfo['idFile'],
-            }
-          ];
-
-          _toIdVerification(fileAttachments);
 
           // Navigator.of(context).push(MaterialPageRoute(
           //   builder: (context) => const FaceDetectionPage(),

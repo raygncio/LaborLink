@@ -405,6 +405,23 @@ class DatabaseService {
     return Request.fromFireStore(querySnap.docs.first);
   }
 
+  Future<Request?> getHandymanService(String userId) async {
+    final querySnap = await _db
+        .collection('request')
+        .where('progress', whereIn: ['pending', 'inprogress'])
+        .where('handymanId', isEqualTo: userId)
+        .get();
+
+    if (querySnap.docs.isEmpty) {
+      // Handle the case where no documents are found.
+      // You might want to return null or throw an exception.
+      return null;
+    }
+
+    // Assuming you expect only one document to match the conditions.
+    return Request.fromFireStore(querySnap.docs.first);
+  }
+
   // CODE STILL NOT WORKING
   // COMPOUND QUERIES USING FILTER.OR(FILTER()), FILTER.AND(FILTER())
   Future<Request> getRequestData(String userId) async {

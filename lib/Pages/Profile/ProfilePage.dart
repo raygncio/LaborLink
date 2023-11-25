@@ -287,10 +287,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           suffixIcon: Padding(
                                             padding:
                                                 const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
+                                            child: buildClickableIcon(
+                                              Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
-                                                width: 16),
+                                                width: 16,
+                                              ),
+                                              () {
+                                                print("Edit icon clicked");
+                                              },
+                                            ),
                                           ),
                                           height: 35,
                                           inputTextStyle: _inputTextStyle,
@@ -320,10 +326,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           suffixIcon: Padding(
                                             padding:
                                                 const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
+                                            child: buildClickableIcon(
+                                              Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
-                                                width: 16),
+                                                width: 16,
+                                              ),
+                                              () {
+                                                print("Edit icon clicked");
+                                              },
+                                            ),
                                           ),
                                           height: 35,
                                           inputTextStyle: _inputTextStyle,
@@ -353,10 +365,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           suffixIcon: Padding(
                                             padding:
                                                 const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
+                                            child: buildClickableIcon(
+                                              Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
-                                                width: 16),
+                                                width: 16,
+                                              ),
+                                              () {
+                                                print("Edit icon clicked");
+                                              },
+                                            ),
                                           ),
                                           height: 35,
                                           inputTextStyle: _inputTextStyle,
@@ -386,10 +404,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           suffixIcon: Padding(
                                             padding:
                                                 const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
+                                            child: buildClickableIcon(
+                                              Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
-                                                width: 16),
+                                                width: 16,
+                                              ),
+                                              () {
+                                                print("Edit icon clicked");
+                                              },
+                                            ),
                                           ),
                                           height: 35,
                                           inputTextStyle: _inputTextStyle,

@@ -15,10 +15,8 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
-
+import 'package:laborlink/models/request.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 class HandymanHomePage extends StatefulWidget {
@@ -316,13 +314,16 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   Future<Widget> getOngoingService() async {
     DatabaseService service = DatabaseService();
-    try {
-      List<Map<String, dynamic>> openRequests =
-          await service.getUserAndRequest(widget.userId);
-      print(openRequests);
-    } catch (error) {
-      print('Error fetching user data: $error');
+    Request? requestInfo = await service.getHandymanService(widget.userId);
+
+    if (requestInfo != null) {
+      return OngoingRequestCard(
+        title: requestInfo.title,
+        address: requestInfo.address,
+        // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
+      );
+    } else {
+      return NoOngoingRequestCard();
     }
-    return const NoOngoingServiceCard();
   }
 }

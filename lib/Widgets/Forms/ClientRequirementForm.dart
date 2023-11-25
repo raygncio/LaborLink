@@ -89,21 +89,20 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
           child: Column(
             children: [
               DropdownButtonFormField<String>(
-                value: _idTypeController.text.isNotEmpty
+                value: validIds.contains(_idTypeController.text)
                     ? _idTypeController.text
                     : validIds[0],
                 items: validIds.map((String value) {
                   return DropdownMenuItem<String>(
-                    value: value == 'nbi' ? value : null,
+                    value: value,
                     child: Text(value),
+                    enabled: value == 'NBI',
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
-                  if (newValue!.toLowerCase() == 'nbi') {
-                    setState(() {
-                      _idTypeController.text = newValue.toLowerCase();
-                    });
-                  }
+                  setState(() {
+                    _idTypeController.text = newValue!.toLowerCase();
+                  });
                 },
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(
