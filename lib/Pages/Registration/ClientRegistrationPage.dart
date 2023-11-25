@@ -248,7 +248,7 @@ class _ClientRegistrationPageState
           // jumps to id verification
           _toIdVerification(fileAttachments);
 
-          // Dead code below
+          // Dead code below >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
           // Create a user in Firebase Authentication
           DatabaseService service = DatabaseService();
