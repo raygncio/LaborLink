@@ -13,16 +13,17 @@ List<Map<String, dynamic>> labors = [
 
 String imgPlaceholder = "https://i.stack.imgur.com/y9DpT.jpg";
 
-String imgUrl = "https://st4.depositphotos.com/9998432/24359/v/450/depositphotos_243599464-stock-illustration-person-gray-photo-placeholder-man.jpg";
+String imgUrl =
+    "https://st4.depositphotos.com/9998432/24359/v/450/depositphotos_243599464-stock-illustration-person-gray-photo-placeholder-man.jpg";
 
 List<Map<String, dynamic>> dummyClients = List.generate(
     10,
-        (index) => {
-      "img_url": imgUrl,
-      "name": "Client Name",
-      "area": "Makati City",
-      "rating": index < 5 ? index + 1 : 4,
-    });
+    (index) => {
+          "img_url": imgUrl,
+          "name": "Client Name",
+          "area": "Makati City",
+          "rating": index < 5 ? index + 1 : 4,
+        });
 
 List<Map<String, dynamic>> dummyFilteredHandyman = List.generate(
     10,
@@ -47,6 +48,34 @@ List<Map<String, dynamic>> dummyReviews = List.generate(
 
 List<String> dummyDropdownData =
     List.generate(10, (index) => "Temp Data $index");
+
+const List<String> specializations = <String>[
+  'Plumbing',
+  'Carpentry',
+  'Electrical',
+  'Painting',
+  'Maintenance',
+  'Welding',
+  'Housekeeping',
+  'Roofing',
+  'Installation',
+  'Pest Control'
+];
+
+const List<String> timeOptions = <String>[
+  '8:00 - 9:00 am',
+  '9:00 - 10:00 am',
+  '10:00 - 11:00 am',
+  '11:00 - 12:00 pm',
+  '12:00 - 1:00 pm',
+  '1:00 - 2:00 pm',
+  '2:00 - 3:00 pm',
+  '3:00 - 4:00 pm',
+  '4:00 - 5:00 pm',
+  '5:00 - 6:00 pm',
+  '6:00 - 7:00 pm',
+  '7:00 - 8:00 pm',
+];
 
 String loremIpsumLong =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";

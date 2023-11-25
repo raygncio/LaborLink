@@ -43,6 +43,13 @@ class ChooseFilePickerState extends State<ChooseFilePicker> {
   File? _pickedImageFile;
   String get getFileName => _fileName;
 
+  String? validateAttachment() {
+    if (_pickedImageFile == null) {
+      return 'Please upload a file.';
+    }
+    return null;
+  }
+
   void _pickImage() async {
     // image quality -> 50 for small fize
     // max width: 150 -> small frame
@@ -123,7 +130,7 @@ class ChooseFilePickerState extends State<ChooseFilePicker> {
                         textColor: AppColors.black,
                         fontFamily: AppFonts.montserrat,
                         fontWeight: AppFontWeights.regular,
-                        fontSize: 10)),
+                        fontSize: 12)),
               ),
             ],
           ),

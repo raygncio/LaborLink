@@ -7,9 +7,16 @@ import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:intl/intl.dart';
+
+final _firebase = FirebaseAuth.instance;
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  final String userId;
+  const ProfilePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -38,13 +45,42 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    _fullNameController.text = "Allan Ray C. Escueta";
-    _birthdateController.text = "August 8, 2023";
-    _emailController.text = "customer@gmail.com";
-    _phoneNumberController.text = "09171234567";
-    _addressController.text = "Tønsberg, Norway";
+    // _fullNameController.text = "Allan Ray C. Escueta";
+    // _birthdateController.text = "August 8, 2023";
+    // _emailController.text = "customer@gmail.com";
+    // _phoneNumberController.text = "09171234567";
+    // _addressController.text = "Tønsberg, Norway";
 
     super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    DatabaseService service = DatabaseService();
+    try {
+      Client clientInfo = await service.getUserData(widget.userId);
+
+      String fullName = clientInfo.firstName +
+          ' ' +
+          (clientInfo.middleName ?? "") +
+          ' ' +
+          clientInfo.lastName +
+          ' ' +
+          (clientInfo.suffix ?? "");
+
+      String formattedDate =
+          DateFormat('MMMM d, y').format(clientInfo.dob); // Format the date
+
+      setState(() {
+        _fullNameController.text = fullName;
+        _birthdateController.text = formattedDate;
+        _emailController.text = clientInfo.emailAdd;
+        _phoneNumberController.text = clientInfo.phoneNumber;
+        _addressController.text = clientInfo.streetAddress;
+      });
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
   @override
@@ -120,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        "Name",
+                        _fullNameController.text,
                         style: getTextStyle(
                             textColor: AppColors.white,
                             fontFamily: AppFonts.montserrat,
@@ -131,7 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        "temp@gmail.com",
+                        _emailController.text,
                         style: getTextStyle(
                             textColor: AppColors.white,
                             fontFamily: AppFonts.montserrat,
@@ -183,7 +219,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     fontSize: 14),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 22, left: 18),
+                                padding:
+                                    const EdgeInsets.only(top: 22, left: 18),
                                 child: Column(
                                   children: [
                                     AppNormalTextFormField(
@@ -196,14 +233,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                         contentPadding: const EdgeInsets.only(
                                             left: 17, right: 11),
                                         prefixIcon: Padding(
-                                          padding: const EdgeInsets.only(right: 10),
+                                          padding:
+                                              const EdgeInsets.only(right: 10),
                                           child: Image.asset(
                                               "assets/icons/person-circle-blue.png",
                                               height: 24,
                                               width: 24),
                                         ),
                                         suffixIcon: Padding(
-                                          padding: const EdgeInsets.only(left: 10),
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
                                           child: Image.asset(
                                               "assets/icons/edit-filled-blue.png",
                                               height: 16,
@@ -226,14 +265,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           contentPadding: const EdgeInsets.only(
                                               left: 17, right: 11),
                                           prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 10),
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
                                             child: Image.asset(
                                                 "assets/icons/calendar-filled-blue.png",
                                                 height: 21,
                                                 width: 21),
                                           ),
                                           suffixIcon: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
@@ -257,14 +298,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           contentPadding: const EdgeInsets.only(
                                               left: 17, right: 11),
                                           prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 10),
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
                                             child: Image.asset(
                                                 "assets/icons/email-filled-blue.png",
                                                 height: 24,
                                                 width: 24),
                                           ),
                                           suffixIcon: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
@@ -288,14 +331,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           contentPadding: const EdgeInsets.only(
                                               left: 17, right: 11),
                                           prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 10),
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
                                             child: Image.asset(
                                                 "assets/icons/phone-filled-blue.png",
                                                 height: 24,
                                                 width: 24),
                                           ),
                                           suffixIcon: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
@@ -319,14 +364,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                           contentPadding: const EdgeInsets.only(
                                               left: 21, right: 11),
                                           prefixIcon: Padding(
-                                            padding: const EdgeInsets.only(right: 10),
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
                                             child: Image.asset(
                                                 "assets/icons/address-filled-blue.png",
                                                 height: 21,
                                                 width: 16),
                                           ),
                                           suffixIcon: Padding(
-                                            padding: const EdgeInsets.only(left: 10),
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Image.asset(
                                                 "assets/icons/edit-filled-blue.png",
                                                 height: 16,
@@ -464,6 +511,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void onChangePassword() {}
 
   void onReportAnIssue() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const ReportIssuePage(),
+        builder: (context) => ReportIssuePage(userId: widget.userId),
       ));
 }

@@ -12,12 +12,22 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
+
+final _firebase = FirebaseAuth.instance;
+final _firestore = FirebaseFirestore.instance;
 
 class ClientHomePage extends StatefulWidget {
   final Function(int) navigateToNewPage;
-  const ClientHomePage({Key? key, required this.navigateToNewPage})
+  final String userId;
+  const ClientHomePage(
+      {Key? key, required this.navigateToNewPage, required this.userId})
       : super(key: key);
 
   @override
@@ -26,13 +36,12 @@ class ClientHomePage extends StatefulWidget {
 
 class _ClientHomePageState extends State<ClientHomePage> {
   final _searchController = TextEditingController();
-  late GlobalKey<RequestFormState> requestFormKey;
+  GlobalKey<RequestFormState> requestFormKey = GlobalKey<RequestFormState>();
 
   int _selectedTabIndex = 0;
-
   bool _showSearchResult = false;
-
   bool _hideHeader = false;
+  List<Map<String, dynamic>> _searchResults = [];
 
   @override
   Widget build(BuildContext context) {
@@ -72,37 +81,95 @@ class _ClientHomePageState extends State<ClientHomePage> {
     });
   }
 
-  void updateDirectRequestTabContent(String? searchText) {
+  void updateDirectRequestTabContent(String? searchText) async {
+    // retrieved the handyman whose name will match on the entered text
+    DatabaseService service = DatabaseService();
     if (searchText == null) return;
 
-    setState(() {
-      _showSearchResult = searchText.trim().isNotEmpty;
-    });
+    try {
+      List<Map<String, dynamic>> results =
+          await service.getUserAndHandymanDataByFirstName(searchText);
+
+      // searchResultSection();
+      // print(searchText);
+      print(results);
+
+      setState(() {
+        _showSearchResult = results.isNotEmpty;
+        _searchResults = results;
+      });
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
-  void onHistoryButtonClick() {}
+  void onHistoryButtonClick() =>
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => ClientViewHistory(userId: widget.userId),
+      ));
 
-  void submitRequest(requestType) {
-    // requestType can be direct and open
-    print(requestType);
+  Future<void> submitRequest(requestType) async {
+    setState(() {
+      if (requestFormKey.currentState != null) {
+        requestFormKey.currentState!.isAutoValidationEnabled = true;
+      }
+    });
 
-    // TODO Add submit request processing
+    DatabaseService service = DatabaseService();
 
-    Navigator.of(context)
-        .push(MaterialPageRoute(
-      builder: (context) => const ClientRequestSuccessPage(),
-    ))
-        .then(
-      (value) {
-        if (value == null) return;
+    if (requestFormKey.currentState!.hasFile() &&
+        requestFormKey.currentState!.validateForm()) {
+      // Get form data from RequestForm
+      Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
 
-        if (value == "home") {
-          updateSelectedTab(0);
-        } else if (value == "activity") {
-          widget.navigateToNewPage(1);
-        }
-      },
-    );
+      try {
+        // Create a user in Firebase Authentication
+        String imageUrl = await service.uploadRequestAttachment(
+            widget.userId, formData['attachment']);
+
+        Request request = Request(
+          title: formData["title"],
+          category: formData["category"],
+          description: formData["description"],
+          attachment: imageUrl,
+          address: formData["address"],
+          date: formData["date"],
+          time: formData["time"],
+          progress: "pending",
+          instructions: formData["instructions"],
+          suggestedPrice: 2.0,
+          userId: widget.userId,
+        );
+
+        await service.addRequest(request);
+        // Continue with your navigation or any other logic
+        // requestType can be direct and open
+
+        Navigator.of(context)
+            .push(MaterialPageRoute(
+          builder: (context) => const ClientRequestSuccessPage(),
+        ))
+            .then(
+          (value) {
+            if (value == null) return;
+
+            if (value == "home") {
+              updateSelectedTab(0);
+            } else if (value == "activity") {
+              widget.navigateToNewPage(1);
+            }
+          },
+        );
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error creating user: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void onOpenRequestProceed() {
@@ -111,11 +178,12 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
       if (value == "proceed") {
         suggestedFeeDialog(context).then((value) {
-          if (value == null) return;
+          value = "2.0";
+          //if (value == null) return; nag comment muna kasi null yung napapasa na value
 
-          if (value == "submit") {
-            submitRequest("open");
-          }
+          // Convert value to double and add 50
+          double suggestedFee = double.tryParse(value) ?? 0;
+          submitRequest(suggestedFee);
         });
       }
     });
@@ -201,7 +269,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
             borderRadius: 8,
             height: 46,
             errorBorder: null,
-            hintText: "Search handyman name",
+            hintText: "Search category or handyman name",
             hintTextStyle: getTextStyle(
                 textColor: AppColors.grey,
                 fontFamily: AppFonts.montserrat,
@@ -231,7 +299,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                 color:
                     _showSearchResult ? AppColors.dirtyWhite : AppColors.white,
                 child: _showSearchResult
-                    ? searchResultSection()
+                    ? searchResultSection(_searchResults)
                     : Padding(
                         padding: const EdgeInsets.only(left: 26, right: 23),
                         child: SingleChildScrollView(
@@ -257,7 +325,8 @@ class _ClientHomePageState extends State<ClientHomePage> {
         ),
       );
 
-  Widget searchResultSection() => Padding(
+  Widget searchResultSection(List<Map<String, dynamic>> searchResults) =>
+      Padding(
         padding: const EdgeInsets.only(left: 9, right: 9),
         child: NotificationListener<ScrollUpdateNotification>(
           onNotification: (notification) {
@@ -268,16 +337,16 @@ class _ClientHomePageState extends State<ClientHomePage> {
             return true;
           },
           child: ListView.builder(
-            itemCount: dummyFilteredHandyman.length,
+            itemCount: searchResults.length,
             itemBuilder: (context, index) {
-              Map<String, dynamic> currentHandyman =
-                  dummyFilteredHandyman[index];
+              Map<String, dynamic> currentHandyman = searchResults[index];
 
               return Padding(
                 padding: EdgeInsets.only(top: index == 0 ? 9 : 0),
                 child: HandymanDirectRequestCard(
                     handymanInfo: currentHandyman,
-                    submitRequest: submitRequest),
+                    submitRequest: submitRequest,
+                    userId: widget.userId),
               );
             },
           ),
@@ -285,8 +354,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
       );
 
   Widget openRequestTab() {
-    requestFormKey = GlobalKey<RequestFormState>();
-
     return Padding(
       padding: const EdgeInsets.only(top: 54),
       child: SingleChildScrollView(
@@ -296,9 +363,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
               const EdgeInsets.only(left: 23, right: 23, top: 9, bottom: 18),
           child: Column(
             children: [
-              RequestForm(
-                key: requestFormKey,
-              ),
+              RequestForm(key: requestFormKey, userId: widget.userId),
               Padding(
                 padding: const EdgeInsets.only(top: 25),
                 child: Row(
@@ -322,13 +387,31 @@ class _ClientHomePageState extends State<ClientHomePage> {
   }
 
   Widget getOngoingRequest() {
-    // TODO: Add logic for ongoing Request
-    return const NoOngoingRequestCard();
+    return FutureBuilder<Widget>(
+      future: getOngoingRequestContent(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return snapshot.data ?? const NoOngoingRequestCard();
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+  }
 
-    return const OngoingRequestCard(
-        title: "Request Title",
-        address: "1354-D Lacuna St. Bangkal, Makati City",
-        imgUrl:
-            "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp");
+  Future<Widget> getOngoingRequestContent() async {
+    // TODO: Add logic for ongoing Request
+    DatabaseService service = DatabaseService();
+    Request? requestInfo = await service.getRequestsData(widget.userId);
+
+    if (requestInfo != null) {
+      return OngoingRequestCard(
+        title: requestInfo.title,
+        address: requestInfo.address,
+        // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
+      );
+    } else {
+      return NoOngoingRequestCard();
+    }
   }
 }

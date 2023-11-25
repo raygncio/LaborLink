@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
+final formatter = DateFormat.yMd();
 
 class Review {
   // PROPERTIES
@@ -28,7 +31,7 @@ class Review {
       reviewId: snapshot.id,
       rating: data?['rating'],
       comment: data?['comment'],
-      createdAt: data?['createdAt'],
+      createdAt: (data?['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       userId: data?['userId'],
       requestId: data?['requestId'],
     );

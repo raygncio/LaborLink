@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
+
+final formatter = DateFormat.yMd();
 
 class Report {
   // PROPERTIES
   final String? reportId;
   final String issue;
-  final File proof;
+  final String proof;
   final String status;
   final DateTime? createdAt;
   final String userId;
@@ -29,7 +32,7 @@ class Report {
       issue: data?['issue'],
       proof: data?['proof'],
       status: data?['status'],
-      createdAt: data?['createdAt'],
+      createdAt: (data?['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       userId: data?['userId'],
     );
   }

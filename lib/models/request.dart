@@ -1,31 +1,22 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
-enum Specialization {
-  plumbing,
-  carpentry,
-  electrical,
-  painting,
-  maintenance,
-  welding,
-  housekeeping,
-  roofing,
-  installation,
-  pestcontrol
-}
+final formatter = DateFormat.yMd();
 
 class Request {
   // PROPERTIES
   final String? requestId;
   final String title;
-  final Specialization category;
+  final String category;
   final String description;
-  final File attachment; // file attachment
+  final String attachment; // file attachment
   final String address;
-  final DateTime dateTime;
+  final String date;
+  final String time;
   final String progress;
+  final String? instructions;
   final double suggestedPrice;
-  final File? completionProof; // file attachment
+  final String? completionProof; // file attachment
   final DateTime? createdAt;
   final String userId;
   final String? handymanId;
@@ -38,8 +29,10 @@ class Request {
       required this.description,
       required this.attachment,
       required this.address,
-      required this.dateTime,
+      required this.date,
+      required this.time,
       required this.progress,
+      this.instructions,
       required this.suggestedPrice,
       this.completionProof,
       this.createdAt,
@@ -58,11 +51,13 @@ class Request {
       description: data?['description'],
       attachment: data?['attachment'],
       address: data?['address'],
-      dateTime: data?['dateTime'],
+      date: data?['date'],
+      time: data?['time'],
       progress: data?['progress'],
+      instructions: data?['instructions'],
       suggestedPrice: data?['suggestedPrice'],
       completionProof: data?['completionProof'],
-      createdAt: data?['createdAt'],
+      createdAt: (data?['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       userId: data?['userId'],
       handymanId: data?['handymanId'],
     );
@@ -77,8 +72,10 @@ class Request {
       'description': description,
       'attachment': attachment,
       'address': address,
-      'dateTime': dateTime,
+      'date': date,
+      'time': time,
       'progress': progress,
+      'instructions': instructions,
       'suggestedPrice': suggestedPrice,
       'completionProof': completionProof,
       'createdAt': createdAt ?? DateTime.now(),

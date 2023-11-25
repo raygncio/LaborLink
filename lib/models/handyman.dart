@@ -1,24 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
 
-enum Specialization {
-  plumbing,
-  carpentry,
-  electrical,
-  painting,
-  maintenance,
-  welding,
-  housekeeping,
-  roofing,
-  installation,
-  pestcontrol
-}
+final formatter = DateFormat.yMd();
 
 class Handyman {
   // PROPERTIES
   final String? handymanId;
   final String applicantStatus;
-  final Specialization specialization;
+  final String specialization;
   final String employer;
   final String nbiClearance; // file attachment
   final String certification;
@@ -54,7 +44,7 @@ class Handyman {
       certification: data?['certification'],
       certificationProof: data?['certificationProof'],
       recommendationLetter: data?['recommendationLetter'],
-      createdAt: data?['createdAt'],
+      createdAt: (data?['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       userId: data?['userId'],
     );
   }

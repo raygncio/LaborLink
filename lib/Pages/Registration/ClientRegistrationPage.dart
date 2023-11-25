@@ -213,6 +213,7 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
               userCredential.user!.uid, clientInfo["idFile"]);
 
           Client client = Client(
+              userId: userCredential.user!.uid,
               userRole: "client",
               firstName: basicInfo["first_name"],
               lastName: basicInfo["last_name"],
@@ -237,7 +238,6 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
           ));
         } catch (e) {
           // Handle errors during user creation
-          print("Error creating user: $e");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Error creating user"),

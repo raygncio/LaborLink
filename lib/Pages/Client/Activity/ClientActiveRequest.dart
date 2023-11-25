@@ -52,7 +52,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: Text(
-                                    "Request Title",
+                                    widget.requestDetail["title"],
                                     style: getTextStyle(
                                         textColor: AppColors.tertiaryBlue,
                                         fontFamily: AppFonts.montserrat,
@@ -81,46 +81,46 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                             ),
                             Column(
                               children: [
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 27),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.place,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: "556 Juan Luna Ave.",
+                                    text: widget.requestDetail["address"],
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
                                 ),
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.calendar_month_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: "Today",
+                                    text: widget.requestDetail["date"],
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
                                 ),
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.watch_later,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: "12:00 - 1:00 PM",
+                                    text: widget.requestDetail["time"],
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
                                 ),
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.local_offer_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: "₱550",
+                                    text: widget.requestDetail["suggestedFee"],
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),

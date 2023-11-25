@@ -149,8 +149,6 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
   }
 
   void onProceed() async {
-    Uuid uuid = Uuid();
-
     setState(() {
       basicInformationFormKey.currentState!.isAutoValidationEnabled = true;
       accountDetailsFormKey.currentState!.isAutoValidationEnabled = true;
@@ -233,13 +231,14 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
 
           //for uploading valid ID
           String validUrl = await service.uploadValidId(
-              userCredential.user!.uid, handymanInfo["idType"]);
+              userCredential.user!.uid, handymanInfo["idFile"]);
 
           //for uploading TESDA certification
           String tesdaUrl = await service.uploadTesda(
               userCredential.user!.uid, handymanInfo["certProofFile"]);
 
           Client client = Client(
+              userId: userCredential.user!.uid,
               userRole: "handyman",
               firstName: basicInfo["first_name"],
               lastName: basicInfo["last_name"],
@@ -257,14 +256,18 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
               validId: handymanInfo["idType"],
               idProof: validUrl);
 
+          print(handymanInfo["specialization"]);
+
           Handyman handyman = Handyman(
-              applicantStatus: "pending",
-              specialization: handymanInfo["specialization"],
-              employer: handymanInfo["employer"],
-              nbiClearance: nbiUrl,
-              certification: handymanInfo["certificateName"],
-              certificationProof: tesdaUrl,
-              recommendationLetter: recommendationUrl);
+            applicantStatus: "pending",
+            specialization: handymanInfo["specialization"],
+            employer: handymanInfo["employer"],
+            nbiClearance: nbiUrl,
+            certification: handymanInfo["certificateName"],
+            certificationProof: tesdaUrl,
+            recommendationLetter: recommendationUrl,
+            userId: userCredential.user!.uid,
+          );
 
           await service.addUser(client);
           await service.addHandyman(handyman);
@@ -303,4 +306,19 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
       );
     }
   }
+
+  // Specialization _convertToSpecialization(String? specializationString) {
+  //   if (specializationString != null) {
+  //     try {
+  //       return Specialization.values.firstWhere(
+  //           (e) => e.toString().split('.').last == specializationString);
+  //     } catch (e) {
+  //       print("Error converting specialization: $e");
+  //       // Handle the case where no matching specialization is found
+  //       // You can return a default value or throw an error, depending on your logic
+  //     }
+  //   }
+  //   // Return a default specialization or handle accordingly
+  //   return Specialization.plumbing; // Change this to your default value
+  // }
 }

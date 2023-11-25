@@ -3,17 +3,73 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/styles.dart';
-
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/report.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../dummyDatas.dart';
 
 class IssuesReportedPage extends StatefulWidget {
-  const IssuesReportedPage({Key? key}) : super(key: key);
+  final String userId;
+  const IssuesReportedPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<IssuesReportedPage> createState() => _IssuesReportedPageState();
 }
 
 class _IssuesReportedPageState extends State<IssuesReportedPage> {
+  List<Report> issues = []; // This will hold your list of issues
+  String fullName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // Call an async function to fetch data
+    _loadData();
+    fetchUserData();
+  }
+
+  // Define an async function to fetch data
+  _loadData() async {
+    // Use await to wait for the result
+    // need ko ata i connect yung user id ng client sa user id ng reports?
+    List<Report> reports = await getAllReportData(widget.userId);
+
+    // Update the state with the result
+    setState(() {
+      issues = reports;
+    });
+  }
+
+  Future<void> fetchUserData() async {
+    DatabaseService service = DatabaseService();
+    try {
+      Client clientInfo = await service.getUserData(widget.userId);
+
+      fullName = clientInfo.firstName +
+          ' ' +
+          (clientInfo.middleName ?? "") +
+          ' ' +
+          clientInfo.lastName +
+          ' ' +
+          (clientInfo.suffix ?? "");
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+  }
+
+  Future<List<Report>> getAllReportData(String userId) async {
+    DatabaseService service = DatabaseService();
+    try {
+      List<Report> reports = await service.getAllReportData(widget.userId);
+      return reports;
+    } catch (error) {
+      print('Error fetching user data 2: $error');
+      // Return an empty list in case of an error
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -31,8 +87,12 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                   padding: const EdgeInsets.only(top: 74),
                   child: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: 10,
+                    itemCount:
+                        issues.length, // Use the length of the issues list
                     itemBuilder: (context, index) {
+                      Report report =
+                          issues[index]; // Get the report at the current index
+
                       return Container(
                         decoration: const BoxDecoration(
                             color: Colors.white,
@@ -49,21 +109,21 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                       left: 23, top: 12.64),
                                   child: Row(
                                     children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 11),
-                                        child: ClipOval(
-                                          child: Image.network(
-                                            imgUrl,
-                                            width: 64,
-                                            height: 64,
-                                          ),
-                                        ),
-                                      ),
+                                      // Padding(
+                                      //   padding:
+                                      //       const EdgeInsets.only(right: 11),
+                                      //   child: ClipOval(
+                                      //     child: Image.network(
+                                      //       report.proof, // Use report data
+                                      //       width: 64,
+                                      //       height: 64,
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       Column(
                                         children: [
                                           Text(
-                                            "Hanni Pham",
+                                            fullName,
                                             style: getTextStyle(
                                                 textColor:
                                                     AppColors.secondaryBlue,
@@ -85,28 +145,31 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                                         BorderRadius.circular(
                                                             50),
                                                   ),
-                                                  child: Image.asset(
-                                                    "assets/icons/plumbing.png",
-                                                  ),
+                                                  // child: Image.asset(
+                                                  //   report
+                                                  //       .proof, // Use report data
+                                                  // ),
                                                 ),
                                               ),
-                                              Text(
-                                                "Clogged Toilet",
-                                                style: getTextStyle(
-                                                    textColor:
-                                                        AppColors.secondaryBlue,
-                                                    fontFamily:
-                                                        AppFonts.montserrat,
-                                                    fontWeight:
-                                                        AppFontWeights.bold,
-                                                    fontSize: 10),
-                                              ),
+                                              // Text(
+                                              //   report
+                                              //       .issueType, // Use report data
+                                              //   style: getTextStyle(
+                                              //       textColor:
+                                              //           AppColors.secondaryBlue,
+                                              //       fontFamily:
+                                              //           AppFonts.montserrat,
+                                              //       fontWeight:
+                                              //           AppFontWeights.bold,
+                                              //       fontSize: 10),
+                                              // ),
                                             ],
                                           ),
-                                          const Padding(
+                                          Padding(
                                             padding: EdgeInsets.only(top: 2.82),
                                             child: AppBadge(
-                                              label: "Request ID: 12345",
+                                              label:
+                                                  "Request ID: ${report.reportId}", // Use report data
                                               type: BadgeType.normal,
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: 7, vertical: 1),
@@ -117,88 +180,92 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 28, right: 17, top: 14.65),
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      double columnWidth =
-                                          constraints.maxWidth / 2;
+                                // Padding(
+                                //   padding: const EdgeInsets.only(
+                                //       left: 28, right: 17, top: 14.65),
+                                //   child: LayoutBuilder(
+                                //     builder: (context, constraints) {
+                                //       double columnWidth =
+                                //           constraints.maxWidth / 2;
 
-                                      return Row(
-                                        children: [
-                                          SizedBox(
-                                            width: columnWidth,
-                                            child: const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                TextWithIcon(
-                                                  icon: Icon(Icons.place,
-                                                      size: 13,
-                                                      color: AppColors
-                                                          .accentOrange),
-                                                  text: "556 Juan Luna Ave.",
-                                                  fontSize: 9,
-                                                  contentPadding: 8,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: 6.75),
-                                                  child: TextWithIcon(
-                                                    icon: Icon(
-                                                        Icons
-                                                            .local_offer_rounded,
-                                                        size: 13,
-                                                        color: AppColors
-                                                            .accentOrange),
-                                                    text: "₱550",
-                                                    fontSize: 9,
-                                                    contentPadding: 8,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: columnWidth,
-                                            child: const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                TextWithIcon(
-                                                  icon: Icon(
-                                                      Icons
-                                                          .calendar_month_rounded,
-                                                      size: 13,
-                                                      color: AppColors
-                                                          .accentOrange),
-                                                  text: "07 Aug 2023",
-                                                  fontSize: 9,
-                                                  contentPadding: 8,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: 6.75),
-                                                  child: TextWithIcon(
-                                                    icon: Icon(
-                                                        Icons.watch_later,
-                                                        size: 13,
-                                                        color: AppColors
-                                                            .accentOrange),
-                                                    text: "12:00 - 1:00 PM",
-                                                    fontSize: 9,
-                                                    contentPadding: 8,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
+                                //       return Row(
+                                //         children: [
+                                //           SizedBox(
+                                //             width: columnWidth,
+                                //             child: Column(
+                                //               crossAxisAlignment:
+                                //                   CrossAxisAlignment.start,
+                                //               children: [
+                                //                 TextWithIcon(
+                                //                   icon: Icon(Icons.place,
+                                //                       size: 13,
+                                //                       color: AppColors
+                                //                           .accentOrange),
+                                //                   text: report
+                                //                       .location, // Use report data
+                                //                   fontSize: 9,
+                                //                   contentPadding: 8,
+                                //                 ),
+                                //                 Padding(
+                                //                   padding: EdgeInsets.only(
+                                //                       top: 6.75),
+                                //                   child: TextWithIcon(
+                                //                     icon: Icon(
+                                //                         Icons
+                                //                             .local_offer_rounded,
+                                //                         size: 13,
+                                //                         color: AppColors
+                                //                             .accentOrange),
+                                //                     text:
+                                //                         "₱${report.cost}", // Use report data
+                                //                     fontSize: 9,
+                                //                     contentPadding: 8,
+                                //                   ),
+                                //                 ),
+                                //               ],
+                                //             ),
+                                //           ),
+                                //           SizedBox(
+                                //             width: columnWidth,
+                                //             child: Column(
+                                //               crossAxisAlignment:
+                                //                   CrossAxisAlignment.start,
+                                //               children: [
+                                //                 TextWithIcon(
+                                //                   icon: Icon(
+                                //                       Icons
+                                //                           .calendar_month_rounded,
+                                //                       size: 13,
+                                //                       color: AppColors
+                                //                           .accentOrange),
+                                //                   text: report
+                                //                       .date, // Use report data
+                                //                   fontSize: 9,
+                                //                   contentPadding: 8,
+                                //                 ),
+                                //                 Padding(
+                                //                   padding: EdgeInsets.only(
+                                //                       top: 6.75),
+                                //                   child: TextWithIcon(
+                                //                     icon: Icon(
+                                //                         Icons.watch_later,
+                                //                         size: 13,
+                                //                         color: AppColors
+                                //                             .accentOrange),
+                                //                     text: report
+                                //                         .time, // Use report data
+                                //                     fontSize: 9,
+                                //                     contentPadding: 8,
+                                //                   ),
+                                //                 ),
+                                //               ],
+                                //             ),
+                                //           )
+                                //         ],
+                                //       );
+                                //     },
+                                //   ),
+                                // ),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       left: 28,
@@ -206,7 +273,7 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                       top: 8.27,
                                       bottom: 19),
                                   child: Text(
-                                    "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+                                    report.issue, // Use report data
                                     overflow: TextOverflow.visible,
                                     style: getTextStyle(
                                         textColor: AppColors.black,
@@ -297,13 +364,14 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
         Container(
           width: 88,
           height: 25,
-          decoration:
-              BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+              color: bgColor, borderRadius: BorderRadius.circular(8)),
           child: Center(
             child: Text(status,
                 style: getTextStyle(
-                    textColor:
-                        status == "Returned" ? AppColors.black : AppColors.white,
+                    textColor: status == "Returned"
+                        ? AppColors.black
+                        : AppColors.white,
                     fontFamily: AppFonts.montserrat,
                     fontWeight: AppFontWeights.bold,
                     fontSize: 12)),
@@ -315,7 +383,8 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
             padding: const EdgeInsets.only(top: 3),
             child: SizedBox(
               width: 119,
-              child: Text("Expect a customer representative to call you within the days",
+              child: Text(
+                  "Expect a customer representative to call you within the days",
                   overflow: TextOverflow.visible,
                   textAlign: TextAlign.right,
                   style: getTextStyle(

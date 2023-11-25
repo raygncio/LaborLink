@@ -51,7 +51,7 @@ class UploadFilePickerState extends State<UploadFilePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '',
+          widget.label ?? '',
           style: getTextStyle(
               textColor: AppColors.tertiaryBlue,
               fontFamily: AppFonts.poppins,

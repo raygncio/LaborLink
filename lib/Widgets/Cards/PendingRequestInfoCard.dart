@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
+import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 
 enum PendingRequestType {
@@ -12,7 +13,9 @@ enum PendingRequestType {
 
 class PendingRequestInfoCard extends StatefulWidget {
   final PendingRequestType type;
-  const PendingRequestInfoCard({Key? key, required this.type})
+  final Map<String, dynamic> requestDetail;
+  const PendingRequestInfoCard(
+      {Key? key, required this.type, required this.requestDetail})
       : super(key: key);
 
   @override
@@ -22,9 +25,22 @@ class PendingRequestInfoCard extends StatefulWidget {
 class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
   late BadgeType badgeType;
   late String badgeLabel;
+  late String title;
+  late String address;
+  late String date;
+  late String time;
+  late double suggestedFee;
+  late String userId;
 
   @override
   void initState() {
+    title = widget.requestDetail["title"];
+    address = widget.requestDetail["address"];
+    date = widget.requestDetail["date"];
+    time = widget.requestDetail["time"];
+    suggestedFee = widget.requestDetail["suggestedFee"];
+    userId = widget.requestDetail["userId"];
+
     switch (widget.type) {
       case PendingRequestType.openRequest:
       case PendingRequestType.directRequest:
@@ -38,6 +54,16 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
         break;
     }
     super.initState();
+  }
+
+  void onCancelRequest() async {
+    DatabaseService service = DatabaseService();
+    try {
+      await service.cancelRequest(userId);
+      print('Document updated successfully');
+    } catch (e) {
+      print('Error updating document: $e');
+    }
   }
 
   @override
@@ -71,7 +97,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Text(
-                          "Request Title",
+                          title,
                           style: getTextStyle(
                               textColor: AppColors.tertiaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -95,14 +121,14 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       fontWeight: AppFontWeights.regular,
                       fontSize: 13),
                 ),
-                const Column(
+                Column(
                   children: [
                     Padding(
                       padding: EdgeInsets.only(top: 15),
                       child: TextWithIcon(
                         icon: Icon(Icons.place,
                             size: 17, color: AppColors.accentOrange),
-                        text: "556 Juan Luna Ave.",
+                        text: address,
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -112,7 +138,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       child: TextWithIcon(
                         icon: Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: "Today",
+                        text: date,
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -122,7 +148,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       child: TextWithIcon(
                         icon: Icon(Icons.watch_later,
                             size: 17, color: AppColors.accentOrange),
-                        text: "12:00 - 1:00 PM",
+                        text: time,
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -132,7 +158,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       child: TextWithIcon(
                         icon: Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: "₱550",
+                        text: suggestedFee.toString(),
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -172,7 +198,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                                 fontWeight: AppFontWeights.bold,
                                 fontSize: 9),
                             color: AppColors.accentOrange,
-                            command: () {},
+                            command: onCancelRequest,
                             borderRadius: 8,
                             borderWidth: 1),
                       ],

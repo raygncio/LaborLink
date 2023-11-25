@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Report/ReportSubmittedPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/FilePickers/ChooseFilePicker.dart';
+import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:laborlink/models/report.dart';
+
+final _firebase = FirebaseAuth.instance;
+final _firestore = FirebaseFirestore.instance;
 
 class ReportIssuePage extends StatefulWidget {
-  const ReportIssuePage({Key? key}) : super(key: key);
+  final String userId;
+  const ReportIssuePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ReportIssuePage> createState() => _ReportIssuePageState();
@@ -14,7 +23,9 @@ class ReportIssuePage extends StatefulWidget {
 
 class _ReportIssuePageState extends State<ReportIssuePage> {
   final _descriptionController = TextEditingController();
-  final _filePickerKey = GlobalKey<ChooseFilePickerState>();
+  final _filePickerKey = GlobalKey<UploadFilePickerState>();
+  //file
+  File? _selectedImage;
 
   final _labelTextStyle = getTextStyle(
       textColor: AppColors.secondaryBlue,
@@ -56,30 +67,13 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 25),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                              left: 16, right: 17, top: 5, bottom: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.accentOrange,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text("Request ID: 12345",
-                              style: getTextStyle(
-                                  textColor: AppColors.white,
-                                  fontFamily: AppFonts.montserrat,
-                                  fontWeight: AppFontWeights.bold,
-                                  fontSize: 16)),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 30),
                         ),
                       ),
                       Padding(
                         padding:
-                            const EdgeInsets.only(left: 27, right: 26, top: 16),
+                            const EdgeInsets.only(left: 27, right: 26, top: 30),
                         child: Text(
                             "Tell us about the issue you have encountered during your service, and we will help you resolve it right away!",
                             textAlign: TextAlign.center,
@@ -87,11 +81,14 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
                             style: getTextStyle(
                                 textColor: AppColors.secondaryBlue,
                                 fontFamily: AppFonts.montserrat,
-                                fontWeight: AppFontWeights.regular,
-                                fontSize: 12)),
+                                fontWeight: AppFontWeights.medium,
+                                fontSize: 15)),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24),
+                        padding: const EdgeInsets.only(
+                          left: 24,
+                          right: 24,
+                        ),
                         child: Column(
                           children: [
                             Padding(
@@ -118,29 +115,32 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
                                 label: "Description",
                                 labelTextStyle: _labelTextStyle,
                                 maxLength: 500,
+                                validator: validateField,
                               ),
                             ),
-                            ChooseFilePicker(
+                            UploadFilePicker(
                               key: _filePickerKey,
                               label: "Attachment",
-                              labelTextStyle: _labelTextStyle,
-                              containerBorderWidth: 0.7,
+                              onPickImage: (pickedImage) {
+                                // receive image file
+                                _selectedImage = pickedImage;
+                              },
                             ),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 43),
                                 child: SizedBox(
-                                  width: 127,
+                                  width: 100,
                                   child: Row(
                                     children: [
                                       AppFilledButton(
                                           text: "Submit",
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontFamily: AppFonts.montserrat,
                                           color: AppColors.accentOrange,
                                           command: onSubmit,
-                                          borderRadius: 5),
+                                          borderRadius: 8),
                                     ],
                                   ),
                                 ),
@@ -163,9 +163,49 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
 
   void onBack() => Navigator.of(context).pop();
 
-  void onSubmit() => Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const ReportSubmittedPage(),
-      ));
+  void onSubmit() async {
+    String? descriptionError = validateField(_descriptionController.text);
+
+    if (descriptionError != null) {
+      // Handle the validation error for the description field
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(descriptionError),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      try {
+        // Create a user in Firebase Authentication
+        DatabaseService service = DatabaseService();
+
+        String reportUrl = await service.uploadReportAttachment(
+            widget.userId, _selectedImage!);
+
+        Report report = Report(
+            issue: _descriptionController.text,
+            proof: reportUrl,
+            status: "waiting",
+            userId: widget.userId);
+
+        await service.addReports(report);
+        // Continue with your navigation or any other logic
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ReportSubmittedPage(userId: widget.userId),
+          ),
+        );
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error creating user"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   Widget appBar(deviceWidth) => Container(
         color: AppColors.secondaryBlue,
@@ -199,7 +239,7 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
                           textColor: AppColors.secondaryYellow,
                           fontFamily: AppFonts.montserrat,
                           fontWeight: AppFontWeights.bold,
-                          fontSize: 16),
+                          fontSize: 20),
                     ),
                   ),
                 ],
@@ -208,4 +248,11 @@ class _ReportIssuePageState extends State<ReportIssuePage> {
           ),
         ),
       );
+
+  String? validateField(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return "Please provide a detailed description of the issue you encountered.";
+    }
+    return null;
+  }
 }

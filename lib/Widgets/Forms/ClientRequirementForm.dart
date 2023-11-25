@@ -84,7 +84,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
             : AutovalidateMode.disabled,
         child: Padding(
           padding:
-              const EdgeInsets.only(left: 8, right: 8, top: 10, bottom: 18),
+              const EdgeInsets.only(left: 8, right: 8, top: 10, bottom: 15),
           child: Column(
             children: [
               DropdownButtonFormField<String>(
@@ -130,12 +130,13 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                   filled: true,
                   fillColor: AppColors.white,
                 ),
-                style: _inputTextStyle,
+                style: _inputTextStyle.copyWith(fontSize: 12),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 9.25),
                 child: UploadFilePicker(
                   key: _idFilePickerKey,
+                  label: "ATTACH FILE*",
                   onPickImage: (pickedImage) {
                     // receive image file
                     _selectedImage = pickedImage;

@@ -7,7 +7,8 @@ import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 
 class ClientViewHistory extends StatefulWidget {
-  const ClientViewHistory({Key? key}) : super(key: key);
+  final String userId;
+  const ClientViewHistory({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ClientViewHistory> createState() => _ClientViewHistoryState();

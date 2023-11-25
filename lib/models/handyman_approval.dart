@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class HandymanAproval {
+class HandymanApproval {
   // PROPERTIES
   final String? approvalId;
   final String status;
@@ -8,19 +8,19 @@ class HandymanAproval {
   final String requestId;
 
   // CONSTRUCTORS
-  HandymanAproval({
+  HandymanApproval({
     this.approvalId,
     required this.status,
     required this.handymanId,
     required this.requestId,
   });
 
-  factory HandymanAproval.fromFireStore(
+  factory HandymanApproval.fromFireStore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     //SnapshotOptions? options,
   ) {
     final data = snapshot.data();
-    return HandymanAproval(
+    return HandymanApproval(
       approvalId: snapshot.id,
       status: data?['status'],
       handymanId: data?['handymanId'],

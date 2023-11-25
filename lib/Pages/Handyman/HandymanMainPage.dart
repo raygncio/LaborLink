@@ -12,7 +12,8 @@ import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
 import 'package:laborlink/styles.dart';
 
 class HandymanMainPage extends StatefulWidget {
-  const HandymanMainPage({Key? key}) : super(key: key);
+  final String userId;
+  const HandymanMainPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<HandymanMainPage> createState() => _HandymanMainPageState();
@@ -48,17 +49,15 @@ class _HandymanMainPageState extends State<HandymanMainPage> {
   Widget selectedPage() {
     if (_selectedIndex == 0) {
       return HandymanHomePage(
-        navigateToNewPage: updateSelectedIndex,
-      );
+          navigateToNewPage: updateSelectedIndex, userId: widget.userId);
     } else if (_selectedIndex == 1) {
       return HandymanActivityPage(
         navigateToNewPage: updateSelectedIndex,
       );
-    }
-    else if (_selectedIndex == 2){
-      return const IssuesReportedPage();
+    } else if (_selectedIndex == 2) {
+      return IssuesReportedPage(userId: widget.userId);
     }
 
-    return const ProfilePage();
+    return ProfilePage(userId: widget.userId);
   }
 }

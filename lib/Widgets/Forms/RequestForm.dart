@@ -1,30 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Checkbox.dart';
 import 'package:laborlink/Widgets/Dropdown.dart';
-import 'package:laborlink/Widgets/FilePickers/ChooseFilePicker.dart';
+import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/styles.dart';
-
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:intl/intl.dart';
 import '../../dummyDatas.dart';
 
-class RequestForm extends StatefulWidget {
-  final GlobalKey<RequestFormState> key;
+final _firebase = FirebaseAuth.instance;
+final formatter = DateFormat.yMd();
 
-  const RequestForm({required this.key}) : super(key: key);
+// const List<String> specializations = <String>[
+//   'Plumbing',
+//   'Carpentry',
+//   'Electrical',
+//   'Painting',
+//   'Maintenance',
+//   'Welding',
+//   'Housekeeping',
+//   'Roofing',
+//   'Installation',
+//   'Pest Control'
+// ];
+
+class RequestForm extends StatefulWidget {
+  final String userId;
+  final GlobalKey<RequestFormState> key;
+  final Map<String, dynamic>? handymanInfo;
+  const RequestForm(
+      {required this.key, required this.userId, this.handymanInfo})
+      : super(key: key);
 
   @override
   State<RequestForm> createState() => RequestFormState();
 }
 
 class RequestFormState extends State<RequestForm> {
+  bool isAutoValidationEnabled = false;
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
   final _instructionsController = TextEditingController();
 
-  final _filePickerKey = GlobalKey<ChooseFilePickerState>();
+  final _filePickerKey = GlobalKey<UploadFilePickerState>();
+  DateTime? _selectedDate;
+//file
+  File? _selectedImage;
 
   final List<String> _categories = dummyDropdownData;
   final List<String> _dateOptions = dummyDropdownData;
@@ -54,18 +81,35 @@ class RequestFormState extends State<RequestForm> {
     return _formKey.currentState!.validate();
   }
 
+  bool hasFile() {
+    return _filePickerKey.currentState!.hasFile;
+  }
+
   Map<String, dynamic> get getFormData {
-    setState(() {});
-    return {
-      "title": _titleController.text,
-      "category": _categoryValue,
-      "description": _descriptionController.text,
-      "attachment": _filePickerKey.currentState!.getFileName,
-      "date": _dateValue,
-      "time": _timeValue,
-      "address": _addressController.text,
-      "instructions": _instructionsController.text,
-    };
+    if (widget.handymanInfo != null) {
+      return {
+        "title": _titleController.text,
+        "category": _categoryValue,
+        "description": _descriptionController.text,
+        "attachment": _selectedImage,
+        "date": _selectedDate,
+        "time": _timeValue,
+        "address": _addressController.text,
+        "instructions": _instructionsController.text,
+        "handymanId": widget.handymanInfo!["handymanId"],
+      };
+    } else {
+      return {
+        "title": _titleController.text,
+        "category": _categoryValue,
+        "description": _descriptionController.text,
+        "attachment": _selectedImage,
+        "date": _selectedDate,
+        "time": _timeValue,
+        "address": _addressController.text,
+        "instructions": _instructionsController.text,
+      };
+    }
   }
 
   @override
@@ -75,6 +119,22 @@ class RequestFormState extends State<RequestForm> {
     _timeValue = _timeOptions.first;
 
     super.initState();
+    fetchUserAddress();
+  }
+
+  Future<void> fetchUserAddress() async {
+    DatabaseService service = DatabaseService();
+    try {
+      Client clientInfo = await service.getUserData(widget.userId);
+
+      String address = clientInfo.streetAddress;
+
+      setState(() {
+        _addressController.text = address;
+      });
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
   @override
@@ -90,6 +150,9 @@ class RequestFormState extends State<RequestForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
+      autovalidateMode: isAutoValidationEnabled
+          ? AutovalidateMode.always
+          : AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -123,7 +186,7 @@ class RequestFormState extends State<RequestForm> {
                     fontWeight: AppFontWeights.semiBold,
                     fontSize: 10),
                 labelPadding: const EdgeInsets.only(bottom: 4),
-                dropdownValues: _categories,
+                dropdownValues: specializations,
                 onChanged: (value) {
                   setState(() {
                     _categoryValue = value;
@@ -157,35 +220,42 @@ class RequestFormState extends State<RequestForm> {
           ),
           SizedBox(
             width: 202,
-            child: ChooseFilePicker(
+            child: UploadFilePicker(
               key: _filePickerKey,
               label: "Attachment",
-              labelTextStyle: _labelTextStyle,
-              containerBorderWidth: 0.7,
+              onPickImage: (pickedImage) {
+                // receive image file
+                _selectedImage = pickedImage;
+              },
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 7),
+            padding: const EdgeInsets.only(top: 5),
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: AppDropdown(
-                    height: 27,
-                    width: 113,
-                    label: "Date needed *",
-                    labelTextStyle: getTextStyle(
+                TextButton(
+                  onPressed: _presentDatePicker,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 28),
+                    child: Text(
+                      'Date needed*',
+                      style: getTextStyle(
                         textColor: AppColors.secondaryBlue,
                         fontFamily: AppFonts.montserrat,
                         fontWeight: AppFontWeights.semiBold,
-                        fontSize: 10),
-                    labelPadding: const EdgeInsets.only(bottom: 4),
-                    dropdownValues: _dateOptions,
-                    onChanged: (value) {
-                      setState(() {
-                        _dateValue = value;
-                      });
-                    },
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: IconButton(
+                    onPressed: _presentDatePicker,
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: AppColors.tertiaryBlue,
+                    ),
                   ),
                 ),
                 AppDropdown(
@@ -198,7 +268,7 @@ class RequestFormState extends State<RequestForm> {
                       fontWeight: AppFontWeights.semiBold,
                       fontSize: 10),
                   labelPadding: const EdgeInsets.only(bottom: 4),
-                  dropdownValues: _timeOptions,
+                  dropdownValues: timeOptions,
                   onChanged: (value) {
                     setState(() {
                       _timeValue = value;
@@ -302,5 +372,22 @@ class RequestFormState extends State<RequestForm> {
       return "This field is required";
     }
     return null;
+  }
+
+  void _presentDatePicker() async {
+    final now = DateTime.now(); // initial date
+    final firstDate = DateTime(now.year - 100, now.month, now.day);
+    final lastDate = DateTime(now.year - 18, now.month, now.day);
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: lastDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+
+    // this line will be executed after selecting date
+    setState(() {
+      _selectedDate = pickedDate;
+    });
   }
 }

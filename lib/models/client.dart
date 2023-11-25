@@ -1,9 +1,9 @@
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 
 final formatter = DateFormat.yMd();
-final authenticatedUser = FirebaseAuth.instance.currentUser!;
+// final authenticatedUser = FirebaseAuth.instance.currentUser!;
 
 class Client {
   // PROPERTIES
@@ -30,7 +30,7 @@ class Client {
 
   // CONSTRUCTORS
   Client({
-    this.userId,
+    required this.userId,
     required this.userRole,
     required this.firstName,
     required this.lastName,
@@ -58,13 +58,13 @@ class Client {
   ) {
     final data = snapshot.data();
     return Client(
-      userId: snapshot.id,
+      userId: snapshot.id, //
       userRole: data?['userRole'],
       firstName: data?['firstName'],
       lastName: data?['lastName'],
       middleName: data?['middleName'],
       suffix: data?['suffix'],
-      dob: data?['dob'],
+      dob: (data?['dob'] as Timestamp?)?.toDate() ?? DateTime.now(),
       sex: data?['sex'],
       streetAddress: data?['streetAddress'],
       city: data?['city'],
@@ -77,13 +77,13 @@ class Client {
       validId: data?['validId'],
       idProof: data?['idProof'],
       profilePic: data?['profilePic'],
-      createdAt: data?['createdAt'],
+      createdAt: (data?['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'userId': authenticatedUser.uid,
+      'userId': userId,
       'userRole': userRole,
       'firstName': firstName,
       'lastName': lastName,
@@ -95,8 +95,8 @@ class Client {
       'state': state,
       'city': city,
       'zipCode': zipCode,
-      'emailAdd': authenticatedUser.email,
-      'username': authenticatedUser.displayName,
+      'emailAdd': emailAdd,
+      'username': username,
       'phoneNumber': phoneNumber,
       'status': userRole == 'handyman' ? 'pending' : 'active',
       'validId': validId,
@@ -115,7 +115,7 @@ class Client {
 
 // class Address {
 //   Address(
-//       {required this.streetAddress,     
+//       {required this.streetAddress,
 //       required this.city,
 //       required this.state,
 //       required this.zipCode});

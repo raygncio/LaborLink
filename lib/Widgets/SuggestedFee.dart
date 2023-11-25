@@ -6,9 +6,24 @@ class SuggestedFee extends StatefulWidget {
 
   @override
   State<SuggestedFee> createState() => _SuggestedFeeState();
+
+  // Make it a static variable to access in the getter
+  static _SuggestedFeeState _suggestedFeeState = _SuggestedFeeState();
+
+  // Add a getter to get the suggested fee
+  double get suggestedFee => _suggestedFeeState.calculateTotalFee();
 }
 
 class _SuggestedFeeState extends State<SuggestedFee> {
+  double suggestedFee = 0; // Variable to store suggested fee
+
+  // Method to calculate total fee
+  double calculateTotalFee() {
+    // Assume fixed convenience fee is 50
+    double convenienceFee = 50;
+    return suggestedFee + convenienceFee;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -17,10 +32,11 @@ class _SuggestedFeeState extends State<SuggestedFee> {
         Text(
           "Suggested Service Fee",
           style: getTextStyle(
-              textColor: AppColors.accentOrange,
-              fontFamily: AppFonts.montserrat,
-              fontWeight: AppFontWeights.semiBold,
-              fontSize: 10),
+            textColor: AppColors.accentOrange,
+            fontFamily: AppFonts.montserrat,
+            fontWeight: AppFontWeights.semiBold,
+            fontSize: 10,
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4),
@@ -28,20 +44,47 @@ class _SuggestedFeeState extends State<SuggestedFee> {
             width: 152,
             height: 27,
             decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                border: Border.all(color: AppColors.accentOrange)),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Text(
-                  "PHP",
-                  style: getTextStyle(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              border: Border.all(color: AppColors.accentOrange),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Row(
+                children: [
+                  Text(
+                    "PHP",
+                    style: getTextStyle(
                       textColor: AppColors.accentOrange,
                       fontFamily: AppFonts.montserrat,
                       fontWeight: AppFontWeights.semiBold,
-                      fontSize: 10),
-                ),
+                      fontSize: 10,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4), // Adjust the padding as needed
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            suggestedFee = double.tryParse(value) ?? 0;
+                          });
+                        },
+                        keyboardType: TextInputType.number,
+                        style: getTextStyle(
+                          textColor: AppColors.accentOrange,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.semiBold,
+                          fontSize: 10,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -66,15 +109,15 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
-                            padding:
-                            const EdgeInsets.only(left: 11, top: 8),
+                            padding: const EdgeInsets.only(left: 11, top: 8),
                             child: Text(
                               "Breakdown",
                               style: getTextStyle(
-                                  textColor: AppColors.accentOrange,
-                                  fontFamily: AppFonts.montserrat,
-                                  fontWeight: AppFontWeights.bold,
-                                  fontSize: 12),
+                                textColor: AppColors.accentOrange,
+                                fontFamily: AppFonts.montserrat,
+                                fontWeight: AppFontWeights.bold,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),
@@ -86,53 +129,49 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                               Padding(
                                 padding: const EdgeInsets.only(right: 38),
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
                                       "Suggested Fee",
                                       style: getTextStyle(
-                                          textColor:
-                                          AppColors.accentOrange,
-                                          fontFamily: AppFonts.montserrat,
-                                          fontWeight:
-                                          AppFontWeights.regular,
-                                          fontSize: 12),
+                                        textColor: AppColors.accentOrange,
+                                        fontFamily: AppFonts.montserrat,
+                                        fontWeight: AppFontWeights.regular,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                     Text(
                                       "Convenience Fee",
                                       style: getTextStyle(
-                                          textColor:
-                                          AppColors.accentOrange,
-                                          fontFamily: AppFonts.montserrat,
-                                          fontWeight:
-                                          AppFontWeights.regular,
-                                          fontSize: 12),
+                                        textColor: AppColors.accentOrange,
+                                        fontFamily: AppFonts.montserrat,
+                                        fontWeight: AppFontWeights.regular,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                               Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Php 500",
+                                    "Php ${suggestedFee.toString()}",
                                     style: getTextStyle(
-                                        textColor: AppColors.accentOrange,
-                                        fontFamily: AppFonts.montserrat,
-                                        fontWeight:
-                                        AppFontWeights.regular,
-                                        fontSize: 12),
+                                      textColor: AppColors.accentOrange,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.regular,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                   Text(
-                                    "Php 50",
+                                    "Php 50", // Fixed convenience fee
                                     style: getTextStyle(
-                                        textColor: AppColors.accentOrange,
-                                        fontFamily: AppFonts.montserrat,
-                                        fontWeight:
-                                        AppFontWeights.regular,
-                                        fontSize: 12),
+                                      textColor: AppColors.accentOrange,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.regular,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ],
                               )
@@ -140,8 +179,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                           ),
                         ),
                         const Padding(
-                          padding: EdgeInsets.only(
-                              left: 53, right: 13, top: 7),
+                          padding: EdgeInsets.only(left: 53, right: 13, top: 7),
                           child: Divider(
                             color: AppColors.accentOrange,
                             thickness: 0.7,
@@ -149,15 +187,15 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                           ),
                         ),
                         Padding(
-                          padding:
-                          const EdgeInsets.only(top: 3, right: 12),
+                          padding: const EdgeInsets.only(top: 3, right: 12),
                           child: Text(
-                            "Php 500",
+                            "Php ${suggestedFee.toString()}",
                             style: getTextStyle(
-                                textColor: AppColors.accentOrange,
-                                fontFamily: AppFonts.montserrat,
-                                fontWeight: AppFontWeights.bold,
-                                fontSize: 12),
+                              textColor: AppColors.accentOrange,
+                              fontFamily: AppFonts.montserrat,
+                              fontWeight: AppFontWeights.bold,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],

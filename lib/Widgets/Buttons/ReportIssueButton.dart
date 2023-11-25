@@ -41,6 +41,6 @@ class _ReportIssueButtonState extends State<ReportIssueButton> {
   }
 
   void onReportIssue() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const ReportIssuePage(),
+        builder: (context) => const ReportIssuePage(userId: "test"),
       ));
 }

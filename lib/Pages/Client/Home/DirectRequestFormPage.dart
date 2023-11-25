@@ -9,7 +9,9 @@ import 'package:laborlink/styles.dart';
 
 class DirectRequestFormPage extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
-  const DirectRequestFormPage({Key? key, required this.handymanInfo})
+  final String userId;
+  const DirectRequestFormPage(
+      {Key? key, required this.handymanInfo, required this.userId})
       : super(key: key);
 
   @override
@@ -114,8 +116,9 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RequestForm(
-                key: requestFormKey,
-              ),
+                  key: requestFormKey,
+                  userId: widget.userId,
+                  handymanInfo: widget.handymanInfo),
               Padding(
                 padding: const EdgeInsets.only(top: 25),
                 child: Row(

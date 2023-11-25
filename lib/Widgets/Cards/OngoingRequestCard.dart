@@ -4,12 +4,9 @@ import 'package:laborlink/styles.dart';
 class OngoingRequestCard extends StatefulWidget {
   final String title;
   final String address;
-  final String imgUrl;
+  final String? imgUrl;
   const OngoingRequestCard(
-      {Key? key,
-      required this.title,
-      required this.address,
-      required this.imgUrl})
+      {Key? key, required this.title, required this.address, this.imgUrl})
       : super(key: key);
 
   @override
@@ -58,18 +55,18 @@ class _OngoingRequestCardState extends State<OngoingRequestCard> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(2),
-                decoration: const BoxDecoration(
-                    color: AppColors.accentOrange, shape: BoxShape.circle),
-                child: ClipOval(
-                  child: Image.network(
-                    widget.imgUrl,
-                    width: 30,
-                    height: 30,
-                  ),
-                ),
-              )
+              // Container(
+              //   padding: const EdgeInsets.all(2),
+              //   decoration: const BoxDecoration(
+              //       color: AppColors.accentOrange, shape: BoxShape.circle),
+              //   child: ClipOval(
+              //     child: Image.network(
+              //       widget.imgUrl ?? "",
+              //       width: 30,
+              //       height: 30,
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),

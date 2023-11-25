@@ -9,10 +9,16 @@ import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/client.dart';
 
 class ClientActivityPage extends StatefulWidget {
   final Function(int) navigateToNewPage;
-  const ClientActivityPage({Key? key, required this.navigateToNewPage})
+  final String userId;
+  const ClientActivityPage(
+      {Key? key, required this.navigateToNewPage, required this.userId})
       : super(key: key);
 
   @override
@@ -23,9 +29,59 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   int _selectedTabIndex = 0;
 
   bool _haveActiveRequest = false;
-  bool _havePendingOpenRequest = true;
+  bool _havePendingOpenRequest = false;
   bool _havePendingDirectRequest = false;
   bool _forApproval = false;
+  Request? requestInfo;
+  DatabaseService service = DatabaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    checkForRequests();
+  }
+
+  void checkForRequests() async {
+    try {
+      requestInfo = await service.getRequestsData(widget.userId);
+
+      String progress = requestInfo!.progress;
+      print(progress);
+
+      setState(() {
+        if (progress == "pending") {
+          _haveActiveRequest = false;
+          _havePendingOpenRequest = true;
+          _havePendingDirectRequest = true;
+          _forApproval = true;
+        }
+      });
+    } catch (error) {
+      print('Error fetching user data:1 $error');
+    }
+  }
+
+  Future<Map<String, dynamic>> convertRequestToMap(Request request) async {
+    Client? clientInfo;
+    try {
+      clientInfo = await service.getUserData(widget.userId);
+    } catch (error) {
+      print('Error fetching user data 2: $error');
+    }
+    print(clientInfo);
+
+    // Implement the conversion logic based on the structure of Request
+    return {
+      'title': requestInfo!.title,
+      'category': requestInfo!.category,
+      'progress': requestInfo!.progress,
+      'date': requestInfo!.date,
+      'time': requestInfo!.time,
+      'suggestedFee': requestInfo!.suggestedPrice,
+      'address': clientInfo!.streetAddress,
+      'userId': requestInfo!.userId,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,58 +221,133 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         ),
       );
 
-  Widget pendingApproval() =>
-      const PendingRequestInfoCard(type: PendingRequestType.forApproval);
+  Widget pendingApproval() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: convertRequestToMap(requestInfo!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Handle the error
+        } else {
+          Map<String, dynamic> requestDetail = snapshot.data!;
 
-  Widget pendingOpenRequest() => Stack(
-        children: [
-          Container(
-            color: AppColors.dirtyWhite,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 192),
-            child: interestedLaborers(),
-          ),
-          const PendingRequestInfoCard(type: PendingRequestType.openRequest),
-        ],
-      );
+          return PendingRequestInfoCard(
+            type: PendingRequestType.forApproval,
+            requestDetail: requestDetail,
+          );
+        }
+      },
+    );
+  }
 
-  Widget pendingDirectRequest() => Stack(
-        children: [
-          Container(
-            color: AppColors.dirtyWhite,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 208),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    "Selected Handyman",
-                    style: getTextStyle(
-                        textColor: AppColors.secondaryBlue,
-                        fontFamily: AppFonts.montserrat,
-                        fontWeight: AppFontWeights.regular,
-                        fontSize: 10),
+  Widget pendingOpenRequest() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: convertRequestToMap(requestInfo!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Handle the error
+        } else {
+          Map<String, dynamic> requestDetail = snapshot.data!;
+
+          return Stack(
+            children: [
+              Container(
+                color: AppColors.dirtyWhite,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 192),
+                child: interestedLaborers(),
+              ),
+              PendingRequestInfoCard(
+                type: PendingRequestType.openRequest,
+                requestDetail: requestDetail,
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget pendingDirectRequest() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: convertRequestToMap(requestInfo!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Handle the error
+        } else {
+          Map<String, dynamic> requestDetail = snapshot.data!;
+
+          return _buildPendingDirectRequest(requestDetail);
+        }
+      },
+    );
+  }
+
+  Widget _buildPendingDirectRequest(Map<String, dynamic> requestDetail) {
+    return Stack(
+      children: [
+        Container(
+          color: AppColors.dirtyWhite,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 208),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  "Selected Handyman",
+                  style: getTextStyle(
+                    textColor: AppColors.secondaryBlue,
+                    fontFamily: AppFonts.montserrat,
+                    fontWeight: AppFontWeights.regular,
+                    fontSize: 10,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 9, top: 8),
-                  child: HandymanSelectedCard(
-                      handymanInfo: dummyFilteredHandyman[4]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 9, top: 8),
+                child: HandymanSelectedCard(
+                  handymanInfo: dummyFilteredHandyman[4],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const PendingRequestInfoCard(type: PendingRequestType.directRequest),
-        ],
-      );
+        ),
+        PendingRequestInfoCard(
+          type: PendingRequestType.directRequest,
+          requestDetail: requestDetail,
+        ),
+      ],
+    );
+  }
 
   Widget activeRequest() => Padding(
         padding: const EdgeInsets.only(top: 54),
-        child: ClientActiveRequest(requestDetail: dummyActiveRequest[3]),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: convertRequestToMap(requestInfo!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Return a loading indicator or placeholder
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              // Handle the error
+              return Text('Error: ${snapshot.error}');
+            } else {
+              // Use the data from the snapshot
+              Map<String, dynamic> requestDetail = snapshot.data!;
+
+              return ClientActiveRequest(requestDetail: requestDetail);
+            }
+          },
+        ),
       );
 
   Widget interestedLaborers() => SingleChildScrollView(
@@ -320,8 +451,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                 child: GestureDetector(
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ClientViewHistory(),
+                                    builder: (context) => ClientViewHistory(
+                                      userId: widget.userId,
+                                    ),
                                   )),
                                   child: Container(
                                     height: 52,

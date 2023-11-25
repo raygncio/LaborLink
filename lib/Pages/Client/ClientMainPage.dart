@@ -8,14 +8,15 @@ import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
 import 'package:laborlink/styles.dart';
 
 class ClientMainPage extends StatefulWidget {
-  const ClientMainPage({Key? key}) : super(key: key);
+  final String userId;
+  const ClientMainPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ClientMainPage> createState() => _ClientMainPageState();
 }
 
 class _ClientMainPageState extends State<ClientMainPage> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +44,15 @@ class _ClientMainPageState extends State<ClientMainPage> {
 
   Widget selectedPage() {
     if (_selectedIndex == 0) {
-      return ClientHomePage(navigateToNewPage: updateSelectedIndex,);
-    }
-    else if(_selectedIndex == 1) {
-      return ClientActivityPage(navigateToNewPage: updateSelectedIndex,);
-    }
-    else if(_selectedIndex == 2) {
-      return const IssuesReportedPage();
+      return ClientHomePage(
+          navigateToNewPage: updateSelectedIndex, userId: widget.userId);
+    } else if (_selectedIndex == 1) {
+      return ClientActivityPage(
+          navigateToNewPage: updateSelectedIndex, userId: widget.userId);
+    } else if (_selectedIndex == 2) {
+      return IssuesReportedPage(userId: widget.userId);
     }
 
-    return const ProfilePage();
+    return ProfilePage(userId: widget.userId);
   }
 }

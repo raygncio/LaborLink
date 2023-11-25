@@ -4,7 +4,8 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/styles.dart';
 
 class ReportSubmittedPage extends StatefulWidget {
-  const ReportSubmittedPage({Key? key}) : super(key: key);
+  final String userId;
+  const ReportSubmittedPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ReportSubmittedPage> createState() => _ReportSubmittedPageState();
@@ -42,7 +43,7 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 61, right: 61, top: 4),
+                  padding: const EdgeInsets.only(left: 61, right: 61, top: 12),
                   child: Text(
                     "Thank you for your bringing this to our attention. We’ll do our best to handle this issue as soon as possible!",
                     textAlign: TextAlign.center,
@@ -50,7 +51,7 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
                     style: getTextStyle(
                         textColor: AppColors.black,
                         fontFamily: AppFonts.montserrat,
-                        fontWeight: AppFontWeights.regular,
+                        fontWeight: AppFontWeights.medium,
                         fontSize: 12),
                   ),
                 ),
@@ -71,17 +72,33 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 6),
+                  padding: const EdgeInsets.only(top: 22),
                   child: GestureDetector(
                     onTap: onContinue,
-                    child: Text("Continue",
-                        style: getTextStyle(
-                            textColor: AppColors.secondaryBlue,
-                            fontFamily: AppFonts.montserrat,
-                            fontWeight: AppFontWeights.semiBold,
-                            fontSize: 15)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.accentOrange,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SizedBox(
+                        width: 147,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            "Continue",
+                            textAlign: TextAlign.center,
+                            style: getTextStyle(
+                              textColor: AppColors.white,
+                              fontFamily: AppFonts.montserrat,
+                              fontWeight: AppFontWeights.semiBold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -92,7 +109,7 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
 
   void onCheckReports() =>
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const IssuesReportedPage(),
+        builder: (context) => IssuesReportedPage(userId: widget.userId),
       ));
 
   void onContinue() => Navigator.of(context).pop();

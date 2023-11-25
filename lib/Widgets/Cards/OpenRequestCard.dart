@@ -5,11 +5,15 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:laborlink/models/request.dart';
 
 import '../Dialogs.dart';
 
 class OpenRequestCard extends StatefulWidget {
-  const OpenRequestCard({Key? key}) : super(key: key);
+  final Map<String, dynamic> clientRequestInfo;
+  const OpenRequestCard({Key? key, required this.clientRequestInfo})
+      : super(key: key);
 
   @override
   State<OpenRequestCard> createState() => _OpenRequestCardState();
@@ -18,6 +22,25 @@ class OpenRequestCard extends StatefulWidget {
 class _OpenRequestCardState extends State<OpenRequestCard> {
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.clientRequestInfo['firstName'] ?? '';
+    String middleName = widget.clientRequestInfo['middleName'] ?? '';
+    String lastName = widget.clientRequestInfo['lastName'] ?? '';
+    String suffix = widget.clientRequestInfo['suffix'] ?? '';
+
+    // Concatenate non-null values
+    String fullname = '$firstName $middleName $lastName $suffix';
+
+    final String requestId = widget.clientRequestInfo['requestId'] ?? '';
+    final String category = widget.clientRequestInfo['category'] ?? '';
+    final String title = widget.clientRequestInfo['title'] ?? '';
+    final String address = widget.clientRequestInfo['address'] ?? '';
+    final double? suggestedFee =
+        widget.clientRequestInfo['suggestedPrice'] as double?;
+    final String date = widget.clientRequestInfo['date'] ?? '';
+    final String time = widget.clientRequestInfo['time'] ?? '';
+    final String description = widget.clientRequestInfo['description'] ?? '';
+    final String attachment = widget.clientRequestInfo['attachment'] ?? '';
+
     return Container(
       height: 279,
       decoration: BoxDecoration(
@@ -47,17 +70,17 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                       Column(
                         children: [
                           Text(
-                            "Hanni Pham",
+                            fullname,
                             style: getTextStyle(
                                 textColor: AppColors.secondaryBlue,
                                 fontFamily: AppFonts.montserrat,
                                 fontWeight: AppFontWeights.bold,
                                 fontSize: 15),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(top: 1.27),
                             child: AppBadge(
-                              label: "Request ID: 12345",
+                              label: requestId,
                               type: BadgeType.normal,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 1),
@@ -82,7 +105,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                                   ),
                                 ),
                                 Text(
-                                  "Clogged Toilet",
+                                  title,
                                   style: getTextStyle(
                                       textColor: AppColors.secondaryBlue,
                                       fontFamily: AppFonts.montserrat,
@@ -149,13 +172,13 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   children: [
                     SizedBox(
                       width: columnWidth,
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextWithIcon(
                             icon: Icon(Icons.place,
                                 size: 13, color: AppColors.accentOrange),
-                            text: "556 Juan Luna Ave.",
+                            text: address,
                             fontSize: 9,
                             contentPadding: 8,
                           ),
@@ -164,7 +187,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                             child: TextWithIcon(
                               icon: Icon(Icons.local_offer_rounded,
                                   size: 13, color: AppColors.accentOrange),
-                              text: "₱550",
+                              text: suggestedFee.toString(),
                               fontSize: 9,
                               contentPadding: 8,
                             ),
@@ -174,13 +197,13 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                     ),
                     SizedBox(
                       width: columnWidth,
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextWithIcon(
                             icon: Icon(Icons.calendar_month_rounded,
                                 size: 13, color: AppColors.accentOrange),
-                            text: "07 Aug 2023",
+                            text: date,
                             fontSize: 9,
                             contentPadding: 8,
                           ),
@@ -189,7 +212,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                             child: TextWithIcon(
                               icon: Icon(Icons.watch_later,
                                   size: 13, color: AppColors.accentOrange),
-                              text: "12:00 - 1:00 PM",
+                              text: time,
                               fontSize: 9,
                               contentPadding: 8,
                             ),
@@ -205,7 +228,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
           Padding(
             padding: const EdgeInsets.only(left: 13, right: 13, top: 8.27),
             child: Text(
-              "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+              description,
               overflow: TextOverflow.visible,
               style: getTextStyle(
                   textColor: AppColors.black,
@@ -214,33 +237,33 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   fontSize: 9),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 4.5),
-                    child: Image.network(
-                      imgPlaceholder,
-                      height: 101,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 4.5),
-                    child: Image.network(
-                      imgPlaceholder,
-                      height: 101,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
+          //   child: Row(
+          //     children: [
+          //       Expanded(
+          //         child: Padding(
+          //           padding: const EdgeInsets.only(right: 4.5),
+          //           child: Image.network(
+          //             imgPlaceholder,
+          //             height: 101,
+          //             fit: BoxFit.cover,
+          //           ),
+          //         ),
+          //       ),
+          //       Expanded(
+          //         child: Padding(
+          //           padding: const EdgeInsets.only(left: 4.5),
+          //           child: Image.network(
+          //             imgPlaceholder,
+          //             height: 101,
+          //             fit: BoxFit.cover,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // )
         ],
       ),
     );
@@ -253,8 +276,8 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
       if (value == null) return;
 
       if (value == "submit") {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const OfferSubmittedPage()));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const OfferSubmittedPage()));
       }
     });
   }

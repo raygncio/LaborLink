@@ -113,7 +113,7 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
                             borderRadius: _borderRadius,
                             inputTextStyle: _inputTextStyle,
                             fillColor: AppColors.white,
-                            validator: validateField,
+                            validator: validateUsername,
                           ),
                         ),
                       ),
@@ -150,7 +150,7 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
                     borderRadius: _borderRadius,
                     inputTextStyle: _inputTextStyle,
                     fillColor: AppColors.white,
-                    validator: validateField,
+                    validator: validatePassword,
                   ),
                 ),
               ],
@@ -159,11 +159,35 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
     );
   }
 
+  String? validateUsername(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return "This field is required";
+    } else if (value.trim().length < 4) {
+      return "Please enter at least 4 characters";
+    }
+    return null;
+  }
+
   String? validateEmailAddress(String? value) {
     if (value == null || value.trim().isEmpty || !value.contains('@')) {
       return "Email Address is required";
     }
 
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "This field is required";
+    } else if (value.length < 6) {
+      return "Password must be at least 6 characters";
+    } else {
+      // Count the number of digits in the password
+      int digitCount = value.replaceAll(RegExp(r'\D'), '').length;
+      if (digitCount < 2) {
+        return "Password must contain at least 2 digits";
+      }
+    }
     return null;
   }
 

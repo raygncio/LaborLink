@@ -7,6 +7,7 @@ import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
 import 'package:laborlink/Pages/Registration/ClientRegistrationPage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:laborlink/Pages/Registration/TermsAndConditionPage.dart';
 import 'firebase_options.dart';
 
 void main() async {

@@ -12,7 +12,6 @@ class LaborMenu extends StatefulWidget {
 }
 
 class _LaborMenuState extends State<LaborMenu> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -32,7 +31,10 @@ class _LaborMenuState extends State<LaborMenu> {
           String laborName = labor["name"];
 
           return GestureDetector(
-            onTap: onLaborSelect,
+            onTap: () {
+              onLaborSelect(
+                  index); // Pass the index when a labor category is tapped
+            },
             child: Column(
               children: [
                 SizedBox(
@@ -60,7 +62,8 @@ class _LaborMenuState extends State<LaborMenu> {
     );
   }
 
-  void onLaborSelect(){
-
+  void onLaborSelect(int index) {
+    String selectedLaborName = labors[index]["name"];
+    print('Selected labor: $selectedLaborName');
   }
 }

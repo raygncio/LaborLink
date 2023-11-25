@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
 import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
@@ -11,6 +12,9 @@ import 'package:laborlink/styles.dart';
 import '../Widgets/Buttons/FilledButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -90,43 +94,71 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void onLogin() async {
-    Map<String, dynamic> logInfo = loginFormKey.currentState!.getFormData;
+    if (loginFormKey.currentState!.validateForm()) {
+      Map<String, dynamic> logInfo = loginFormKey.currentState!.getFormData;
+      DatabaseService service = DatabaseService();
 
-    final enteredEmail = logInfo["username"]?.toString().trim() ?? "";
-    final enteredPassword = logInfo["password"]?.toString().trim() ?? "";
-    DatabaseService service = DatabaseService();
+      final enteredEmail = logInfo["username"]?.toString().trim() ?? "";
+      final enteredPassword = logInfo["password"]?.toString().trim() ?? "";
 
-    // identify kung sino nag log in
-    // username, email, password
+      // Check if entered input is an email format
+      bool isEmail = enteredEmail.contains('@');
 
-    try {
-      final UserCredential userCredential =
-          await _firebase.signInWithEmailAndPassword(
-        email: enteredEmail,
-        password: enteredPassword,
-      );
+      try {
+        UserCredential userCredential;
 
-      print(userCredential.user!.uid);
+        if (isEmail) {
+          // Sign in using email and password directly
+          userCredential = await _firebase.signInWithEmailAndPassword(
+            email: enteredEmail,
+            password: enteredPassword,
+          );
+        } else {
+          // If the input is a username, search for the associated email
+          String? emailFromUsername =
+              await service.getEmailFromUsername(enteredEmail);
 
-      Map<String, dynamic> clientInfo =
-          await service.getUserData(userCredential.user!.uid);
+          if (emailFromUsername != null) {
+            // Sign in using the retrieved email and password
+            userCredential = await _firebase.signInWithEmailAndPassword(
+              email: emailFromUsername,
+              password: enteredPassword,
+            );
+          } else {
+            // Handle case when username is not found
+            throw 'Username not found';
+          }
+        }
 
-      if (clientInfo["userRole"] == "handyman") {
-        // User is a handyman, navigate to the handyman page.
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => HandymanPage(),
-        // ));
-      } else if (clientInfo["userRole"] == "client") {
-        // User is a client, navigate to the client page.
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ClientMainPage(),
-        ));
-      } else {
-        print("errorrr");
+        Client clientInfo = await service.getUserData(userCredential.user!.uid);
+
+        if (clientInfo.userRole == "handyman") {
+          // User is a handyman, navigate to the handyman page.
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                HandymanMainPage(userId: userCredential.user!.uid),
+          ));
+        } else if (clientInfo.userRole == "client") {
+          // User is a client, navigate to the client page.
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                ClientMainPage(userId: userCredential.user!.uid),
+          ));
+        } else {
+          print("Unknown user role");
+        }
+      } catch (e) {
+        // Handle login errors, e.g., show an error message.
+        print("Login error: $e");
       }
-    } catch (e) {
-      // Handle login errors, e.g., show an error message.
-      print("Login error: $e");
+    } else {
+      // Show an error message for not entering valid credentials
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter valid credentials."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

@@ -151,6 +151,10 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       context: context,
       builder: (context) {
+        // Create an instance of SuggestedFee
+        SuggestedFee suggestedFeeWidget = const SuggestedFee();
+        double? totalFee;
+
         return Container(
           padding:
               const EdgeInsets.only(left: 24, right: 24, top: 25, bottom: 22),
@@ -172,7 +176,16 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
                           height: 35,
                           fontFamily: AppFonts.montserrat,
                           color: AppColors.accentOrange,
-                          command: () => Navigator.of(context).pop("submit"),
+                          command: () {
+                            double suggestedFeeValue =
+                                suggestedFeeWidget.suggestedFee;
+
+                            // Calculate the total fee by adding 50 to the suggestedFee value
+                            totalFee = suggestedFeeValue + 50;
+
+                            print("Total Fee: $totalFee");
+                            Navigator.of(context).pop("Total Fee: $totalFee");
+                          },
                           borderRadius: 8),
                     ],
                   ),

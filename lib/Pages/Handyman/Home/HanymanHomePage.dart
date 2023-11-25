@@ -15,12 +15,17 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/database_service.dart';
 
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 class HandymanHomePage extends StatefulWidget {
   final Function(int) navigateToNewPage;
-  const HandymanHomePage({Key? key, required this.navigateToNewPage})
+  final String userId;
+  const HandymanHomePage(
+      {Key? key, required this.navigateToNewPage, required this.userId})
       : super(key: key);
 
   @override
@@ -29,7 +34,9 @@ class HandymanHomePage extends StatefulWidget {
 
 class _HandymanHomePageState extends State<HandymanHomePage> {
   final _searchController = TextEditingController();
+  DatabaseService service = DatabaseService();
   late GlobalKey<RequestFormState> requestFormKey;
+  List<Map<String, dynamic>> _searchResults = [];
 
   int _selectedTabIndex = 0;
 
@@ -73,12 +80,25 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     });
   }
 
-  void updateFindLaborTabContent(String? searchText) {
+  void updateFindLaborTabContent(String? searchText) async {
+    DatabaseService service = DatabaseService();
     if (searchText == null) return;
 
-    setState(() {
-      _showSearchResult = searchText.trim().isNotEmpty;
-    });
+    try {
+      List<Map<String, dynamic>> results =
+          await service.getUserAndRequestBaseOnSearch(searchText);
+
+      // searchResultSection();
+      // print(searchText);
+      print(results);
+
+      setState(() {
+        _showSearchResult = results.isNotEmpty;
+        _searchResults = results;
+      });
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
   void onHistoryButtonClick() {}
@@ -193,10 +213,24 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      getOngoingService(),
+                      // Use FutureBuilder here
+                      FutureBuilder<Widget>(
+                        future: getOngoingService(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text("Error: ${snapshot.error}");
+                          } else {
+                            return snapshot.data ?? const SizedBox();
+                          }
+                        },
+                      ),
                       HistoryButton(
-                          command: onHistoryButtonClick,
-                          backgroundColor: AppColors.white),
+                        command: onHistoryButtonClick,
+                        backgroundColor: AppColors.white,
+                      ),
                     ],
                   ),
                 ),
@@ -207,15 +241,48 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         ),
       );
 
+  // Widget openRequestsSection() => FutureBuilder(
+  //       future: service.getAllUserAndItsRequest(widget.userId),
+  //       builder: (context, AsyncSnapshot<List<UserAndRequest>> snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return CircularProgressIndicator();
+  //         } else if (snapshot.hasError) {
+  //           return Text("Error: ${snapshot.error}");
+  //         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+  //           return Text("No open requests found.");
+  //         } else {
+  //           return Padding(
+  //             padding: const EdgeInsets.only(left: 9, right: 9, top: 77),
+  //             child: ListView.builder(
+  //               itemCount: snapshot.data!.length,
+  //               itemBuilder: (context, index) {
+  //                 // Access client and request using snapshot.data![index].client and snapshot.data![index].request
+  //                 return Padding(
+  //                   padding: EdgeInsets.only(
+  //                       top: index == 0 ? 15 : 9,
+  //                       bottom: index == snapshot.data!.length - 1 ? 75 : 0),
+  //                   child: OpenRequestCard(
+  //                     client: snapshot.data![index].client,
+  //                     request: snapshot.data![index].request,
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           );
+  //         }
+  //       },
+  //     );
+
   Widget openRequestsSection() => Padding(
         padding: const EdgeInsets.only(left: 9, right: 9, top: 77),
         child: ListView.builder(
-          itemCount: 10,
+          itemCount: _searchResults.length,
           itemBuilder: (context, index) {
+            Map<String, dynamic> currentClientRequest = _searchResults[index];
             return Padding(
               padding: EdgeInsets.only(
                   top: index == 0 ? 15 : 9, bottom: index == 9 ? 75 : 0),
-              child: const OpenRequestCard(),
+              child: OpenRequestCard(clientRequestInfo: currentClientRequest),
             );
           },
         ),
@@ -245,7 +312,15 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     );
   }
 
-  Widget getOngoingService() {
+  Future<Widget> getOngoingService() async {
+    DatabaseService service = DatabaseService();
+    try {
+      List<Map<String, dynamic>> openRequests =
+          await service.getUserAndRequest(widget.userId);
+      print(openRequests);
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
     return const NoOngoingServiceCard();
   }
 }

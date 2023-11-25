@@ -81,9 +81,9 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
       'idType': _idTypeController.text,
       'certificateName': _certificateNameController.text,
       'recLetterFile': _recLetterImage,
-      'idFile': _idFilePickerKey.currentState!.getFileName,
-      'certProofFile': _certProofFilePickerKey.currentState!.getFileName,
-      'nbiClearanceFile': _nbiClearanceFilePickerKey.currentState!.getFileName,
+      'idFile': idFile,
+      'certProofFile': certProofFile,
+      'nbiClearanceFile': nbiClearanceFile,
     };
   }
 
@@ -193,6 +193,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                       padding: const EdgeInsets.only(top: 9.25),
                       child: UploadFilePicker(
                         key: _recLetterFilePickerKey,
+                        label: "RECOMMENDATION LETTER",
                         onPickImage: (pickedImage) {
                           // receive image file
                           _recLetterImage = pickedImage;
