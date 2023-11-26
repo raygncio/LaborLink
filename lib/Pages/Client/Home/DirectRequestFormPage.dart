@@ -23,6 +23,7 @@ class DirectRequestFormPage extends StatefulWidget {
 
 class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
   GlobalKey<RequestFormState> requestFormKey = GlobalKey<RequestFormState>();
+  double _totalFee = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +58,13 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
 
   void onBack() => Navigator.of(context).pop();
 
+  _getTotalFee(double fee) {
+    setState(() {
+      _totalFee = fee;
+      print('>>>>>>>>>>>$_totalFee');
+    });
+  }
+
   void onProceed() {
     if (requestFormKey.currentState!.validateForm()) {
       // Retrieve form data
@@ -86,49 +94,48 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
           if (value == null) return;
 
           if (value == "proceed") {
-            suggestedFeeDialog(context).then((value) async {
+            suggestedFeeDialog(context, _getTotalFee).then((value) async {
               if (value == null) return;
-                DatabaseService service = DatabaseService();
-                try {
-                  // Create a user in Firebase Authentication
-                  String imageUrl = await service.uploadRequestAttachment(
-                      widget.userId, formData['attachment']);
+              DatabaseService service = DatabaseService();
+              try {
+                // Create a user in Firebase Authentication
+                String imageUrl = await service.uploadRequestAttachment(
+                    widget.userId, formData['attachment']);
 
-                  Request request = Request(
-                    title: formData["title"],
-                    category: formData["category"],
-                    description: formData["description"],
-                    attachment: imageUrl,
-                    address: formData["address"],
-                    date: formData["date"],
-                    time: formData["time"],
-                    progress: "pending",
-                    instructions: formData["instructions"],
-                    suggestedPrice: 2.0,
-                    userId: widget.userId,
-                    handymanId:  widget.handymanInfo["userId"],
-                  );
+                Request request = Request(
+                  title: formData["title"],
+                  category: formData["category"],
+                  description: formData["description"],
+                  attachment: imageUrl,
+                  address: formData["address"],
+                  date: formData["date"],
+                  time: formData["time"],
+                  progress: "pending",
+                  instructions: formData["instructions"],
+                  suggestedPrice: _totalFee,
+                  userId: widget.userId,
+                  handymanId: widget.handymanInfo["userId"],
+                );
 
-                  HandymanApproval handymanApproval = HandymanApproval(
-                    status: 'direct',
-                    handymanId: widget.handymanInfo["userId"],
-                    requestId: widget.userId,
-                  );
+                HandymanApproval handymanApproval = HandymanApproval(
+                  status: 'direct',
+                  handymanId: widget.handymanInfo["userId"],
+                  requestId: widget.userId,
+                );
 
-                  await service.addHandymanApproval(handymanApproval);
-                  await service.addRequest(request);
+                await service.addHandymanApproval(handymanApproval);
+                await service.addRequest(request);
 
-                  Navigator.of(context).pop("submit");
-                } catch (e) {
-                  // Handle errors during user creation
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Error creating user: $e"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              
+                Navigator.of(context).pop("submit");
+              } catch (e) {
+                // Handle errors during user creation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Error creating user: $e"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             });
           }
         });

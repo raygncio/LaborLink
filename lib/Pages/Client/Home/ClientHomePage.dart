@@ -41,6 +41,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   bool _showSearchResult = false;
   bool _hideHeader = false;
   List<Map<String, dynamic>> _searchResults = [];
+  double _totalFee = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +137,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
           time: formData["time"],
           progress: "pending",
           instructions: formData["instructions"],
-          suggestedPrice: 2.0,
+          suggestedPrice: _totalFee,
           userId: widget.userId,
         );
 
@@ -171,12 +172,19 @@ class _ClientHomePageState extends State<ClientHomePage> {
     }
   }
 
+  _getTotalFee(double fee) {
+    setState(() {
+      _totalFee = fee;
+      print('>>>>>>>>>>>$_totalFee');
+    });
+  }
+
   void onOpenRequestProceed() {
     confirmationDialog(context).then((value) {
       if (value == null) return;
 
       if (value == "proceed") {
-        suggestedFeeDialog(context).then((value) {
+        suggestedFeeDialog(context, _getTotalFee).then((value) {
           value = "2.0";
           //if (value == null) return; nag comment muna kasi null yung napapasa na value
 

@@ -167,9 +167,9 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 15),
+                      padding: const EdgeInsets.only(top: 15),
                       child: TextWithIcon(
-                        icon: Icon(Icons.place,
+                        icon: const Icon(Icons.place,
                             size: 17, color: AppColors.accentOrange),
                         text: address,
                         fontSize: 12,
@@ -177,19 +177,19 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.calendar_month_rounded,
+                        icon: const Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: formattedDate.format(DateTime.parse(date)),
+                        text: date,
                         fontSize: 12,
                         contentPadding: 19,
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.watch_later,
+                        icon: const Icon(Icons.watch_later,
                             size: 17, color: AppColors.accentOrange),
                         text: time,
                         fontSize: 12,
@@ -197,9 +197,9 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.local_offer_rounded,
+                        icon: const Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
                         text: suggestedFee.toString(),
                         fontSize: 12,

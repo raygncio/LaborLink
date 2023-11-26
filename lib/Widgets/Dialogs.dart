@@ -143,7 +143,8 @@ Future<void> errorDialog(BuildContext context) {
   );
 }
 
-Future<String?> suggestedFeeDialog(BuildContext context) =>
+Future<String?> suggestedFeeDialog(
+        BuildContext context, Function(double) getFee) =>
     showModalBottomSheet<String>(
       isScrollControlled: true,
       backgroundColor: AppColors.white,
@@ -152,10 +153,6 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       context: context,
       builder: (context) {
-        // Create an instance of SuggestedFee
-        SuggestedFee suggestedFeeWidget = const SuggestedFee();
-        double? totalFee;
-
         return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -166,7 +163,9 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SuggestedFee(),
+                SuggestedFee(
+                  getFee: getFee,
+                ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: SizedBox(
@@ -182,13 +181,7 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
                             fontFamily: AppFonts.montserrat,
                             color: AppColors.accentOrange,
                             command: () {
-                              double total = suggestedFeeWidget.suggestedFee;
-
-                              // Calculate the total fee by adding 50 to the suggestedFee value
-                              totalFee = total;
-
-                              print("Total Fee: $totalFee");
-                              Navigator.of(context).pop("Total Fee: $totalFee");
+                              Navigator.of(context).pop();
                             },
                             borderRadius: 8),
                       ],
@@ -226,7 +219,7 @@ Future<String?> makeOfferDialog(BuildContext context) {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  const SuggestedFee(),
+                  //const SuggestedFee(),
                   Padding(
                     padding: const EdgeInsets.only(top: 14.75),
                     child: TextAreaFormField(

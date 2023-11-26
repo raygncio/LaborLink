@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/styles.dart';
 
 class SuggestedFee extends StatefulWidget {
-  const SuggestedFee({Key? key}) : super(key: key);
+  const SuggestedFee({Key? key, required this.getFee}) : super(key: key);
+
+  final Function(double) getFee;
 
   @override
   State<SuggestedFee> createState() => _SuggestedFeeState();
-
-  // Make it a static variable to access in the getter
-  static _SuggestedFeeState suggestedFeeState = _SuggestedFeeState();
-
-  // Add a getter to get the suggested fee
-  double get suggestedFee => suggestedFeeState.getTotal();
 }
 
 class _SuggestedFeeState extends State<SuggestedFee> {
@@ -19,10 +15,15 @@ class _SuggestedFeeState extends State<SuggestedFee> {
   double convenienceFee = 0;
   double totalFee = 0;
 
-  // Method to calculate total fee
-  double getTotal() {
-    print(totalFee);
-    return totalFee;
+  getTotal(String value) {
+    suggestedFee = double.tryParse(value) ?? 0;
+    convenienceFee = suggestedFee * 0.10;
+
+    setState(() {
+      totalFee = suggestedFee + convenienceFee;
+    });
+
+    widget.getFee(totalFee);
   }
 
   @override
@@ -68,11 +69,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                           vertical: 4), // Adjust the padding as needed
                       child: TextField(
                         onChanged: (value) {
-                          setState(() {
-                            suggestedFee = double.tryParse(value) ?? 0;
-                            convenienceFee = suggestedFee * 0.10;
-                            totalFee = suggestedFee + convenienceFee;
-                          });
+                          getTotal(value);
                         },
                         keyboardType: TextInputType.number,
                         style: getTextStyle(
@@ -168,8 +165,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                                     ),
                                   ),
                                   Text(
-                                    'Php ${convenienceFee.toString()}'
-                                        .toString(), // Fixed convenience fee
+                                    'Php ${convenienceFee.toStringAsFixed(2)}',
                                     style: getTextStyle(
                                       textColor: AppColors.accentOrange,
                                       fontFamily: AppFonts.montserrat,
