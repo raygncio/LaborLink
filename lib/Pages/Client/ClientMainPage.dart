@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
 import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Profile/ProfilePage.dart';
@@ -42,10 +43,10 @@ class _ClientMainPageState extends State<ClientMainPage> {
 
   Future<bool> onWillPop() {
     DateTime now = DateTime.now();
-    if (currentBackPressTime == null || 
+    if (currentBackPressTime == null ||
         now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(msg: exit_warning);
+      Fluttertoast.showToast(msg: 'Exit?');
       return Future.value(false);
     }
     return Future.value(true);
