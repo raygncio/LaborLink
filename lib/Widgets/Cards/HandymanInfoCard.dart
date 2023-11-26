@@ -82,7 +82,7 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                               type: BadgeType.normal),
                         ),
                         AppBadge(
-                            label: widget.handymanInfo["city"],
+                            label: widget.handymanInfo["city"] ?? '',
                             type: BadgeType.normal)
                       ],
                     ),

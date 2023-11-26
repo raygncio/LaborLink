@@ -72,7 +72,9 @@ class DatabaseService {
   // For request attachments
   Future<String> uploadRequestAttachment(
       String userId, File selectedImage) async {
-    final requestStorage = _storage.ref().child('request').child('$userId.jpg');
+    String filename = '$userId-${DateTime.now()}';
+    final requestStorage =
+        _storage.ref().child('request').child('$filename.jpg');
     await requestStorage.putFile(selectedImage);
     final imageUrl = await requestStorage.getDownloadURL();
 
@@ -82,7 +84,8 @@ class DatabaseService {
   // For report attachments
   Future<String> uploadReportAttachment(
       String userId, File selectedImage) async {
-    final reportStorage = _storage.ref().child('report').child('$userId.jpg');
+    String filename = '$userId-${DateTime.now()}';
+    final reportStorage = _storage.ref().child('report').child('$filename.jpg');
     await reportStorage.putFile(selectedImage);
     final imageUrl = await reportStorage.getDownloadURL();
 
@@ -388,34 +391,42 @@ class DatabaseService {
     return resultList;
   }
 
-  // Search user and its request
+  // Get direct request of handyman
   Future<List<Map<String, dynamic>>> getDirectRequestOfHandyman(
       String handymanId) async {
     List<Map<String, dynamic>> resultList = [];
     // Query 'user' collection
-    final userQuery = await _db.collection('user').get();
+    final handymanQuery = await _db
+        .collection('handymanApproval')
+        .where('handymanId', isEqualTo: handymanId)
+        .where('status', isEqualTo: 'direct')
+        .get();
 
     // Process 'user' query results
-    for (var userDoc in userQuery.docs) {
-      final userId = userDoc.id;
-
-      // Query 'request' collection using userId
+    for (var handymanDoc in handymanQuery.docs) {
+      final handymanId = handymanDoc.id;
+      //print(handymanId); doc id
+      final handymanData = handymanDoc.data();
+      // Access specific fields from handymanData
+      final requestId = handymanData['requestId'];
+      print(handymanDoc.data());
+      // Query 'request' collection using requestId
       final requestQuery = await _db
           .collection('request')
-          .where('userId', isEqualTo: userId)
+          .where('userId', isEqualTo: requestId)
           .where('handymanId', isEqualTo: handymanId)
           .get();
 
       // Process 'request' query results
       for (var requestDoc in requestQuery.docs) {
-        final userData = userDoc.data();
         final requestData = requestDoc.data();
-
-        // Combine user and request data into a single map
-        Map<String, dynamic> combinedData = {...userData, ...requestData};
+        print(requestData);
+        // Combine handyman and request data into a single map
+        Map<String, dynamic> combinedData = {...handymanData, ...requestData};
         resultList.add(combinedData);
       }
     }
+    print(resultList);
     return resultList;
   }
 

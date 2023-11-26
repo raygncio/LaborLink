@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
@@ -6,8 +8,11 @@ import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/report.dart';
 import 'package:laborlink/models/client.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../dummyDatas.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class IssuesReportedPage extends StatefulWidget {
   final String userId;
@@ -20,6 +25,8 @@ class IssuesReportedPage extends StatefulWidget {
 class _IssuesReportedPageState extends State<IssuesReportedPage> {
   List<Report> issues = []; // This will hold your list of issues
   String fullName = "";
+  File? defaultAvatar;
+  final formattedDate = DateFormat('yyyy-MM-dd hh:mm');
 
   @override
   void initState() {
@@ -27,6 +34,7 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
     // Call an async function to fetch data
     _loadData();
     fetchUserData();
+    _loadDefaultAvatar();
   }
 
   // Define an async function to fetch data
@@ -70,6 +78,22 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
     }
   }
 
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -95,194 +119,101 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
 
                       return Container(
                         decoration: const BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: AppColors.secondaryBlue,
-                                    width: 0.5))),
+                          color: Colors.white,
+                          border: Border(
+                            bottom: BorderSide(
+                                color: AppColors.secondaryBlue, width: 0.5),
+                          ),
+                        ),
                         child: Stack(
                           children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 23, top: 12.64),
-                                  child: Row(
-                                    children: [
-                                      // Padding(
-                                      //   padding:
-                                      //       const EdgeInsets.only(right: 11),
-                                      //   child: ClipOval(
-                                      //     child: Image.network(
-                                      //       report.proof, // Use report data
-                                      //       width: 64,
-                                      //       height: 64,
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      Column(
-                                        children: [
-                                          Text(
-                                            fullName,
-                                            style: getTextStyle(
-                                                textColor:
-                                                    AppColors.secondaryBlue,
-                                                fontFamily: AppFonts.montserrat,
-                                                fontWeight: AppFontWeights.bold,
-                                                fontSize: 15),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 22),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 15.64, bottom: 12),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 5),
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: AppColors.white,
+                                            foregroundImage:
+                                                FileImage(defaultAvatar!),
                                           ),
-                                          Row(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 3),
-                                                child: Container(
-                                                  height: 12.35,
-                                                  width: 12.35,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.dirtyWhite,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                  ),
-                                                  // child: Image.asset(
-                                                  //   report
-                                                  //       .proof, // Use report data
-                                                  // ),
-                                                ),
-                                              ),
-                                              // Text(
-                                              //   report
-                                              //       .issueType, // Use report data
-                                              //   style: getTextStyle(
-                                              //       textColor:
-                                              //           AppColors.secondaryBlue,
-                                              //       fontFamily:
-                                              //           AppFonts.montserrat,
-                                              //       fontWeight:
-                                              //           AppFontWeights.bold,
-                                              //       fontSize: 10),
-                                              // ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 2.82),
-                                            child: AppBadge(
-                                              label:
-                                                  "Request ID: ${report.reportId}", // Use report data
-                                              type: BadgeType.normal,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 7, vertical: 1),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              fullName,
+                                              style: getTextStyle(
+                                                  textColor:
+                                                      AppColors.secondaryBlue,
+                                                  fontFamily:
+                                                      AppFonts.montserrat,
+                                                  fontWeight:
+                                                      AppFontWeights.bold,
+                                                  fontSize: 15),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 2.82),
+                                              child: Text(
+                                                formattedDate
+                                                    .format(report.createdAt!),
+                                                style: getTextStyle(
+                                                    textColor: AppColors.black,
+                                                    fontFamily:
+                                                        AppFonts.montserrat,
+                                                    fontWeight:
+                                                        AppFontWeights.medium,
+                                                    fontSize: 12),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 2.82),
+                                              child: AppBadge(
+                                                label:
+                                                    "Request ID: ${report.reportId}", // Use report data
+                                                type: BadgeType.normal,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 7,
+                                                        vertical: 1),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                // Padding(
-                                //   padding: const EdgeInsets.only(
-                                //       left: 28, right: 17, top: 14.65),
-                                //   child: LayoutBuilder(
-                                //     builder: (context, constraints) {
-                                //       double columnWidth =
-                                //           constraints.maxWidth / 2;
-
-                                //       return Row(
-                                //         children: [
-                                //           SizedBox(
-                                //             width: columnWidth,
-                                //             child: Column(
-                                //               crossAxisAlignment:
-                                //                   CrossAxisAlignment.start,
-                                //               children: [
-                                //                 TextWithIcon(
-                                //                   icon: Icon(Icons.place,
-                                //                       size: 13,
-                                //                       color: AppColors
-                                //                           .accentOrange),
-                                //                   text: report
-                                //                       .location, // Use report data
-                                //                   fontSize: 9,
-                                //                   contentPadding: 8,
-                                //                 ),
-                                //                 Padding(
-                                //                   padding: EdgeInsets.only(
-                                //                       top: 6.75),
-                                //                   child: TextWithIcon(
-                                //                     icon: Icon(
-                                //                         Icons
-                                //                             .local_offer_rounded,
-                                //                         size: 13,
-                                //                         color: AppColors
-                                //                             .accentOrange),
-                                //                     text:
-                                //                         "₱${report.cost}", // Use report data
-                                //                     fontSize: 9,
-                                //                     contentPadding: 8,
-                                //                   ),
-                                //                 ),
-                                //               ],
-                                //             ),
-                                //           ),
-                                //           SizedBox(
-                                //             width: columnWidth,
-                                //             child: Column(
-                                //               crossAxisAlignment:
-                                //                   CrossAxisAlignment.start,
-                                //               children: [
-                                //                 TextWithIcon(
-                                //                   icon: Icon(
-                                //                       Icons
-                                //                           .calendar_month_rounded,
-                                //                       size: 13,
-                                //                       color: AppColors
-                                //                           .accentOrange),
-                                //                   text: report
-                                //                       .date, // Use report data
-                                //                   fontSize: 9,
-                                //                   contentPadding: 8,
-                                //                 ),
-                                //                 Padding(
-                                //                   padding: EdgeInsets.only(
-                                //                       top: 6.75),
-                                //                   child: TextWithIcon(
-                                //                     icon: Icon(
-                                //                         Icons.watch_later,
-                                //                         size: 13,
-                                //                         color: AppColors
-                                //                             .accentOrange),
-                                //                     text: report
-                                //                         .time, // Use report data
-                                //                     fontSize: 9,
-                                //                     contentPadding: 8,
-                                //                   ),
-                                //                 ),
-                                //               ],
-                                //             ),
-                                //           )
-                                //         ],
-                                //       );
-                                //     },
-                                //   ),
-                                // ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 28,
-                                      right: 17,
-                                      top: 8.27,
-                                      bottom: 19),
-                                  child: Text(
-                                    report.issue, // Use report data
-                                    overflow: TextOverflow.visible,
-                                    style: getTextStyle(
-                                        textColor: AppColors.black,
-                                        fontFamily: AppFonts.montserrat,
-                                        fontWeight: AppFontWeights.regular,
-                                        fontSize: 9),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Image.network(report.proof),
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Text(
+                                      report.issue, // Use report data
+                                      overflow: TextOverflow.visible,
+                                      style: getTextStyle(
+                                          textColor: AppColors.black,
+                                          fontFamily: AppFonts.montserrat,
+                                          fontWeight: AppFontWeights.regular,
+                                          fontSize: 15),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Positioned(
                               top: 15,

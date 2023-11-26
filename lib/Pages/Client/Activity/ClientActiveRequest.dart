@@ -10,6 +10,7 @@ import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClientActiveRequest extends StatefulWidget {
   final Map<String, dynamic> requestDetail;

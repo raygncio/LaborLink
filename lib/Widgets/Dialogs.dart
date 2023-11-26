@@ -145,6 +145,7 @@ Future<void> errorDialog(BuildContext context) {
 
 Future<String?> suggestedFeeDialog(BuildContext context) =>
     showModalBottomSheet<String>(
+      isScrollControlled: true,
       backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -155,42 +156,47 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
         SuggestedFee suggestedFeeWidget = const SuggestedFee();
         double? totalFee;
 
-        return Container(
+        return Padding(
           padding:
-              const EdgeInsets.only(left: 24, right: 24, top: 25, bottom: 22),
-          height: 250,
-          child: Column(
-            children: [
-              const SuggestedFee(),
-              Align(
-                alignment: Alignment.centerRight,
-                child: SizedBox(
-                  width: 147,
-                  child: Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      AppFilledButton(
-                          text: "Submit",
-                          padding: const EdgeInsets.only(top: 13),
-                          fontSize: 15,
-                          height: 35,
-                          fontFamily: AppFonts.montserrat,
-                          color: AppColors.accentOrange,
-                          command: () {
-                            double total = suggestedFeeWidget.suggestedFee;
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            padding:
+                const EdgeInsets.only(left: 24, right: 24, top: 25, bottom: 22),
+            height: 250,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SuggestedFee(),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: SizedBox(
+                    width: 147,
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        AppFilledButton(
+                            text: "Submit",
+                            padding: const EdgeInsets.only(top: 13),
+                            fontSize: 15,
+                            height: 35,
+                            fontFamily: AppFonts.montserrat,
+                            color: AppColors.accentOrange,
+                            command: () {
+                              double total = suggestedFeeWidget.suggestedFee;
 
-                            // Calculate the total fee by adding 50 to the suggestedFee value
-                            totalFee = total;
+                              // Calculate the total fee by adding 50 to the suggestedFee value
+                              totalFee = total;
 
-                            print("Total Fee: $totalFee");
-                            Navigator.of(context).pop("Total Fee: $totalFee");
-                          },
-                          borderRadius: 8),
-                    ],
+                              print("Total Fee: $totalFee");
+                              Navigator.of(context).pop("Total Fee: $totalFee");
+                            },
+                            borderRadius: 8),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         );
       },

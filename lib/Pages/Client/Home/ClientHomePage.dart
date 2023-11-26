@@ -24,10 +24,9 @@ final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
 
 class ClientHomePage extends StatefulWidget {
-  final Function(int) navigateToNewPage;
+  final Function(int)? navigateToNewPage;
   final String userId;
-  const ClientHomePage(
-      {Key? key, required this.navigateToNewPage, required this.userId})
+  const ClientHomePage({Key? key, this.navigateToNewPage, required this.userId})
       : super(key: key);
 
   @override
@@ -156,7 +155,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
             if (value == "home") {
               updateSelectedTab(0);
             } else if (value == "activity") {
-              widget.navigateToNewPage(1);
+              widget.navigateToNewPage!(1);
             }
           },
         );

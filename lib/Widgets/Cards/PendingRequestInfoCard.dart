@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/styles.dart';
 
 enum PendingRequestType {
@@ -32,6 +34,8 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
   late double suggestedFee;
   late String userId;
 
+  var formattedDate = DateFormat('d-MM-yyyy');
+
   @override
   void initState() {
     title = widget.requestDetail["title"];
@@ -57,12 +61,51 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
   }
 
   void onCancelRequest() async {
-    DatabaseService service = DatabaseService();
-    try {
-      await service.cancelRequest(userId);
-      print('Document updated successfully');
-    } catch (e) {
-      print('Error updating document: $e');
+    bool confirmCancel = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cancel Request'),
+          content: Text('Are you sure you want to cancel your request?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false when cancel is pressed
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true when confirm is pressed
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmCancel == true) {
+      DatabaseService service = DatabaseService();
+      try {
+        await service.cancelRequest(userId);
+        print('Document updated successfully');
+        // Show SnackBar when request is successfully cancelled
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Your request has been successfully cancelled'),
+            duration: Duration(seconds: 2),
+            backgroundColor: AppColors.tertiaryBlue,
+          ),
+        );
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ClientMainPage(userId: userId),
+        ));
+      } catch (e) {
+        print('Error updating document: $e');
+      }
     }
   }
 
@@ -138,7 +181,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       child: TextWithIcon(
                         icon: Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: date,
+                        text: formattedDate.format(DateTime.parse(date)),
                         fontSize: 12,
                         contentPadding: 19,
                       ),

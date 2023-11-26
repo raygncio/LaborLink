@@ -7,6 +7,7 @@ import 'package:laborlink/Widgets/Forms/RequestForm.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/database_service.dart';
 
 class DirectRequestFormPage extends StatefulWidget {
@@ -87,8 +88,6 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
           if (value == "proceed") {
             suggestedFeeDialog(context).then((value) async {
               if (value == null) return;
-
-              if (value == "submit") {
                 DatabaseService service = DatabaseService();
                 try {
                   // Create a user in Firebase Authentication
@@ -107,11 +106,12 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
                     instructions: formData["instructions"],
                     suggestedPrice: 2.0,
                     userId: widget.userId,
+                    handymanId:  widget.handymanInfo["userId"],
                   );
 
                   HandymanApproval handymanApproval = HandymanApproval(
                     status: 'direct',
-                    handymanId: widget.userId,
+                    handymanId: widget.handymanInfo["userId"],
                     requestId: widget.userId,
                   );
 
@@ -128,7 +128,7 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
                     ),
                   );
                 }
-              }
+              
             });
           }
         });

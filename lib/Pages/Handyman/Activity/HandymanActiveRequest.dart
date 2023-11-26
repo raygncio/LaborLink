@@ -12,6 +12,7 @@ import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HandymanActiveRequest extends StatefulWidget {
   final Map<String, dynamic> requestDetail;
@@ -236,13 +237,12 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
   }
 
   void updateProgress() {
-    if(!_requestCompleted){
+    if (!_requestCompleted) {
       setState(() {
         _currentProgress += 1;
         _requestCompleted = _currentProgress == 5;
       });
-    }
-    else{
+    } else {
       attachServiceProofDialog(context);
     }
   }

@@ -132,6 +132,13 @@ class RequestFormState extends State<RequestForm> {
     _dateValue = _dateOptions.first;
     _timeValue = _timeOptions.first;
 
+    if (widget.handymanInfo != null) {
+      // Check if handymanInfo is not null
+      String handymanCategory = widget.handymanInfo!['specialization'];
+      print(handymanCategory);
+      _categoryValue = handymanCategory;
+    }
+
     super.initState();
     fetchUserAddress();
   }
@@ -224,7 +231,9 @@ class RequestFormState extends State<RequestForm> {
               label: "Attachment",
               onPickImage: (pickedImage) {
                 // receive image file
-                _selectedImage = pickedImage;
+                setState(() {
+                  _selectedImage = pickedImage;
+                });
               },
             ),
           ),
@@ -375,7 +384,7 @@ class RequestFormState extends State<RequestForm> {
   void _presentDatePicker() async {
     final now = DateTime.now(); // initial date
     final firstDate = DateTime(now.year, now.month, now.day);
-    final lastDate = DateTime(now.year, now.month, now.day + 1);
+    final lastDate = DateTime(now.year, now.month, now.day + 2);
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: lastDate,

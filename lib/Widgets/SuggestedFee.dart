@@ -21,6 +21,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
 
   // Method to calculate total fee
   double getTotal() {
+    print(totalFee);
     return totalFee;
   }
 
