@@ -305,7 +305,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                       fontWeight: AppFontWeights.regular,
                       fontSize: 10)),
             ),
-            const DirectRequestCard(),
+            DirectRequestCard(userId: widget.userId),
           ],
         ),
       ),

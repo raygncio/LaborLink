@@ -17,12 +17,12 @@ class SavedClientDataNotifier extends StateNotifier<Map<String, dynamic>> {
   saveRegistrationData(Map<String, dynamic> userData) {
     // state contains the list of maps
 
-    final isNotEmpty = state.isNotEmpty;
+    final isEmpty = state.isEmpty;
 
     // spread operator pulls out all the elements
     // and add them as invidual elements to the new list
     // pull out all the existing and ADD the new meal to a list
-    if (isNotEmpty) {
+    if (isEmpty) {
       state = {...state, ...userData};
       return;
     }

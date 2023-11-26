@@ -8,7 +8,8 @@ import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 
 class DirectRequestCard extends StatefulWidget {
-  const DirectRequestCard({Key? key}) : super(key: key);
+  final String userId;
+  const DirectRequestCard({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<DirectRequestCard> createState() => _DirectRequestCardState();
@@ -97,7 +98,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, top: 11.65),
+                  padding:
+                      const EdgeInsets.only(left: 15, right: 15, top: 11.65),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       double columnWidth = constraints.maxWidth / 2;
@@ -120,7 +122,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                   padding: EdgeInsets.only(top: 6.75),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.local_offer_rounded,
-                                        size: 13, color: AppColors.accentOrange),
+                                        size: 13,
+                                        color: AppColors.accentOrange),
                                     text: "₱550",
                                     fontSize: 9,
                                     contentPadding: 8,
@@ -145,7 +148,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                   padding: EdgeInsets.only(top: 6.75),
                                   child: TextWithIcon(
                                     icon: Icon(Icons.watch_later,
-                                        size: 13, color: AppColors.accentOrange),
+                                        size: 13,
+                                        color: AppColors.accentOrange),
                                     text: "12:00 - 1:00 PM",
                                     fontSize: 9,
                                     contentPadding: 8,
@@ -160,7 +164,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 13, right: 13, top: 8.27),
+                  padding:
+                      const EdgeInsets.only(left: 13, right: 13, top: 8.27),
                   child: Text(
                     "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
                     overflow: TextOverflow.visible,
@@ -269,13 +274,11 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
       if (value == null) return;
 
       if (value == "submit") {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const OfferSubmittedPage()));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const OfferSubmittedPage()));
       }
     });
   }
 
-  void onDecline(){
-
-  }
+  void onDecline() {}
 }

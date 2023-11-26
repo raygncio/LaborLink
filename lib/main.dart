@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
@@ -13,7 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // initialize camera upon start
+  //initialize camera upon start
   cameras = await availableCameras();
 
   // lock orientation

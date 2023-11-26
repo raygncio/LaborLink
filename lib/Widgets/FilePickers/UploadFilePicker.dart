@@ -28,8 +28,8 @@ class UploadFilePickerState extends State<UploadFilePicker> {
     // image quality -> 50 for small fize
     // max width: 150 -> small frame
     // -> lower bandwidth
-    final pickedImage = await ImagePicker().pickImage(
-        source: ImageSource.gallery, imageQuality: 50, maxWidth: 150);
+    final pickedImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 100);
 
     // check if there's an image
     if (pickedImage == null) return;

@@ -65,6 +65,13 @@ flutter {
     source '../..'
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.squareup.okhttp:okhttp:2.7.5'
+        force 'com.squareup.okio:okio:1.17.5'
+    }
+}
+
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:17.1.0'
@@ -72,8 +79,4 @@ dependencies {
     implementation 'com.google.android.gms:play-services-tflite-java:16.0.1'
     implementation 'com.google.android.gms:play-services-tflite-support:16.0.1'
     implementation 'com.google.android.gms:play-services-tflite-gpu:16.1.0'
-    implementation ('com.regula.face:api:+@aar') {
-        transitive = true
-    }
-    implementation ('com.regula.face:core:+@aar')
 }

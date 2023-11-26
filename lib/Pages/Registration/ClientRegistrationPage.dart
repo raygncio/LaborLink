@@ -230,6 +230,7 @@ class _ClientRegistrationPageState
             ...addressInfo,
             ...accountInfo,
             ...clientInfo,
+            'userRole': 'client',
           };
           ref
               .read(savedClientDataProvider.notifier)
@@ -240,7 +241,7 @@ class _ClientRegistrationPageState
 
           fileAttachments = [
             {
-              'type': clientInfo['idType'],
+              'type': 'tesda',
               'file': clientInfo['idFile'],
             }
           ];
@@ -250,42 +251,42 @@ class _ClientRegistrationPageState
 
           // Dead code below >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-          // Create a user in Firebase Authentication
-          DatabaseService service = DatabaseService();
-          UserCredential userCredential =
-              await _firebase.createUserWithEmailAndPassword(
-                  email: accountInfo["email"],
-                  password: accountInfo["password"]);
+          // // Create a user in Firebase Authentication
+          // DatabaseService service = DatabaseService();
+          // UserCredential userCredential =
+          //     await _firebase.createUserWithEmailAndPassword(
+          //         email: accountInfo["email"],
+          //         password: accountInfo["password"]);
 
-          // Get the current date and time
-          // DateTime now = DateTime.now();
-          // Convert the DateTime to a string in a suitable format
-          // String currentDate =
-          //     "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          // Upload files to Firebase Storage
-          String imageUrl = await service.uploadNBIClearance(
-              userCredential.user!.uid, clientInfo["idFile"]);
+          // // Get the current date and time
+          // // DateTime now = DateTime.now();
+          // // Convert the DateTime to a string in a suitable format
+          // // String currentDate =
+          // //     "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          // // Upload files to Firebase Storage
+          // String imageUrl = await service.uploadNBIClearance(
+          //     userCredential.user!.uid, clientInfo["idFile"]);
 
-          Client client = Client(
-              userId: userCredential.user!.uid,
-              userRole: "client",
-              firstName: basicInfo["first_name"],
-              lastName: basicInfo["last_name"],
-              middleName: basicInfo["middle_name"],
-              suffix: basicInfo["suffix"],
-              dob: basicInfo["birthday"],
-              sex: basicInfo["gender"],
-              streetAddress: addressInfo["street"],
-              state: addressInfo["state"],
-              city: addressInfo["city"],
-              zipCode: int.parse(addressInfo["zip"]),
-              emailAdd: accountInfo["email"],
-              username: accountInfo["username"],
-              phoneNumber: accountInfo["phone"],
-              validId: clientInfo["idType"],
-              idProof: imageUrl);
+          // Client client = Client(
+          //     userId: userCredential.user!.uid,
+          //     userRole: "client",
+          //     firstName: basicInfo["first_name"],
+          //     lastName: basicInfo["last_name"],
+          //     middleName: basicInfo["middle_name"],
+          //     suffix: basicInfo["suffix"],
+          //     dob: basicInfo["birthday"],
+          //     sex: basicInfo["gender"],
+          //     streetAddress: addressInfo["street"],
+          //     state: addressInfo["state"],
+          //     city: addressInfo["city"],
+          //     zipCode: int.parse(addressInfo["zip"]),
+          //     emailAdd: accountInfo["email"],
+          //     username: accountInfo["username"],
+          //     phoneNumber: accountInfo["phone"],
+          //     validId: clientInfo["idType"],
+          //     idProof: imageUrl);
 
-          await service.addUser(client);
+          // await service.addUser(client);
 
           // Navigator.of(context).push(MaterialPageRoute(
           //   builder: (context) => const FaceDetectionPage(),
