@@ -17,23 +17,38 @@ class ClientMainPage extends StatefulWidget {
 
 class _ClientMainPageState extends State<ClientMainPage> {
   int _selectedIndex = 0;
+  DateTime? currentBackPressTime;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(child: selectedPage()),
-            AppBottomNavBar(
-              selectedIndex: _selectedIndex,
-              onChanged: updateSelectedIndex,
-            )
-          ],
+      body: WillPopScope(
+        onWillPop: onWillPop,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(child: selectedPage()),
+              AppBottomNavBar(
+                selectedIndex: _selectedIndex,
+                onChanged: updateSelectedIndex,
+              )
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null || 
+        now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      Fluttertoast.showToast(msg: exit_warning);
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   void updateSelectedIndex(int selectedIndex) {
