@@ -6,6 +6,8 @@ import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/Forms/RequestForm.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/database_service.dart';
 
 class DirectRequestFormPage extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -79,17 +81,53 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
           ),
         );
       } else {
-        // Proceed with the form data
-        // Your logic here...
         confirmationDialog(context).then((value) {
           if (value == null) return;
 
           if (value == "proceed") {
-            suggestedFeeDialog(context).then((value) {
+            suggestedFeeDialog(context).then((value) async {
               if (value == null) return;
 
               if (value == "submit") {
-                Navigator.of(context).pop("submit");
+                DatabaseService service = DatabaseService();
+                try {
+                  // Create a user in Firebase Authentication
+                  String imageUrl = await service.uploadRequestAttachment(
+                      widget.userId, formData['attachment']);
+
+                  Request request = Request(
+                    title: formData["title"],
+                    category: formData["category"],
+                    description: formData["description"],
+                    attachment: imageUrl,
+                    address: formData["address"],
+                    date: formData["date"],
+                    time: formData["time"],
+                    progress: "pending",
+                    instructions: formData["instructions"],
+                    suggestedPrice: 2.0,
+                    userId: widget.userId,
+                  );
+
+                  HandymanApproval handymanApproval = HandymanApproval(
+                    status: 'direct',
+                    handymanId: widget.userId,
+                    requestId: widget.userId,
+                  );
+
+                  await service.addHandymanApproval(handymanApproval);
+                  await service.addRequest(request);
+
+                  Navigator.of(context).pop("submit");
+                } catch (e) {
+                  // Handle errors during user creation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Error creating user: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             });
           }

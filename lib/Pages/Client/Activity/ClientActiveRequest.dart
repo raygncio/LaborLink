@@ -185,7 +185,32 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     );
   }
 
-  void onMessageButtonClick() {}
+  void onMessageButtonClick() {
+    sendMessage(
+      '09171792602',
+      'Hello, this is a test message!', // Your desired message content
+    );
+  }
+
+  Future<void> sendMessage(String phoneNumber, String message) async {
+    final Uri url = Uri(
+      scheme: 'sms',
+      path: phoneNumber,
+      queryParameters: {'body': message},
+    );
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        print('Could not launch SMS');
+        // Handle error if unable to launch the SMS app
+      }
+    } catch (e) {
+      print('Error launching SMS: $e');
+      // Handle error
+    }
+  }
 
   void onConfirm() {
     Navigator.of(context).push(MaterialPageRoute(

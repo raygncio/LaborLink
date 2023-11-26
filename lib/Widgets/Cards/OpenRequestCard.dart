@@ -287,6 +287,9 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     } catch (e) {
       print('Error: $e');
     }
+    setState(() {
+          
+        });
   }
 
   void onMakeOffer() {

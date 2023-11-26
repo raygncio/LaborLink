@@ -49,9 +49,12 @@ class RequestFormState extends State<RequestForm> {
   final _instructionsController = TextEditingController();
 
   final _filePickerKey = GlobalKey<UploadFilePickerState>();
-  DateTime? _selectedDate;
+
 //file
   File? _selectedImage;
+  DateTime? _selectedDate;
+  String homeAddress = '';
+  var formattedDate = DateFormat('d-MM-yyyy');
 
   final List<String> _categories = dummyDropdownData;
   final List<String> _dateOptions = dummyDropdownData;
@@ -92,8 +95,8 @@ class RequestFormState extends State<RequestForm> {
         "category": _categoryValue,
         "description": _descriptionController.text,
         "attachment": _selectedImage,
-        "date": _selectedDate,
-        "time": _timeValue,
+        "date": _selectedDate.toString(),
+        "time": _timeValue.toString(),
         "address": _addressController.text,
         "instructions": _instructionsController.text,
         "handymanId": widget.handymanInfo!["handymanId"],
@@ -104,11 +107,22 @@ class RequestFormState extends State<RequestForm> {
         "category": _categoryValue,
         "description": _descriptionController.text,
         "attachment": _selectedImage,
-        "date": _selectedDate,
-        "time": _timeValue,
+        "date": _selectedDate.toString(),
+        "time": _timeValue.toString(),
         "address": _addressController.text,
         "instructions": _instructionsController.text,
       };
+    }
+  }
+
+  Future<void> fetchUserAddress() async {
+    DatabaseService service = DatabaseService();
+    try {
+      Client clientInfo = await service.getUserData(widget.userId);
+
+      homeAddress = clientInfo.streetAddress;
+    } catch (error) {
+      print('Error fetching user data: $error');
     }
   }
 
@@ -120,21 +134,6 @@ class RequestFormState extends State<RequestForm> {
 
     super.initState();
     fetchUserAddress();
-  }
-
-  Future<void> fetchUserAddress() async {
-    DatabaseService service = DatabaseService();
-    try {
-      Client clientInfo = await service.getUserData(widget.userId);
-
-      String address = clientInfo.streetAddress;
-
-      setState(() {
-        _addressController.text = address;
-      });
-    } catch (error) {
-      print('Error fetching user data: $error');
-    }
   }
 
   @override
@@ -229,54 +228,53 @@ class RequestFormState extends State<RequestForm> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Row(
-              children: [
-                TextButton(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
                   onPressed: _presentDatePicker,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 28),
-                    child: Text(
-                      'Date needed*',
-                      style: getTextStyle(
-                        textColor: AppColors.secondaryBlue,
-                        fontFamily: AppFonts.montserrat,
-                        fontWeight: AppFontWeights.semiBold,
-                        fontSize: 10,
-                      ),
-                    ),
+                  icon: const Icon(
+                    Icons.calendar_today,
+                    color: AppColors.tertiaryBlue,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: IconButton(
-                    onPressed: _presentDatePicker,
-                    icon: Icon(
-                      Icons.calendar_today,
-                      color: AppColors.tertiaryBlue,
-                    ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 5, top: 10),
+                child: Text(
+                  _selectedDate != null
+                      ? formattedDate.format(_selectedDate!)
+                      : 'Please select a date',
+                  style: getTextStyle(
+                    textColor: AppColors.secondaryBlue,
+                    fontFamily: AppFonts.montserrat,
+                    fontWeight: AppFontWeights.regular,
+                    fontSize: 15,
                   ),
                 ),
-                AppDropdown(
-                  height: 27,
-                  width: 113,
-                  label: "Time needed *",
-                  labelTextStyle: getTextStyle(
-                      textColor: AppColors.secondaryBlue,
-                      fontFamily: AppFonts.montserrat,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 10),
-                  labelPadding: const EdgeInsets.only(bottom: 4),
-                  dropdownValues: timeOptions,
-                  onChanged: (value) {
-                    setState(() {
-                      _timeValue = value;
-                    });
-                  },
-                ),
-              ],
-            ),
+              ),
+              const Spacer(),
+              AppDropdown(
+                height: 27,
+                width: 113,
+                label: "Time needed *",
+                labelTextStyle: getTextStyle(
+                    textColor: AppColors.secondaryBlue,
+                    fontFamily: AppFonts.montserrat,
+                    fontWeight: AppFontWeights.semiBold,
+                    fontSize: 10),
+                labelPadding: const EdgeInsets.only(bottom: 4),
+                dropdownValues: timeOptions,
+                onChanged: (value) {
+                  setState(() {
+                    _timeValue = value;
+                  });
+                },
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.only(top: 7),
@@ -311,7 +309,7 @@ class RequestFormState extends State<RequestForm> {
                     borderWidth: 1,
                     onChanged: (value) {
                       setState(() {
-                        _useDefaultAddress = value;
+                        _addressController.text = homeAddress;
                       });
                     },
                   ),
@@ -376,8 +374,8 @@ class RequestFormState extends State<RequestForm> {
 
   void _presentDatePicker() async {
     final now = DateTime.now(); // initial date
-    final firstDate = DateTime(now.year - 100, now.month, now.day);
-    final lastDate = DateTime(now.year - 18, now.month, now.day);
+    final firstDate = DateTime(now.year, now.month, now.day);
+    final lastDate = DateTime(now.year, now.month, now.day + 1);
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: lastDate,
