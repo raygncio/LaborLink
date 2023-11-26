@@ -147,9 +147,16 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           print("Unknown user role");
         }
-      } catch (e) {
+      } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.
         print("Login error: $e");
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'Authentication Failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } else {
       // Show an error message for not entering valid credentials

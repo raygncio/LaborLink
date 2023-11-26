@@ -548,33 +548,32 @@ class DatabaseService {
     await _db.collection('handymanApproval').add(approvalData.toFirestore());
   }
 
-  // Get all user and its request specific to the category of the handyman
-  Future<List<Map<String, dynamic>>> getUserAndRequest(String userId) async {
+  // Get all interested handyman
+  Future<List<Map<String, dynamic>>> getInterestedHandyman(
+      String requestId) async {
     List<Map<String, dynamic>> resultList = [];
     DatabaseService service = DatabaseService();
-    Handyman handyman = await service.getHandymanData(userId);
 
     // Query 'user' collection
-    final userQuery = await _db.collection('user').get();
+    final handymanQuery = await _db.collection('handymanApproval').get();
 
     // Process 'user' query results
-    for (var userDoc in userQuery.docs) {
-      final userId = userDoc.id;
+    for (var handymanDoc in handymanQuery.docs) {
+      final handymanId = handymanDoc.id;
 
       // Query 'request' collection using userId
-      final requestQuery = await _db
-          .collection('request')
-          .where('userId', isEqualTo: userId)
-          .where('category', isEqualTo: handyman.specialization)
+      final userQuery = await _db
+          .collection('user')
+          .where('userId', isEqualTo: handymanId)
           .get();
 
       // Process 'request' query results
-      for (var requestDoc in requestQuery.docs) {
+      for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
-        final requestData = requestDoc.data();
+        final handymanData = handymanDoc.data();
 
         // Combine user and request data into a single map
-        Map<String, dynamic> combinedData = {...userData, ...requestData};
+        Map<String, dynamic> combinedData = {...userData, ...handymanData};
         resultList.add(combinedData);
       }
     }
@@ -595,6 +594,38 @@ class DatabaseService {
         await _db.collection('offer').doc(userId).get();
 
     return Offer.fromFireStore(docSnap);
+  }
+
+  // Get all interested handyman and its offers to the request
+  Future<List<Map<String, dynamic>>> getInterestedHandymanAndOffer(
+      String requestId) async {
+    List<Map<String, dynamic>> resultList = [];
+    DatabaseService service = DatabaseService();
+
+    // Query 'user' collection
+    final offerQuery = await _db.collection('offer').get();
+
+    // Process 'user' query results
+    for (var offerDoc in offerQuery.docs) {
+      final offerId = offerDoc.id;
+
+      // Query 'request' collection using userId
+      final userQuery = await _db
+          .collection('user')
+          .where('userId', isEqualTo: offerId)
+          .get();
+
+      // Process 'request' query results
+      for (var userDoc in userQuery.docs) {
+        final userData = userDoc.data();
+        final offerData = offerDoc.data();
+
+        // Combine user and request data into a single map
+        Map<String, dynamic> combinedData = {...userData, ...offerData};
+        resultList.add(combinedData);
+      }
+    }
+    return resultList;
   }
 
   // REVIEWS

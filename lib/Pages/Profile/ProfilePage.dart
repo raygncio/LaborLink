@@ -74,8 +74,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ' ' +
           (clientInfo.suffix ?? "");
 
-      String formattedDate =
-          DateFormat('MMMM d, y').format(clientInfo.dob); // Format the date
+      String formattedDate = 
+          DateFormat('MMMM d, y').format(clientInfo.dob!) ; // Format the date
 
       setState(() {
         _fullNameController.text = fullName;

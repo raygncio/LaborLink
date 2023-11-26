@@ -13,7 +13,7 @@ class Client {
   final String lastName;
   final String middleName;
   final String? suffix;
-  final DateTime dob;
+  final DateTime? dob;
   final String sex;
   final String streetAddress;
   final String city;
@@ -36,7 +36,7 @@ class Client {
     required this.lastName,
     required this.middleName,
     this.suffix,
-    required this.dob,
+    this.dob,
     required this.sex,
     required this.streetAddress,
     required this.state,
@@ -106,9 +106,9 @@ class Client {
     };
   }
 
-  String get formattedDob {
-    return formatter.format(dob);
-  }
+  // String get formattedDob {
+  //   return formatter.format(dob);
+  // }
 }
 
 // HELPER CLASS

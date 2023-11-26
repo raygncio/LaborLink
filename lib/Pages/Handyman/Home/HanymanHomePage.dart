@@ -35,7 +35,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   DatabaseService service = DatabaseService();
   late GlobalKey<RequestFormState> requestFormKey;
   List<Map<String, dynamic>> _searchResults = [];
-  List<Map<String, dynamic>> results = [];
+  List<Map<String, dynamic>> offers = [];
+  List<Map<String, dynamic>> interested = [];
 
   int _selectedTabIndex = 0;
 

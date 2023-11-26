@@ -155,7 +155,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
       // Firestore
       await service.addUser(client);
-    } catch (error) {
+    } on FirebaseAuthException catch (error) {
       print('Error fetching user data: $error');
     }
   }
@@ -165,59 +165,65 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     // Create a user in Firebase Authentication
     DatabaseService service = DatabaseService();
-    UserCredential userCredential =
-        await _firebase.createUserWithEmailAndPassword(
-            email: savedUserData["email"], password: savedUserData["password"]);
 
-    //for uploading nbi clearance
-    String imageUrl = await service.uploadNBIClearance(
-        userCredential.user!.uid, savedUserData["idFile"]);
+    try {
+      UserCredential userCredential =
+          await _firebase.createUserWithEmailAndPassword(
+              email: savedUserData["email"],
+              password: savedUserData["password"]);
 
-    String recommendationUrl = '';
-    if (savedUserData["recLetterFile"] != null) {
-      //for uploading recommendation letter
-      recommendationUrl = await service.uploadRecommendationLetter(
-          userCredential.user!.uid, savedUserData["recLetterFile"]);
-    }
+      //for uploading nbi clearance
+      String imageUrl = await service.uploadNBIClearance(
+          userCredential.user!.uid, savedUserData["idFile"]);
 
-    //for uploading TESDA certification
-    String tesdaUrl = await service.uploadTesda(
-        userCredential.user!.uid, savedUserData["certProofFile"]);
+      String recommendationUrl = '';
+      if (savedUserData["recLetterFile"] != null) {
+        //for uploading recommendation letter
+        recommendationUrl = await service.uploadRecommendationLetter(
+            userCredential.user!.uid, savedUserData["recLetterFile"]);
+      }
 
-    Client client = Client(
+      //for uploading TESDA certification
+      String tesdaUrl = await service.uploadTesda(
+          userCredential.user!.uid, savedUserData["certProofFile"]);
+
+      Client client = Client(
+          userId: userCredential.user!.uid,
+          userRole: "handyman",
+          firstName: savedUserData["first_name"],
+          lastName: savedUserData["last_name"],
+          middleName: savedUserData["middle_name"],
+          suffix: savedUserData["suffix"],
+          dob: savedUserData["birthday"],
+          sex: savedUserData["gender"],
+          streetAddress: savedUserData["street"],
+          state: savedUserData["state"],
+          city: savedUserData["city"],
+          zipCode: int.parse(savedUserData["zip"]),
+          emailAdd: savedUserData["email"],
+          username: savedUserData["username"],
+          phoneNumber: savedUserData["phone"],
+          validId: savedUserData["idType"],
+          idProof: imageUrl);
+
+      print(savedUserData["specialization"]);
+
+      Handyman handyman = Handyman(
+        applicantStatus: "pending",
+        specialization: savedUserData["specialization"],
+        employer: savedUserData["employer"],
+        nbiClearance: imageUrl,
+        certification: savedUserData["certificateName"],
+        certificationProof: tesdaUrl,
+        recommendationLetter: recommendationUrl,
         userId: userCredential.user!.uid,
-        userRole: "handyman",
-        firstName: savedUserData["first_name"],
-        lastName: savedUserData["last_name"],
-        middleName: savedUserData["middle_name"],
-        suffix: savedUserData["suffix"],
-        dob: savedUserData["birthday"],
-        sex: savedUserData["gender"],
-        streetAddress: savedUserData["street"],
-        state: savedUserData["state"],
-        city: savedUserData["city"],
-        zipCode: int.parse(savedUserData["zip"]),
-        emailAdd: savedUserData["email"],
-        username: savedUserData["username"],
-        phoneNumber: savedUserData["phone"],
-        validId: savedUserData["idType"],
-        idProof: imageUrl);
+      );
 
-    print(savedUserData["specialization"]);
-
-    Handyman handyman = Handyman(
-      applicantStatus: "pending",
-      specialization: savedUserData["specialization"],
-      employer: savedUserData["employer"],
-      nbiClearance: imageUrl,
-      certification: savedUserData["certificateName"],
-      certificationProof: tesdaUrl,
-      recommendationLetter: recommendationUrl,
-      userId: userCredential.user!.uid,
-    );
-
-    await service.addUser(client);
-    await service.addHandyman(handyman);
+      await service.addUser(client);
+      await service.addHandyman(handyman);
+    } on FirebaseAuthException catch (error) {
+      print('>>>>>>>>>>>>>>>>>>>>Error fetching user data: $error');
+    }
   }
 
   @override
