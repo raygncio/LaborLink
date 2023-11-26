@@ -3,8 +3,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class SavedClientDataNotifier extends StateNotifier<Map<String, dynamic>> {
-  SavedClientDataNotifier() : super({});
+class RegistrationDataNotifier extends StateNotifier<Map<String, dynamic>> {
+  RegistrationDataNotifier() : super({});
   // reach out to the parent class and pass the initial data
   // set the initial data that will be stored in the Notifier and the Provider below
   // in this, an empty list of maps
@@ -30,9 +30,10 @@ class SavedClientDataNotifier extends StateNotifier<Map<String, dynamic>> {
   }
 }
 
-final savedClientDataProvider =
-    StateNotifierProvider<SavedClientDataNotifier, Map<String, dynamic>>((ref) {
+final registrationDataProvider =
+    StateNotifierProvider<RegistrationDataNotifier, Map<String, dynamic>>(
+        (ref) {
   // instance of the notifier class
   // for editing and retrieving the state
-  return SavedClientDataNotifier();
+  return RegistrationDataNotifier();
 });

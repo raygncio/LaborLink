@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/LoginPage.dart';
+import 'package:laborlink/Pages/Registration/TermsAndConditionPage.dart';
 import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/providers/saved_client_provider.dart';
+import 'package:laborlink/providers/registration_data_provider.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,6 +33,7 @@ class VerdictPage extends ConsumerStatefulWidget {
 class _VerdictPageState extends ConsumerState<VerdictPage> {
   Widget button = const SizedBox();
   Map<String, dynamic> savedUserData = {};
+  bool isRegistered = false;
 
   String processOutputs() {
     if (widget.outputs.isEmpty) return '';
@@ -84,8 +87,8 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
   }
 
   showButton() {
-    Widget route = const DummyPage();
-    if (widget.isSuccessful) route = const SplashOnePage();
+    Widget route = const LoginPage();
+    if (widget.isSuccessful) route = const TermsAndConditionPage();
     Widget delayed;
 
     delayed = TextButton(
@@ -111,6 +114,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     setState(() {
       button = delayed;
+      isRegistered = true;
     });
   }
 
@@ -165,10 +169,14 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isSuccessful) savedUserData = ref.watch(savedClientDataProvider);
+    if (widget.isSuccessful) {
+      savedUserData = ref.watch(registrationDataProvider);
+    }
 
-    if (savedUserData.isNotEmpty && savedUserData['userRole'] == 'client') {
-      createClientAccount();
+    if (!isRegistered && savedUserData.isNotEmpty) {
+      if (savedUserData['userRole'] == 'client') {
+        createClientAccount();
+      }
     }
 
     String description = processOutputs();

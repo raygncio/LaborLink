@@ -388,6 +388,37 @@ class DatabaseService {
     return resultList;
   }
 
+  // Search user and its request
+  Future<List<Map<String, dynamic>>> getDirectRequestOfHandyman(
+      String handymanId) async {
+    List<Map<String, dynamic>> resultList = [];
+    // Query 'user' collection
+    final userQuery = await _db.collection('user').get();
+
+    // Process 'user' query results
+    for (var userDoc in userQuery.docs) {
+      final userId = userDoc.id;
+
+      // Query 'request' collection using userId
+      final requestQuery = await _db
+          .collection('request')
+          .where('userId', isEqualTo: userId)
+          .where('handymanId', isEqualTo: handymanId)
+          .get();
+
+      // Process 'request' query results
+      for (var requestDoc in requestQuery.docs) {
+        final userData = userDoc.data();
+        final requestData = requestDoc.data();
+
+        // Combine user and request data into a single map
+        Map<String, dynamic> combinedData = {...userData, ...requestData};
+        resultList.add(combinedData);
+      }
+    }
+    return resultList;
+  }
+
   Future<Request?> getRequestsData(String userId) async {
     final querySnap = await _db
         .collection('request')
@@ -476,6 +507,20 @@ class DatabaseService {
     for (var doc in requestQuery.docs) {
       await doc.reference.update({
         'progress': 'cancelled',
+      });
+    }
+  }
+
+  // Update the progress to cancelled request
+  Future<void> declineDirectRequest(String requestId) async {
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: requestId)
+        .get();
+
+    for (var doc in requestQuery.docs) {
+      await doc.reference.update({
+        'handymanId': '',
       });
     }
   }

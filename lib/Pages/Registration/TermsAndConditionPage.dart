@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Registration/AccountCreatedPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Checkbox.dart';
@@ -168,7 +169,7 @@ class _TermsAndConditionPageState extends State<TermsAndConditionPage> {
                           fontFamily: AppFonts.poppins,
                           fontSize: 15,
                           height: 42,
-                          text: "REGISTER",
+                          text: "CONTINUE",
                           color: AppColors.tertiaryBlue,
                           command: onRegister,
                           borderRadius: 8)
@@ -185,5 +186,11 @@ class _TermsAndConditionPageState extends State<TermsAndConditionPage> {
 
   void onCancel() {}
 
-  void onRegister() {}
+  void onRegister() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => const AccountCreatedPage(),
+      ),
+    );
+  }
 }

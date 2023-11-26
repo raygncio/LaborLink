@@ -14,7 +14,7 @@ import 'dart:async';
 import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/splash/splash_one.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/providers/saved_client_provider.dart';
+import 'package:laborlink/providers/registration_data_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
@@ -233,7 +233,7 @@ class _ClientRegistrationPageState
             'userRole': 'client',
           };
           ref
-              .read(savedClientDataProvider.notifier)
+              .read(registrationDataProvider.notifier)
               .saveRegistrationData(savedClientDataMap);
 
           // Verify Credentials First before creating user and storing user data

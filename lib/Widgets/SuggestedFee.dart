@@ -8,20 +8,20 @@ class SuggestedFee extends StatefulWidget {
   State<SuggestedFee> createState() => _SuggestedFeeState();
 
   // Make it a static variable to access in the getter
-  static _SuggestedFeeState _suggestedFeeState = _SuggestedFeeState();
+  static _SuggestedFeeState suggestedFeeState = _SuggestedFeeState();
 
   // Add a getter to get the suggested fee
-  double get suggestedFee => _suggestedFeeState.calculateTotalFee();
+  double get suggestedFee => suggestedFeeState.getTotal();
 }
 
 class _SuggestedFeeState extends State<SuggestedFee> {
   double suggestedFee = 0; // Variable to store suggested fee
+  double convenienceFee = 0;
+  double totalFee = 0;
 
   // Method to calculate total fee
-  double calculateTotalFee() {
-    // Assume fixed convenience fee is 50
-    double convenienceFee = 50;
-    return suggestedFee + convenienceFee;
+  double getTotal() {
+    return totalFee;
   }
 
   @override
@@ -69,6 +69,8 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                         onChanged: (value) {
                           setState(() {
                             suggestedFee = double.tryParse(value) ?? 0;
+                            convenienceFee = suggestedFee * 0.10;
+                            totalFee = suggestedFee + convenienceFee;
                           });
                         },
                         keyboardType: TextInputType.number,
@@ -165,7 +167,8 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                                     ),
                                   ),
                                   Text(
-                                    "Php 50", // Fixed convenience fee
+                                    'Php ${convenienceFee.toString()}'
+                                        .toString(), // Fixed convenience fee
                                     style: getTextStyle(
                                       textColor: AppColors.accentOrange,
                                       fontFamily: AppFonts.montserrat,
@@ -189,7 +192,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                         Padding(
                           padding: const EdgeInsets.only(top: 3, right: 12),
                           child: Text(
-                            "Php ${suggestedFee.toString()}",
+                            "Php $totalFee",
                             style: getTextStyle(
                               textColor: AppColors.accentOrange,
                               fontFamily: AppFonts.montserrat,

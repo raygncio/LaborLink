@@ -134,13 +134,13 @@ class _LoginPageState extends State<LoginPage> {
 
         if (clientInfo.userRole == "handyman") {
           // User is a handyman, navigate to the handyman page.
-          Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) =>
                 HandymanMainPage(userId: userCredential.user!.uid),
           ));
         } else if (clientInfo.userRole == "client") {
           // User is a client, navigate to the client page.
-          Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) =>
                 ClientMainPage(userId: userCredential.user!.uid),
           ));

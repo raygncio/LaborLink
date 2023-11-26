@@ -6,16 +6,37 @@ import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/database_service.dart';
 
 class DirectRequestCard extends StatefulWidget {
   final String userId;
-  const DirectRequestCard({Key? key, required this.userId}) : super(key: key);
+  final Map<String, dynamic> requestInfo;
+  const DirectRequestCard(
+      {Key? key, required this.userId, required this.requestInfo})
+      : super(key: key);
 
   @override
   State<DirectRequestCard> createState() => _DirectRequestCardState();
 }
 
 class _DirectRequestCardState extends State<DirectRequestCard> {
+  late String fullname;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeFullname();
+  }
+
+  void initializeFullname() {
+    String firstName = widget.requestInfo['firstName'] ?? '';
+    String middleName = widget.requestInfo['middleName'] ?? '';
+    String lastName = widget.requestInfo['lastName'] ?? '';
+    String suffix = widget.requestInfo['suffix'] ?? '';
+
+    fullname = '$firstName $middleName $lastName $suffix';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -47,7 +68,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                       Column(
                         children: [
                           Text(
-                            "Hanni Pham",
+                            fullname,
                             style: getTextStyle(
                                 textColor: AppColors.secondaryBlue,
                                 fontFamily: AppFonts.montserrat,
@@ -82,7 +103,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                   ),
                                 ),
                                 Text(
-                                  "Clogged Toilet",
+                                  widget.requestInfo["title"],
                                   style: getTextStyle(
                                       textColor: AppColors.secondaryBlue,
                                       fontFamily: AppFonts.montserrat,
@@ -108,13 +129,13 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                         children: [
                           SizedBox(
                             width: columnWidth,
-                            child: const Column(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextWithIcon(
                                   icon: Icon(Icons.place,
                                       size: 13, color: AppColors.accentOrange),
-                                  text: "556 Juan Luna Ave.",
+                                  text: widget.requestInfo["address"] ?? '',
                                   fontSize: 9,
                                   contentPadding: 8,
                                 ),
@@ -124,7 +145,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                     icon: Icon(Icons.local_offer_rounded,
                                         size: 13,
                                         color: AppColors.accentOrange),
-                                    text: "₱550",
+                                    text: widget.requestInfo["suggestedFee"] ??
+                                        '',
                                     fontSize: 9,
                                     contentPadding: 8,
                                   ),
@@ -134,13 +156,13 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                           ),
                           SizedBox(
                             width: columnWidth,
-                            child: const Column(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextWithIcon(
                                   icon: Icon(Icons.calendar_month_rounded,
                                       size: 13, color: AppColors.accentOrange),
-                                  text: "07 Aug 2023",
+                                  text: widget.requestInfo["date"] ?? '',
                                   fontSize: 9,
                                   contentPadding: 8,
                                 ),
@@ -150,7 +172,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                     icon: Icon(Icons.watch_later,
                                         size: 13,
                                         color: AppColors.accentOrange),
-                                    text: "12:00 - 1:00 PM",
+                                    text: widget.requestInfo["time"] ?? '',
                                     fontSize: 9,
                                     contentPadding: 8,
                                   ),
@@ -167,7 +189,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                   padding:
                       const EdgeInsets.only(left: 13, right: 13, top: 8.27),
                   child: Text(
-                    "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+                    widget.requestInfo["description"],
                     overflow: TextOverflow.visible,
                     style: getTextStyle(
                         textColor: AppColors.black,
@@ -176,33 +198,33 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                         fontSize: 9),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 4.5),
-                          child: Image.network(
-                            imgPlaceholder,
-                            height: 101,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 4.5),
-                          child: Image.network(
-                            imgPlaceholder,
-                            height: 101,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
+                //   child: Row(
+                //     children: [
+                //       Expanded(
+                //         child: Padding(
+                //           padding: const EdgeInsets.only(right: 4.5),
+                //           child: Image.network(
+                //             imgPlaceholder,
+                //             height: 101,
+                //             fit: BoxFit.cover,
+                //           ),
+                //         ),
+                //       ),
+                //       Expanded(
+                //         child: Padding(
+                //           padding: const EdgeInsets.only(left: 4.5),
+                //           child: Image.network(
+                //             imgPlaceholder,
+                //             height: 101,
+                //             fit: BoxFit.cover,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // )
               ],
             ),
             Positioned(
@@ -280,5 +302,13 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     });
   }
 
-  void onDecline() {}
+  void onDecline() async {
+    DatabaseService service = DatabaseService();
+    try {
+      await service.declineDirectRequest(widget.requestInfo["userId"]);
+      print('Document updated successfully');
+    } catch (e) {
+      print('Error updating document: $e');
+    }
+  }
 }

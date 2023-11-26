@@ -92,7 +92,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
       // searchResultSection();
       // print(searchText);
-      print(results);
+      //print(results);
 
       setState(() {
         _showSearchResult = results.isNotEmpty;

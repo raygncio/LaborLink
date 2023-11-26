@@ -26,6 +26,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
 
   //file
   File? _selectedImage;
+  String _idType = '';
 
   final _idFilePickerKey = GlobalKey<UploadFilePickerState>();
 
@@ -54,7 +55,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
 
   Map<String, dynamic> get getFormData {
     return {
-      "idType": _idTypeController.text,
+      "idType": _idType,
       "idFile": _selectedImage,
     };
   }
@@ -89,9 +90,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
           child: Column(
             children: [
               DropdownButtonFormField<String>(
-                value: validIds.contains(_idTypeController.text)
-                    ? _idTypeController.text
-                    : validIds[0],
+                value: validIds.contains(_idType) ? _idType : validIds[0],
                 items: validIds.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -101,7 +100,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                 }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
-                    _idTypeController.text = newValue!.toLowerCase();
+                    _idType = newValue!.toLowerCase();
                   });
                 },
                 decoration: InputDecoration(

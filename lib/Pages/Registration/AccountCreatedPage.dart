@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/LoginPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/ai/screens/splash_success.dart';
 import 'package:laborlink/styles.dart';
 
 class AccountCreatedPage extends StatefulWidget {
@@ -10,9 +14,15 @@ class AccountCreatedPage extends StatefulWidget {
 }
 
 class _AccountCreatedPageState extends State<AccountCreatedPage> {
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+
+    if (isLoading) {
+      return const SplashSuccessPage();
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -84,7 +94,16 @@ class _AccountCreatedPageState extends State<AccountCreatedPage> {
     );
   }
 
-  void onGetStarted(){
-
+  void onGetStarted() {
+    setState(() {
+      isLoading = true;
+    });
+    Timer(const Duration(seconds: 5), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (ctx) => const LoginPage(),
+        ),
+      );
+    });
   }
 }

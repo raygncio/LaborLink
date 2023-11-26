@@ -35,6 +35,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   DatabaseService service = DatabaseService();
   late GlobalKey<RequestFormState> requestFormKey;
   List<Map<String, dynamic>> _searchResults = [];
+  List<Map<String, dynamic>> results = [];
 
   int _selectedTabIndex = 0;
 
@@ -289,26 +290,52 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
       );
 
   Widget directRequestTab() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 54),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 26, top: 21),
-              child: Text("Request addressed to you",
-                  style: getTextStyle(
-                      textColor: AppColors.secondaryBlue,
-                      fontFamily: AppFonts.montserrat,
-                      fontWeight: AppFontWeights.regular,
-                      fontSize: 10)),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: service.getDirectRequestOfHandyman(widget.userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        } else {
+          List<Map<String, dynamic>> results = snapshot.data ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(top: 54),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 26, top: 21),
+                    child: Text("Request addressed to you",
+                        style: getTextStyle(
+                          textColor: AppColors.secondaryBlue,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.regular,
+                          fontSize: 10,
+                        )),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: results.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 9),
+                        child: DirectRequestCard(
+                          userId: widget.userId,
+                          requestInfo: results[index],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-            DirectRequestCard(userId: widget.userId),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 

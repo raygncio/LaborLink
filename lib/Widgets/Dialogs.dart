@@ -177,11 +177,10 @@ Future<String?> suggestedFeeDialog(BuildContext context) =>
                           fontFamily: AppFonts.montserrat,
                           color: AppColors.accentOrange,
                           command: () {
-                            double suggestedFeeValue =
-                                suggestedFeeWidget.suggestedFee;
+                            double total = suggestedFeeWidget.suggestedFee;
 
                             // Calculate the total fee by adding 50 to the suggestedFee value
-                            totalFee = suggestedFeeValue + 50;
+                            totalFee = total;
 
                             print("Total Fee: $totalFee");
                             Navigator.of(context).pop("Total Fee: $totalFee");
