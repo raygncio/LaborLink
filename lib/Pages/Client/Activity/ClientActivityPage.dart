@@ -34,11 +34,14 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   bool _forApproval = false;
   Request? requestInfo;
   DatabaseService service = DatabaseService();
+  List<Map<String, dynamic>> interestedLaborer = [];
+  List<Map<String, dynamic>> interestedLaborerWithOffer = [];
 
   @override
   void initState() {
     super.initState();
     checkForRequests();
+    fetchInterestedLaborers();
   }
 
   void checkForRequests() async {
@@ -58,6 +61,14 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       });
     } catch (error) {
       print('Error fetching user data:1 $error');
+    }
+  }
+
+  void fetchInterestedLaborers() async {
+    try {
+      
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
     }
   }
 

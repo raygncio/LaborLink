@@ -548,7 +548,38 @@ class DatabaseService {
     await _db.collection('handymanApproval').add(approvalData.toFirestore());
   }
 
-  // Future<List<HandymanApproval>> getHandymanApproval(String userId) async {}
+  // Get all user and its request specific to the category of the handyman
+  Future<List<Map<String, dynamic>>> getUserAndRequest(String userId) async {
+    List<Map<String, dynamic>> resultList = [];
+    DatabaseService service = DatabaseService();
+    Handyman handyman = await service.getHandymanData(userId);
+
+    // Query 'user' collection
+    final userQuery = await _db.collection('user').get();
+
+    // Process 'user' query results
+    for (var userDoc in userQuery.docs) {
+      final userId = userDoc.id;
+
+      // Query 'request' collection using userId
+      final requestQuery = await _db
+          .collection('request')
+          .where('userId', isEqualTo: userId)
+          .where('category', isEqualTo: handyman.specialization)
+          .get();
+
+      // Process 'request' query results
+      for (var requestDoc in requestQuery.docs) {
+        final userData = userDoc.data();
+        final requestData = requestDoc.data();
+
+        // Combine user and request data into a single map
+        Map<String, dynamic> combinedData = {...userData, ...requestData};
+        resultList.add(combinedData);
+      }
+    }
+    return resultList;
+  }
 
   // OFFERS
 

@@ -50,7 +50,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
   File? _recLetterImage;
   File? idFile;
   File? certProofFile;
-  //File? nbiClearanceFile;
+  String _idType = '';
 
   // Style
   final _defaultBorder = Border.all(width: 1, color: AppColors.tertiaryBlue);
@@ -79,7 +79,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
     return {
       'specialization': _specializationController.text,
       'employer': _employerController.text,
-      'idType': _idTypeController.text,
+      'idType': _idType,
       'certificateName': _certificateNameController.text,
       'recLetterFile': _recLetterImage,
       'idFile': idFile,
@@ -203,9 +203,8 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                     Padding(
                       padding: const EdgeInsets.only(top: 9.25),
                       child: DropdownButtonFormField<String>(
-                        value: validIds.contains(_idTypeController.text)
-                            ? _idTypeController.text
-                            : validIds[0],
+                        value:
+                            validIds.contains(_idType) ? _idType : validIds[0],
                         items: validIds.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -215,7 +214,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                         }).toList(),
                         onChanged: (String? newValue) {
                           setState(() {
-                            _idTypeController.text = newValue!.toLowerCase();
+                            _idType = newValue!.toLowerCase();
                           });
                         },
                         decoration: InputDecoration(

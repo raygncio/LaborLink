@@ -6,6 +6,7 @@ import 'package:laborlink/Pages/Registration/TermsAndConditionPage.dart';
 import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
+import 'package:laborlink/models/handyman.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/providers/registration_data_provider.dart';
@@ -159,6 +160,66 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     }
   }
 
+  createHandymanAccount() async {
+    print(savedUserData);
+
+    // Create a user in Firebase Authentication
+    DatabaseService service = DatabaseService();
+    UserCredential userCredential =
+        await _firebase.createUserWithEmailAndPassword(
+            email: savedUserData["email"], password: savedUserData["password"]);
+
+    //for uploading nbi clearance
+    String imageUrl = await service.uploadNBIClearance(
+        userCredential.user!.uid, savedUserData["idFile"]);
+
+    String recommendationUrl = '';
+    if (savedUserData["recLetterFile"] != null) {
+      //for uploading recommendation letter
+      recommendationUrl = await service.uploadRecommendationLetter(
+          userCredential.user!.uid, savedUserData["recLetterFile"]);
+    }
+
+    //for uploading TESDA certification
+    String tesdaUrl = await service.uploadTesda(
+        userCredential.user!.uid, savedUserData["certProofFile"]);
+
+    Client client = Client(
+        userId: userCredential.user!.uid,
+        userRole: "handyman",
+        firstName: savedUserData["first_name"],
+        lastName: savedUserData["last_name"],
+        middleName: savedUserData["middle_name"],
+        suffix: savedUserData["suffix"],
+        dob: savedUserData["birthday"],
+        sex: savedUserData["gender"],
+        streetAddress: savedUserData["street"],
+        state: savedUserData["state"],
+        city: savedUserData["city"],
+        zipCode: int.parse(savedUserData["zip"]),
+        emailAdd: savedUserData["email"],
+        username: savedUserData["username"],
+        phoneNumber: savedUserData["phone"],
+        validId: savedUserData["idType"],
+        idProof: imageUrl);
+
+    print(savedUserData["specialization"]);
+
+    Handyman handyman = Handyman(
+      applicantStatus: "pending",
+      specialization: savedUserData["specialization"],
+      employer: savedUserData["employer"],
+      nbiClearance: imageUrl,
+      certification: savedUserData["certificateName"],
+      certificationProof: tesdaUrl,
+      recommendationLetter: recommendationUrl,
+      userId: userCredential.user!.uid,
+    );
+
+    await service.addUser(client);
+    await service.addHandyman(handyman);
+  }
+
   @override
   void initState() {
     Timer(const Duration(seconds: 4), () {
@@ -176,6 +237,9 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     if (!isRegistered && savedUserData.isNotEmpty) {
       if (savedUserData['userRole'] == 'client') {
         createClientAccount();
+      }
+      if (savedUserData['userRole'] == 'handyman') {
+        createHandymanAccount();
       }
     }
 

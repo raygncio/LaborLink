@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -6,6 +8,9 @@ import 'package:laborlink/Widgets/Forms/AddressForm.dart';
 import 'package:laborlink/Widgets/Forms/BasicInformationForm.dart';
 import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
 import 'package:laborlink/Widgets/Forms/HandymanRequirementForm.dart';
+import 'package:laborlink/ai/screens/id_verification.dart';
+import 'package:laborlink/providers/registration_data_provider.dart';
+import 'package:laborlink/splash/splash_one.dart';
 import 'package:laborlink/styles.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,19 +20,21 @@ import 'package:laborlink/models/handyman.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 import 'dart:core';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
 
-class HandymanRegistrationPage extends StatefulWidget {
+class HandymanRegistrationPage extends ConsumerStatefulWidget {
   const HandymanRegistrationPage({Key? key}) : super(key: key);
 
   @override
-  State<HandymanRegistrationPage> createState() =>
+  ConsumerState<HandymanRegistrationPage> createState() =>
       _HandymanRegistrationPageState();
 }
 
-class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
+class _HandymanRegistrationPageState
+    extends ConsumerState<HandymanRegistrationPage> {
   GlobalKey<BasicInformationFormState> basicInformationFormKey =
       GlobalKey<BasicInformationFormState>();
   GlobalKey<AddressFormState> addressFormKey = GlobalKey<AddressFormState>();
@@ -35,6 +42,8 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
       GlobalKey<AccountDetailsFormState>();
   GlobalKey<HandymanRequirementFormState> handymanRequirementFormKey =
       GlobalKey<HandymanRequirementFormState>();
+
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -44,6 +53,10 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+
+    if (_isLoading) {
+      return const SplashOnePage();
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -148,6 +161,24 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
     Navigator.of(context).pop();
   }
 
+  void _toIdVerification(List<Map<String, dynamic>> data) {
+    setState(() {
+      _isLoading = true;
+    });
+    Timer(
+      const Duration(seconds: 5),
+      () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => IdVerification(
+              data: data,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void onProceed() async {
     setState(() {
       basicInformationFormKey.currentState!.isAutoValidationEnabled = true;
@@ -204,78 +235,34 @@ class _HandymanRegistrationPageState extends State<HandymanRegistrationPage> {
         // }
 
         try {
-          // Create a user in Firebase Authentication
-          DatabaseService service = DatabaseService();
-          UserCredential userCredential =
-              await _firebase.createUserWithEmailAndPassword(
-                  email: accountInfo["email"],
-                  password: accountInfo["password"]);
+          // save entered registration data
+          Map<String, dynamic> savedHandymanDataMap = {
+            ...basicInfo,
+            ...addressInfo,
+            ...accountInfo,
+            ...handymanInfo,
+            'userRole': 'handyman',
+          };
+          ref
+              .read(registrationDataProvider.notifier)
+              .saveRegistrationData(savedHandymanDataMap);
 
-          // Get the current date and time
-          // DateTime now = DateTime.now();
-          // Convert the DateTime to a string in a suitable format
-          // String currentDate =
-          //     "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          // Upload files to Firebase Storage
+          // Verify Credentials First before creating user and storing user data
+          List<Map<String, dynamic>> fileAttachments;
 
-          //for uploading nbi clearance
-          String nbiUrl = await service.uploadNBIClearance(
-              userCredential.user!.uid, handymanInfo["nbiClearanceFile"]);
+          fileAttachments = [
+            {
+              'type': 'nbi',
+              'file': handymanInfo['idFile'],
+            },
+            {
+              'type': 'tesda',
+              'file': handymanInfo['certProofFile'],
+            }
+          ];
 
-          String recommendationUrl = '';
-          if (handymanInfo["recLetterFile"] != null) {
-            //for uploading recommendation letter
-            recommendationUrl = await service.uploadRecommendationLetter(
-                userCredential.user!.uid, handymanInfo["recLetterFile"]);
-          }
-
-          //for uploading valid ID
-          String validUrl = await service.uploadValidId(
-              userCredential.user!.uid, handymanInfo["idFile"]);
-
-          //for uploading TESDA certification
-          String tesdaUrl = await service.uploadTesda(
-              userCredential.user!.uid, handymanInfo["certProofFile"]);
-
-          Client client = Client(
-              userId: userCredential.user!.uid,
-              userRole: "handyman",
-              firstName: basicInfo["first_name"],
-              lastName: basicInfo["last_name"],
-              middleName: basicInfo["middle_name"],
-              suffix: basicInfo["suffix"],
-              dob: basicInfo["birthday"],
-              sex: basicInfo["gender"],
-              streetAddress: addressInfo["street"],
-              state: addressInfo["state"],
-              city: addressInfo["city"],
-              zipCode: int.parse(addressInfo["zip"]),
-              emailAdd: accountInfo["email"],
-              username: accountInfo["username"],
-              phoneNumber: accountInfo["phone"],
-              validId: handymanInfo["idType"],
-              idProof: validUrl);
-
-          print(handymanInfo["specialization"]);
-
-          Handyman handyman = Handyman(
-            applicantStatus: "pending",
-            specialization: handymanInfo["specialization"],
-            employer: handymanInfo["employer"],
-            nbiClearance: nbiUrl,
-            certification: handymanInfo["certificateName"],
-            certificationProof: tesdaUrl,
-            recommendationLetter: recommendationUrl,
-            userId: userCredential.user!.uid,
-          );
-
-          await service.addUser(client);
-          await service.addHandyman(handyman);
-
-          // Continue with your navigation or any other logic
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const FaceDetectionPage(),
-          ));
+          // jumps to id verification
+          _toIdVerification(fileAttachments);
         } catch (e) {
           // Handle errors during user creation
           print("Error creating user: $e");

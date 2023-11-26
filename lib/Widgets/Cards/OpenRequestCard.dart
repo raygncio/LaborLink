@@ -6,7 +6,7 @@ import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/client.dart';
-import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/database_service.dart';
 
 import '../Dialogs.dart';
@@ -276,12 +276,16 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     // need to update the request and put the document id of handyman to the database
     DatabaseService service = DatabaseService();
     try {
-      await service.handymanInterested(
-          widget.userId, widget.clientRequestInfo['userId']);
+      HandymanApproval handymanApproval = HandymanApproval(
+        status: 'pending',
+        handymanId: widget.userId,
+        requestId: widget.clientRequestInfo["userId"],
+      );
+
+      await service.addHandymanApproval(handymanApproval);
       // need to put a pop up kapag nag update
-      print('Document updated successfully');
     } catch (e) {
-      print('Error updating document: $e');
+      print('Error: $e');
     }
   }
 
