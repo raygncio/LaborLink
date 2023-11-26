@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
 import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Handyman/Activity/HandymanActivityPage.dart';
@@ -21,23 +22,38 @@ class HandymanMainPage extends StatefulWidget {
 
 class _HandymanMainPageState extends State<HandymanMainPage> {
   int _selectedIndex = 0;
+  DateTime? currentBackPressTime;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(child: selectedPage()),
-            AppBottomNavBar(
-              selectedIndex: _selectedIndex,
-              onChanged: updateSelectedIndex,
-            )
-          ],
+      body: WillPopScope(
+        onWillPop: onWillPop,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(child: selectedPage()),
+              AppBottomNavBar(
+                selectedIndex: _selectedIndex,
+                onChanged: updateSelectedIndex,
+              )
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      Fluttertoast.showToast(msg: 'Exit?');
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   void updateSelectedIndex(int selectedIndex) {
