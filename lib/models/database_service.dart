@@ -541,10 +541,11 @@ class DatabaseService {
   }
 
   // Update the handyman approval to hired
-  Future<void> hiredHandyman(String handymanId) async {
+  Future<void> hiredHandyman(String handymanId, String requestId) async {
     final requestQuery = await _db
         .collection('handymanApproval')
         .where('handymanId', isEqualTo: handymanId)
+        .where('requestId', isEqualTo: requestId)
         .where('status', isEqualTo: 'pending')
         .get();
 
@@ -677,6 +678,7 @@ class DatabaseService {
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
+      resultList.add(requestData);
       // Query 'offer' collection
       final offerQuery = await _db
           .collection('offer')
@@ -687,7 +689,7 @@ class DatabaseService {
       for (var offerDoc in offerQuery.docs) {
         final offerData = offerDoc.data();
         final userIdOnOffer = offerData["userId"];
-
+        resultList.add(offerData);
         // Query 'user' collection using userId from 'offer'
         final userQuery = await _db
             .collection('user')
@@ -698,7 +700,7 @@ class DatabaseService {
         // Process 'user' query results
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
-
+          resultList.add(userData);
           // Query 'review' collection using some key from userData, adjust as needed
           final reviewQuery = await _db
               .collection('reviews')
@@ -708,15 +710,7 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewQuery.docs) {
             final reviewData = reviewDoc.data();
-
-            // Combine all data into a single map
-            Map<String, dynamic> combinedData = {
-              ...requestData,
-              ...offerData,
-              ...userData,
-              ...reviewData
-            };
-            resultList.add(combinedData);
+            resultList.add(reviewData);
           }
         }
       }

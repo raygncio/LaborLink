@@ -13,7 +13,8 @@ import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 class HandymanHireCard extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
   final String requestId;
-  const HandymanHireCard({Key? key, required this.handymanInfo, required this.requestId})
+  const HandymanHireCard(
+      {Key? key, required this.handymanInfo, required this.requestId})
       : super(key: key);
 
   @override
@@ -214,9 +215,10 @@ class HandymanHireCardState extends State<HandymanHireCard> {
 
     if (confirmHire == true) {
       try {
-        await service.hiredHandyman(widget.handymanInfo['userId']);
-        await service.updateRequestProgress(widget.requestId,
-            widget.handymanInfo['handymanId']);
+        await service.hiredHandyman(
+            widget.handymanInfo['userId'], widget.requestId);
+        await service.updateRequestProgress(
+            widget.requestId, widget.handymanInfo['handymanId']);
 
         print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled

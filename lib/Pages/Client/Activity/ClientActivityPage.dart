@@ -408,6 +408,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
+                  print(hasOffer);
 
                   // Choose the appropriate card based on whether there's an offer or not
                   Widget card = hasOffer

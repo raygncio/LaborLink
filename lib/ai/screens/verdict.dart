@@ -245,6 +245,12 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
   }
 
   @override
+  void dispose() {
+    ref.invalidate(registrationDataProvider);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.isSuccessful) {
       savedUserData = ref.watch(registrationDataProvider);

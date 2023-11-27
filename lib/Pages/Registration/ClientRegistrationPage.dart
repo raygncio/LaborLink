@@ -241,7 +241,7 @@ class _ClientRegistrationPageState
 
           fileAttachments = [
             {
-              'type': 'tesda',
+              'type': 'nbi',
               'file': clientInfo['idFile'],
             }
           ];
