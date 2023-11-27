@@ -563,14 +563,18 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getInterestedHandyman(
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
-    DatabaseService service = DatabaseService();
 
     // Query 'user' collection
-    final handymanQuery = await _db.collection('handymanApproval').get();
+    final handymanQuery = await _db
+        .collection('handymanApproval')
+        .where('requestId', isEqualTo: requestId)
+        .get();
 
     // Process 'user' query results
     for (var handymanDoc in handymanQuery.docs) {
-      final handymanId = handymanDoc.id;
+      //final handymanId = handymanDoc.id;
+      final offerData = offerDoc.data();
+      final userIdOnOffer = offerData["userId"];
 
       // Query 'request' collection using userId
       final userQuery = await _db
@@ -611,25 +615,29 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getInterestedHandymanAndOffer(
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
-    DatabaseService service = DatabaseService();
 
     // Query 'user' collection
-    final offerQuery = await _db.collection('offer').get();
+    final offerQuery = await _db
+        .collection('offer')
+        .where('status', isEqualTo: 'pending')
+        .get();
 
     // Process 'user' query results
     for (var offerDoc in offerQuery.docs) {
-      final offerId = offerDoc.id;
+      //final offerId = offerDoc.id; for doc id
+      final offerData = offerDoc.data();
+      final userIdOnOffer = offerData["userId"];
 
       // Query 'request' collection using userId
       final userQuery = await _db
           .collection('user')
-          .where('userId', isEqualTo: offerId)
+          .where('userId', isEqualTo: userIdOnOffer)
+          .where('userRole', isEqualTo: 'handyman')
           .get();
 
       // Process 'request' query results
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
-        final offerData = offerDoc.data();
 
         // Combine user and request data into a single map
         Map<String, dynamic> combinedData = {...userData, ...offerData};

@@ -36,6 +36,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   DatabaseService service = DatabaseService();
   List<Map<String, dynamic>> interestedLaborer = [];
   List<Map<String, dynamic>> interestedLaborerWithOffer = [];
+  List<Map<String, dynamic>> combinedInterestedLaborers = [];
 
   @override
   void initState() {
@@ -72,6 +73,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
+    // Combine the lists
+    combinedInterestedLaborers.addAll(interestedLaborer);
+    combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
   }
 
   void fetchOffersOfLaborers() async {
@@ -372,48 +376,58 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         ),
       );
 
-  Widget interestedLaborers() => SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  "Interested Laborers",
-                  style: getTextStyle(
-                      textColor: AppColors.secondaryBlue,
-                      fontFamily: AppFonts.montserrat,
-                      fontWeight: AppFontWeights.regular,
-                      fontSize: 10),
+  Widget interestedLaborers() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Text(
+                "Interested Laborers",
+                style: getTextStyle(
+                  textColor: AppColors.secondaryBlue,
+                  fontFamily: AppFonts.montserrat,
+                  fontWeight: AppFontWeights.regular,
+                  fontSize: 10,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: dummyFilteredHandyman.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> currentHandyman =
-                        dummyFilteredHandyman[index];
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: combinedInterestedLaborers.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> currentHandyman =
+                      combinedInterestedLaborers[index];
 
-                    return Padding(
-                      padding:
-                          EdgeInsets.only(top: index == 0 ? 5 : 0, bottom: 8),
-                      child: index % 2 == 0
-                          ? HandymanProposalCard(handymanInfo: currentHandyman)
-                          : HandymanHireCard(handymanInfo: currentHandyman),
-                    );
-                  },
-                ),
+                  // Check if the current handyman has an offer
+                  bool hasOffer = interestedLaborerWithOffer.any((offer) =>
+                      offer['handymanId'] == currentHandyman['handymanId']);
+
+                  // Choose the appropriate card based on whether there's an offer or not
+                  Widget card = hasOffer
+                      ? HandymanProposalCard(handymanInfo: currentHandyman)
+                      : HandymanHireCard(handymanInfo: currentHandyman);
+
+                  return Padding(
+                    padding:
+                        EdgeInsets.only(top: index == 0 ? 5 : 0, bottom: 8),
+                    child: card,
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   Widget historyTab(deviceWidth) {
     bool openCompletedRequest = true;
