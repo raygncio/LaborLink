@@ -3,6 +3,9 @@ import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class ViewHandymanProfile extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -14,6 +17,30 @@ class ViewHandymanProfile extends StatefulWidget {
 }
 
 class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
+  File? defaultAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call an async function to fetch data
+    _loadDefaultAvatar();
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +79,17 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
         padding: const EdgeInsets.only(left: 26, bottom: 14, top: 34),
         child: GestureDetector(
           onTap: onBack,
-          child:  Image.asset("assets/icons/back-btn.png", height: 13, width: 17.5),
+          child:
+              Image.asset("assets/icons/back-btn.png", height: 13, width: 17.5),
         ),
       );
 
   Widget reviewsSection() => SingleChildScrollView(
-    scrollDirection: Axis.vertical,
-    child: Padding(
-      padding: const EdgeInsets.only(top: 94, left: 10, right: 10, bottom: 10),
-      child: Column(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding:
+              const EdgeInsets.only(top: 94, left: 10, right: 10, bottom: 10),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -94,6 +123,6 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
               ),
             ],
           ),
-    ),
-  );
+        ),
+      );
 }

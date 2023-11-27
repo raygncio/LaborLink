@@ -13,7 +13,7 @@ const List<String> specializations = <String>[
   'Welding',
   'Housekeeping',
   'Roofing',
-  'Installation',
+  'Installations',
   'Pest Control'
 ];
 
@@ -77,7 +77,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
 
   Map<String, dynamic> get getFormData {
     return {
-      'specialization': _specializationController.text,
+      'specialization': _specializationController.text.toLowerCase(),
       'employer': _employerController.text,
       'idType': _idType,
       'certificateName': _certificateNameController.text,

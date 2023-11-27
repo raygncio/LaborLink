@@ -4,6 +4,9 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class HandymanInfoCard extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -19,8 +22,8 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
 
   @override
   void initState() {
-    super.initState();
     initializeFullname();
+    super.initState();
   }
 
   void initializeFullname() {
@@ -38,7 +41,9 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
       decoration: const BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
           boxShadow: [
             BoxShadow(
               offset: Offset(0, 4),
@@ -51,13 +56,15 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
             const EdgeInsets.only(left: 14, right: 10, top: 10, bottom: 10),
         child: Row(
           children: [
-            // SizedBox(
-            //   height: 61,
-            //   width: 61,
-            //   child: ClipOval(
-            //     child: Image.network(widget.handymanInfo["img_url"]),
-            //   ),
-            // ),
+            SizedBox(
+              height: 45,
+              width: 45,
+              child: CircleAvatar(
+                backgroundColor: AppColors.white,
+                child: ClipOval(
+                    child: Image.asset('assets/icons/person-circle-blue.png')),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: Column(
@@ -103,10 +110,10 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                 color: AppColors.dirtyWhite,
                 borderRadius: BorderRadius.circular(50),
               ),
-              //  child: Image.asset(
-              //      "assets/icons/$widget.handymanInfo['category'] as String?)?.toLowerCase() ?? '')}.png",
-              //      width: 50,
-              //      height: 48),
+              child: Image.asset(
+                  "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
+                  width: 50,
+                  height: 48),
             ),
           ],
         ),

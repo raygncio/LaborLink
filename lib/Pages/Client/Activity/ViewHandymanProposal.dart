@@ -17,8 +17,20 @@ class ViewHandymanProposal extends StatefulWidget {
 }
 
 class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
+  late double bidPrice;
+  late double suggestedPrice;
+  late double addCharge;
+  late double serviceFee;
+  late double convenienceFee;
+
   @override
   Widget build(BuildContext context) {
+    bidPrice = widget.handymanInfo["bidPrice"];
+    suggestedPrice = widget.handymanInfo["suggestedPrice"];
+    addCharge = bidPrice - suggestedPrice;
+    serviceFee = suggestedPrice / 1.10;
+    convenienceFee = suggestedPrice - serviceFee;
+
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -83,8 +95,9 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                           fontSize: 15),
                     ),
                   ),
-                  const AppBadge(
-                    label: "Offered ₱650",
+                  AppBadge(
+                    label: "Offered ₱ " +
+                        widget.handymanInfo["bidPrice"].toString(),
                     type: BadgeType.offer,
                     padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                   )
@@ -158,7 +171,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                       ),
                       const Spacer(),
                       Text(
-                        "₱650.00",
+                        widget.handymanInfo["bidPrice"].toString(),
                         style: getTextStyle(
                             textColor: AppColors.secondaryBlue,
                             fontFamily: AppFonts.montserrat,
@@ -181,7 +194,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱500.00",
+                          serviceFee.toString(),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -205,7 +218,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱50.00",
+                          convenienceFee.toString(),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -229,7 +242,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱100.00",
+                          addCharge.toString(),
                           style: getTextStyle(
                               textColor: AppColors.pink,
                               fontFamily: AppFonts.montserrat,
@@ -255,13 +268,13 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                   left: 15, right: 14, top: 14, bottom: 14),
               child: Stack(
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextWithIcon(
                         icon: Icon(Icons.place,
                             size: 17, color: AppColors.accentOrange),
-                        text: "556 Juan Luna Ave.",
+                        text: widget.handymanInfo["address"],
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -270,7 +283,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         child: TextWithIcon(
                           icon: Icon(Icons.calendar_month_rounded,
                               size: 17, color: AppColors.accentOrange),
-                          text: "07 Aug 2023",
+                          text: widget.handymanInfo["date"],
                           fontSize: 12,
                           contentPadding: 19,
                         ),
@@ -280,7 +293,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         child: TextWithIcon(
                           icon: Icon(Icons.watch_later,
                               size: 17, color: AppColors.accentOrange),
-                          text: "12:00 - 1:00 PM",
+                          text: widget.handymanInfo["time"],
                           fontSize: 12,
                           contentPadding: 19,
                         ),
@@ -290,7 +303,8 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         child: TextWithIcon(
                           icon: Icon(Icons.local_offer_rounded,
                               size: 17, color: AppColors.accentOrange),
-                          text: "₱650*",
+                          text:
+                              widget.handymanInfo["bidPrice"].toString() + "*",
                           fontSize: 12,
                           contentPadding: 19,
                         ),

@@ -26,6 +26,7 @@ class _ClientMainPageState extends State<ClientMainPage> {
   DateTime? currentBackPressTime;
 
   _login() async {
+    print('>>>>>>>${_auth.currentUser!.uid}');
     await _analytics.setUserProperties(
         userId: _auth.currentUser!.uid, userRole: 'client');
   }

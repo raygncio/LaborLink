@@ -92,13 +92,14 @@ class RequestFormState extends State<RequestForm> {
 
   Map<String, dynamic> get getFormData {
     if (widget.handymanInfo != null) {
+      print(_timeValue);
       return {
         "title": _titleController.text,
         "category": _categoryValue,
         "description": _descriptionController.text,
         "attachment": _selectedImage,
         "date": formattedDate.format(_selectedDate!),
-        "time": _timeValue.toString(),
+        "time": _timeValue,
         "address": _addressController.text,
         "instructions": _instructionsController.text,
         "handymanId": widget.handymanInfo!["handymanId"],
@@ -110,7 +111,7 @@ class RequestFormState extends State<RequestForm> {
         "description": _descriptionController.text,
         "attachment": _selectedImage,
         "date": formattedDate.format(_selectedDate!),
-        "time": _timeValue.toString(),
+        "time": _timeValue,
         "address": _addressController.text,
         "instructions": _instructionsController.text,
       };
@@ -130,16 +131,12 @@ class RequestFormState extends State<RequestForm> {
 
   @override
   void initState() {
-    _categoryValue = _categories.first;
+    _categoryValue = widget.handymanInfo != null
+        ? widget.handymanInfo!['specialization']
+        : _categories.first;
+    print('>>>>>>>>>>>>>>$_categoryValue');
     _dateValue = _dateOptions.first;
     _timeValue = _timeOptions.first;
-
-    if (widget.handymanInfo != null) {
-      // Check if handymanInfo is not null
-      String handymanCategory = widget.handymanInfo!['specialization'];
-      print(handymanCategory);
-      _categoryValue = handymanCategory;
-    }
 
     super.initState();
     fetchUserAddress();

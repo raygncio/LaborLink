@@ -181,7 +181,7 @@ Future<String?> suggestedFeeDialog(
                             fontFamily: AppFonts.montserrat,
                             color: AppColors.accentOrange,
                             command: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pop('submit');
                             },
                             borderRadius: 8),
                       ],
@@ -219,7 +219,7 @@ Future<String?> makeOfferDialog(BuildContext context) {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  //const SuggestedFee(),
+                  //SuggestedFee(getFee: ,),
                   Padding(
                     padding: const EdgeInsets.only(top: 14.75),
                     child: TextAreaFormField(

@@ -11,6 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -28,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
-
+  File? defaultAvatar;
   final _labelTextStyle = getTextStyle(
       textColor: AppColors.black,
       fontFamily: AppFonts.montserrat,
@@ -59,6 +62,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
     super.initState();
     fetchUserData();
+    _loadDefaultAvatar();
+  }
+
+  Future<void> _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
+    setState(() {}); // Update the state to display the default avatar
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
   }
 
   Future<void> fetchUserData() async {
@@ -74,8 +95,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ' ' +
           (clientInfo.suffix ?? "");
 
-      String formattedDate = 
-          DateFormat('MMMM d, y').format(clientInfo.dob!) ; // Format the date
+      String formattedDate =
+          DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
 
       setState(() {
         _fullNameController.text = fullName;
@@ -137,8 +158,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             padding: const EdgeInsets.all(7),
                             child: ClipOval(
-                              child: Image.network(
-                                imgUrl,
+                              child: Image.file(
+                                defaultAvatar!, // Add placeholder image path here
                                 width: 75,
                                 height: 75,
                               ),

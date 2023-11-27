@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
+import 'package:laborlink/Pages/Handyman/Activity/HandymanActivityPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/DirectRequestCard.dart';
@@ -101,7 +102,9 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     }
   }
 
-  void onHistoryButtonClick() {}
+  void onHistoryButtonClick() {
+    widget.navigateToNewPage(0);
+  }
 
   Widget header(deviceWidth) => KeyboardVisibilityBuilder(
         builder: (context, isKeyboardVisible) {

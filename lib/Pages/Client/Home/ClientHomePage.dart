@@ -118,8 +118,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
     // DatabaseService service = DatabaseService();
 
-    if (requestFormKey.currentState!.hasFile() &&
-        requestFormKey.currentState!.validateForm()) {
+    if (requestFormKey.currentState!.validateForm()) {
       // Get form data from RequestForm
       Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
 

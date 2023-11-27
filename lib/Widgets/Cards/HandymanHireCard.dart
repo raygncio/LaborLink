@@ -134,7 +134,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             fontSize: 9,
                             fontFamily: AppFonts.montserrat,
                             color: AppColors.accentOrange,
-                            command: onViewProposal,
+                            command: onHireHandyman,
                             borderRadius: 8),
                       ],
                     ),
@@ -148,7 +148,8 @@ class HandymanHireCardState extends State<HandymanHireCard> {
     );
   }
 
-  void onViewProposal() {
+  void onHireHandyman() {
     // need to hire the handyman
+    
   }
 }

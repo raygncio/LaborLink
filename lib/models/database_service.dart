@@ -631,48 +631,59 @@ class DatabaseService {
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
 
-    // Query 'offer' collection
-    final offerQuery = await _db
-        .collection('offer')
-        .where('status', isEqualTo: 'pending')
+    // Query 'request' collection using userId from 'offer'
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: requestId)
         .get();
 
-    // Process 'offer' query results
-    for (var offerDoc in offerQuery.docs) {
-      final offerData = offerDoc.data();
-      final userIdOnOffer = offerData["userId"];
-
-      // Query 'user' collection using userId from 'offer'
-      final userQuery = await _db
-          .collection('user')
-          .where('userId', isEqualTo: userIdOnOffer)
-          .where('userRole', isEqualTo: 'handyman')
+    for (var requestDoc in requestQuery.docs) {
+      final requestData = requestDoc.data();
+      // Query 'offer' collection
+      final offerQuery = await _db
+          .collection('offer')
+          .where('requestId', isEqualTo: requestId)
+          .where('status', isEqualTo: 'pending')
           .get();
 
-      // Process 'user' query results
-      for (var userDoc in userQuery.docs) {
-        final userData = userDoc.data();
+      for (var offerDoc in offerQuery.docs) {
+        final offerData = offerDoc.data();
+        final userIdOnOffer = offerData["userId"];
 
-        // Query 'review' collection using some key from userData, adjust as needed
-        final reviewQuery = await _db
-            .collection('reviews')
+        // Query 'user' collection using userId from 'offer'
+        final userQuery = await _db
+            .collection('user')
             .where('userId', isEqualTo: userIdOnOffer)
+            .where('userRole', isEqualTo: 'handyman')
             .get();
 
-        // Process 'review' query results
-        for (var reviewDoc in reviewQuery.docs) {
-          final reviewData = reviewDoc.data();
+        // Process 'user' query results
+        for (var userDoc in userQuery.docs) {
+          final userData = userDoc.data();
 
-          // Combine all data into a single map
-          Map<String, dynamic> combinedData = {
-            ...userData,
-            ...offerData,
-            ...reviewData
-          };
-          resultList.add(combinedData);
+          // Query 'review' collection using some key from userData, adjust as needed
+          final reviewQuery = await _db
+              .collection('reviews')
+              .where('userId', isEqualTo: userIdOnOffer)
+              .get();
+
+          // Process 'review' query results
+          for (var reviewDoc in reviewQuery.docs) {
+            final reviewData = reviewDoc.data();
+
+            // Combine all data into a single map
+            Map<String, dynamic> combinedData = {
+              ...requestData,
+              ...offerData,
+              ...userData,
+              ...reviewData
+            };
+            resultList.add(combinedData);
+          }
         }
       }
     }
+
     return resultList;
   }
 
