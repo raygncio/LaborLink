@@ -109,7 +109,7 @@ class RequestFormState extends State<RequestForm> {
         "category": _categoryValue,
         "description": _descriptionController.text,
         "attachment": _selectedImage,
-        "date": _selectedDate.toString(),
+        "date": formattedDate.format(_selectedDate!),
         "time": _timeValue.toString(),
         "address": _addressController.text,
         "instructions": _instructionsController.text,
