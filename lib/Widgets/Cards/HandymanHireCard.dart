@@ -4,6 +4,9 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class HandymanHireCard extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -15,8 +18,42 @@ class HandymanHireCard extends StatefulWidget {
 }
 
 class HandymanHireCardState extends State<HandymanHireCard> {
+  late String fullname;
+  File? defaultAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call an async function to fetch data
+    _loadDefaultAvatar();
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Use null-aware and null-coalescing operators to handle null values
+    String firstName = widget.handymanInfo['firstName'] ?? '';
+    String middleName = widget.handymanInfo['middleName'] ?? '';
+    String lastName = widget.handymanInfo['lastName'] ?? '';
+    String suffix = widget.handymanInfo['suffix'] ?? '';
+
+    // Concatenate non-null values
+    fullname = '$firstName $middleName $lastName $suffix';
     return Container(
       height: 81,
       decoration: const BoxDecoration(
@@ -33,7 +70,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.network(widget.handymanInfo["img_url"]),
+                    child: Image.file(defaultAvatar!),
                   ),
                 ),
                 Padding(
@@ -42,7 +79,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.handymanInfo['name'],
+                      Text(fullname,
                           style: getTextStyle(
                               textColor: AppColors.primaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -55,11 +92,11 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["service"],
+                                  label: widget.handymanInfo["specialization"],
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["area"],
+                                label: widget.handymanInfo["city"],
                                 type: BadgeType.normal)
                           ],
                         ),
@@ -111,5 +148,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
     );
   }
 
-  void onViewProposal() {}
+  void onViewProposal() {
+    // need to hire the handyman
+  }
 }
