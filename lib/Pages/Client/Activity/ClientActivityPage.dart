@@ -407,8 +407,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                       combinedInterestedLaborers[index];
 
                   // Check if the current handyman has an offer
-                  bool hasOffer = interestedLaborerWithOffer.any((offer) =>
-                      offer['handymanId'] == currentHandyman['handymanId']);
+                  bool hasOffer = currentHandyman.containsKey('bidPrice');
 
                   // Choose the appropriate card based on whether there's an offer or not
                   Widget card = hasOffer

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
+import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
+import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/Forms/RequestForm.dart';
+import 'package:laborlink/ai/screens/splash_success.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/request.dart';
@@ -22,7 +26,8 @@ class DirectRequestFormPage extends StatefulWidget {
 }
 
 class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
-  GlobalKey<RequestFormState> requestFormKey = GlobalKey<RequestFormState>();
+  GlobalKey<RequestFormState> directRequestFormKey =
+      GlobalKey<RequestFormState>();
   double _totalFee = 0.0;
 
   @override
@@ -66,19 +71,20 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
   }
 
   void onProceed() {
-    if (requestFormKey.currentState!.validateForm()) {
+    if (directRequestFormKey.currentState!.validateForm()) {
       print('>>>> IN direct request proceed');
 
       // Retrieve form data
-      Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
+      Map<String, dynamic> formData =
+          directRequestFormKey.currentState!.getFormData;
 
       // Validate each field separately if needed
       String? titleError =
-          requestFormKey.currentState!.validateTitle(formData['title']);
-      String? descriptionError = requestFormKey.currentState!
+          directRequestFormKey.currentState!.validateTitle(formData['title']);
+      String? descriptionError = directRequestFormKey.currentState!
           .validateDescription(formData['description']);
-      String? addressError =
-          requestFormKey.currentState!.validateAddress(formData['address']);
+      String? addressError = directRequestFormKey.currentState!
+          .validateAddress(formData['address']);
 
       if (titleError != null ||
           descriptionError != null ||
@@ -128,7 +134,33 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
                 await service.addHandymanApproval(handymanApproval);
                 await service.addRequest(request);
 
-                Navigator.of(context).pop("submit");
+                Navigator.of(context)
+                    .push(
+                  MaterialPageRoute(
+                    builder: (ctx) => const ClientRequestSuccessPage(),
+                  ),
+                )
+                    .then(
+                  (value) {
+                    if (value == null) return;
+
+                    if (value == "home") {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) =>
+                              ClientHomePage(userId: widget.userId),
+                        ),
+                      );
+                    } else if (value == "activity") {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) =>
+                              ClientMainPage(userId: widget.userId),
+                        ),
+                      );
+                    }
+                  },
+                );
               } catch (e) {
                 // Handle errors during user creation
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -163,7 +195,7 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RequestForm(
-                  key: requestFormKey,
+                  key: directRequestFormKey,
                   userId: widget.userId,
                   handymanInfo: widget.handymanInfo),
               Padding(

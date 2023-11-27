@@ -619,8 +619,7 @@ class DatabaseService {
     for (var handymanDoc in handymanQuery.docs) {
       final handymanData = handymanDoc.data();
       final handymanId = handymanData["handymanId"];
-      print(handymanData);
-
+      resultList.add(handymanData);
       // Query 'user' collection using handymanId
       final userQuery = await _db
           .collection('user')
@@ -630,7 +629,7 @@ class DatabaseService {
       // Process 'user' query results
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
-        print(userData);
+        resultList.add(userData);
 
         // Query 'reviewCollection' using some key from userData
         final reviewsQuery = await _db
@@ -641,19 +640,11 @@ class DatabaseService {
         // Process 'reviewCollection' query results
         for (var reviewDoc in reviewsQuery.docs) {
           final reviewData = reviewDoc.data();
-
-          // Combine all data into a single map
-          Map<String, dynamic> combinedData = {
-            ...userData,
-            ...handymanData,
-            ...reviewData
-          };
-          resultList.add(combinedData);
+          resultList.add(reviewData);
         }
         // }
       }
     }
-
     return resultList;
   }
 
