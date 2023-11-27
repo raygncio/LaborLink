@@ -185,12 +185,8 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
       if (value == "proceed") {
         suggestedFeeDialog(context, _getTotalFee).then((value) {
-          value = "2.0";
-          //if (value == null) return; nag comment muna kasi null yung napapasa na value
-
-          // Convert value to double and add 50
-          double suggestedFee = double.tryParse(value) ?? 0;
-          submitRequest(suggestedFee);
+    
+          submitRequest('open');
         });
       }
     });
