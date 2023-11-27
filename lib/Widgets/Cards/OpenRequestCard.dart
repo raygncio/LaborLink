@@ -273,7 +273,36 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
   }
 
   void onAccept() async {
-    // need to update the request and put the document id of handyman to the database
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Do you really want to accept this request?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Perform action on 'No' button press (if needed)
+              },
+              child: Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Perform action on 'Yes' button press
+                performAcceptAction();
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void performAcceptAction() async {
+    //  logic to update the request and put the document ID of the handyman in the database
     DatabaseService service = DatabaseService();
     try {
       HandymanApproval handymanApproval = HandymanApproval(
@@ -283,13 +312,12 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
       );
 
       await service.addHandymanApproval(handymanApproval);
-      // need to put a pop up kapag nag update
+      // Show a success message or perform further actions upon accepting the request
     } catch (e) {
       print('Error: $e');
+      // Handle error scenario if required
     }
-    setState(() {
-          
-        });
+    setState(() {});
   }
 
   void onMakeOffer() {

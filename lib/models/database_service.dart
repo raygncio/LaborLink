@@ -282,6 +282,7 @@ class DatabaseService {
             .collection('request')
             .where('userId', isEqualTo: userId)
             .where('category', isEqualTo: searchText)
+            .where('progress', isEqualTo: 'pending')
             .get();
 
         // Process 'request' query results
@@ -309,6 +310,7 @@ class DatabaseService {
         final requestQuery = await _db
             .collection('request')
             .where('userId', isEqualTo: userId)
+            .where('progress', isEqualTo: 'pending')
             .get();
 
         // Process 'request' query results
@@ -524,7 +526,7 @@ class DatabaseService {
     }
   }
 
-  // Update the progress to cancelled request
+  // Decline Direct Request
   Future<void> declineDirectRequest(String requestId) async {
     final requestQuery = await _db
         .collection('request')
@@ -534,6 +536,38 @@ class DatabaseService {
     for (var doc in requestQuery.docs) {
       await doc.reference.update({
         'handymanId': '',
+      });
+    }
+  }
+
+  // Update the handyman approval to hired
+  Future<void> hiredHandyman(String handymanId) async {
+    final requestQuery = await _db
+        .collection('handymanApproval')
+        .where('handymanId', isEqualTo: handymanId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    for (var doc in requestQuery.docs) {
+      await doc.reference.update({
+        'status': 'hired',
+      });
+    }
+  }
+
+  // Update the request to hired and assign the handyman selected
+  Future<void> updateRequestProgress(
+      String requestId, String handymanId) async {
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: requestId)
+        .where('progress', isEqualTo: 'pending')
+        .get();
+
+    for (var doc in requestQuery.docs) {
+      await doc.reference.update({
+        'progress': 'hired',
+        'handymanId': handymanId,
       });
     }
   }
@@ -565,17 +599,27 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getInterestedHandyman(
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
+    // Query 'request' collection using userId from 'offer'
+    // final requestQuery = await _db
+    //     .collection('request')
+    //     .where('userId', isEqualTo: requestId)
+    //     .where('progress', isEqualTo: 'pending')
+    //     .get();
 
+    // for (var requestDoc in requestQuery.docs) {
+    //   final requestData = requestDoc.data();
     // Query 'handymanApproval' collection
     final handymanQuery = await _db
         .collection('handymanApproval')
         .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'pending')
         .get();
 
     // Process 'handymanApproval' query results
     for (var handymanDoc in handymanQuery.docs) {
       final handymanData = handymanDoc.data();
       final handymanId = handymanData["handymanId"];
+      print(handymanData);
 
       // Query 'user' collection using handymanId
       final userQuery = await _db
@@ -586,6 +630,7 @@ class DatabaseService {
       // Process 'user' query results
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
+        print(userData);
 
         // Query 'reviewCollection' using some key from userData
         final reviewsQuery = await _db
@@ -605,8 +650,10 @@ class DatabaseService {
           };
           resultList.add(combinedData);
         }
+        // }
       }
     }
+
     return resultList;
   }
 

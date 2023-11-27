@@ -140,9 +140,9 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                       children: [
                                         Padding(
                                           padding:
-                                              const EdgeInsets.only(right: 5),
+                                              const EdgeInsets.only(right: 10),
                                           child: CircleAvatar(
-                                            radius: 30,
+                                            radius: 27,
                                             backgroundColor: AppColors.white,
                                             foregroundImage:
                                                 FileImage(defaultAvatar!),

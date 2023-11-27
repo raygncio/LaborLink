@@ -67,6 +67,8 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
 
   void onProceed() {
     if (requestFormKey.currentState!.validateForm()) {
+      print('>>>> IN direct request proceed');
+
       // Retrieve form data
       Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
 

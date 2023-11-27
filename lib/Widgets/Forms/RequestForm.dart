@@ -81,8 +81,8 @@ class RequestFormState extends State<RequestForm> {
       fontSize: 10);
 
   bool validateForm() {
-    return _formKey.currentState!.validate() ||
-        _selectedDate != null ||
+    return _formKey.currentState!.validate() &&
+        _selectedDate != null &&
         _selectedImage != null;
   }
 
@@ -92,7 +92,8 @@ class RequestFormState extends State<RequestForm> {
 
   Map<String, dynamic> get getFormData {
     if (widget.handymanInfo != null) {
-      print(_timeValue);
+      print('>>>getform file>>>$_selectedImage');
+      print('>>>getform time>>>$_timeValue');
       return {
         "title": _titleController.text,
         "category": _categoryValue,
@@ -134,9 +135,9 @@ class RequestFormState extends State<RequestForm> {
     _categoryValue = widget.handymanInfo != null
         ? widget.handymanInfo!['specialization']
         : _categories.first;
-    print('>>>>>>>>>>>>>>$_categoryValue');
     _dateValue = _dateOptions.first;
     _timeValue = _timeOptions.first;
+    print(_timeValue);
 
     super.initState();
     fetchUserAddress();
@@ -182,6 +183,8 @@ class RequestFormState extends State<RequestForm> {
                 ),
               ),
               AppDropdown(
+                isDirectRequest: _categoryValue.isNotEmpty,
+                directCategory: _categoryValue,
                 height: 27,
                 width: 110,
                 label: "Category *",
@@ -266,6 +269,7 @@ class RequestFormState extends State<RequestForm> {
               ),
               const Spacer(),
               AppDropdown(
+                isDirectRequest: false,
                 height: 27,
                 width: 113,
                 label: "Time needed *",
@@ -279,6 +283,7 @@ class RequestFormState extends State<RequestForm> {
                 onChanged: (value) {
                   setState(() {
                     _timeValue = value;
+                    print(_timeValue);
                   });
                 },
               ),

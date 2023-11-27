@@ -158,8 +158,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             padding: const EdgeInsets.all(7),
                             child: ClipOval(
-                              child: Image.file(
-                                defaultAvatar!, // Add placeholder image path here
+                              child: Image.asset(
+                                'assets/icons/person-circle-blue.png', // Add placeholder image path here
                                 width: 75,
                                 height: 75,
                               ),

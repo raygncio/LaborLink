@@ -7,10 +7,13 @@ import 'package:laborlink/styles.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 
 class HandymanHireCard extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
-  const HandymanHireCard({Key? key, required this.handymanInfo})
+  final String requestId;
+  const HandymanHireCard({Key? key, required this.handymanInfo, required this.requestId})
       : super(key: key);
 
   @override
@@ -20,6 +23,7 @@ class HandymanHireCard extends StatefulWidget {
 class HandymanHireCardState extends State<HandymanHireCard> {
   late String fullname;
   File? defaultAvatar;
+  final DatabaseService service = DatabaseService();
 
   @override
   void initState() {
@@ -70,7 +74,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.file(defaultAvatar!),
+                    child: Image.asset('assets/icons/person-circle-blue.png'),
                   ),
                 ),
                 Padding(
@@ -134,7 +138,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             fontSize: 9,
                             fontFamily: AppFonts.montserrat,
                             color: AppColors.accentOrange,
-                            command: onHireHandyman,
+                            command: onViewProposal,
                             borderRadius: 8),
                       ],
                     ),
@@ -148,8 +152,87 @@ class HandymanHireCardState extends State<HandymanHireCard> {
     );
   }
 
-  void onHireHandyman() {
-    // need to hire the handyman
-    
+  void onViewProposal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Hiring'),
+          content: Text('Are you sure you want to hire this handyman?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Perform action on 'No' button press
+              },
+              child: Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Perform action on 'Yes' button press
+                hireHandyman();
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void hireHandyman() async {
+    // hire the handyman
+    // update handyman approval status to approved
+    // assign the handyman id to the request
+    // update the request progress to hired
+    bool confirmHire = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Hire Handyman'),
+          content: Text('Are you sure you want to hire this handyman?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false when cancel is pressed
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true when confirm is pressed
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmHire == true) {
+      try {
+        await service.hiredHandyman(widget.handymanInfo['userId']);
+        await service.updateRequestProgress(widget.requestId,
+            widget.handymanInfo['handymanId']);
+
+        print('Document updated successfully');
+        // Show SnackBar when request is successfully cancelled
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Handyman hired successfully'),
+            duration: Duration(seconds: 2),
+            backgroundColor: AppColors.tertiaryBlue,
+          ),
+        );
+        // Navigator.of(context).push(MaterialPageRoute(
+        //   builder: (context) => ClientMainPage(userId: userId),
+        // ));
+      } catch (e) {
+        print('Error updating document: $e');
+      }
+    }
   }
 }

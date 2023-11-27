@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -71,12 +72,14 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(fullname,
-                      style: getTextStyle(
-                          textColor: AppColors.primaryBlue,
-                          fontFamily: AppFonts.montserrat,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15)),
+                  Text(
+                    fullname,
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: Row(
@@ -94,11 +97,20 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                       ],
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 4),
-                  //   child: RateWidget(
-                  //       rate: widget.handymanInfo["rating"], iconSize: 12),
-                  // ),
+                  // *************** RATINGS
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: RatingBar.builder(
+                        initialRating: 3,
+                        itemCount: 5,
+                        itemSize: 15,
+                        ignoreGestures: true,
+                        itemBuilder: (ctx, index) => const Icon(
+                              Icons.star,
+                              color: AppColors.secondaryYellow,
+                            ),
+                        onRatingUpdate: (rating) {}),
+                  )
                 ],
               ),
             ),

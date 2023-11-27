@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/styles.dart';
 
 class AppDropdown extends StatefulWidget {
+  final bool isDirectRequest;
+  final String? directCategory;
   final String? label;
   final TextStyle? labelTextStyle;
   final EdgeInsetsGeometry? labelPadding;
@@ -12,6 +14,8 @@ class AppDropdown extends StatefulWidget {
   final List<String> dropdownValues;
   const AppDropdown(
       {Key? key,
+      required this.isDirectRequest,
+      this.directCategory,
       this.label,
       this.labelTextStyle,
       this.labelPadding,
@@ -30,7 +34,13 @@ class _AppDropdownState extends State<AppDropdown> {
 
   @override
   void initState() {
-    _dropdownValue = widget.dropdownValues.first;
+    if (widget.isDirectRequest) {
+      _dropdownValue = widget.dropdownValues.firstWhere(
+          (element) => element.toLowerCase() == widget.directCategory,
+          orElse: () => widget.dropdownValues.first);
+    } else {
+      _dropdownValue = widget.dropdownValues.first;
+    }
     super.initState();
   }
 
@@ -72,8 +82,12 @@ class _AppDropdownState extends State<AppDropdown> {
                   fontWeight: AppFontWeights.regular,
                   fontSize: 10),
               items: widget.dropdownValues
-                  .map((value) =>
-                      DropdownMenuItem(value: value, child: Text(value)))
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
                   .toList(),
               onChanged: (String? value) {
                 setState(() {

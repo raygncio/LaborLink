@@ -58,7 +58,7 @@ const List<String> specializations = <String>[
   'Welding',
   'Housekeeping',
   'Roofing',
-  'Installation',
+  'Installations',
   'Pest Control'
 ];
 

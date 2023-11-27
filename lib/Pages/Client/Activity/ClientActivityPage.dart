@@ -80,8 +80,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
   void fetchOffersOfLaborers() async {
     try {
-      interestedLaborer =
-          await service.getInterestedHandyman(widget.userId);
+      interestedLaborer = await service.getInterestedHandyman(widget.userId);
+      print(interestedLaborer);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -413,7 +413,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                   // Choose the appropriate card based on whether there's an offer or not
                   Widget card = hasOffer
                       ? HandymanProposalCard(handymanInfo: currentHandyman)
-                      : HandymanHireCard(handymanInfo: currentHandyman);
+                      : HandymanHireCard(
+                          handymanInfo: currentHandyman,
+                          requestId: widget.userId);
 
                   return Padding(
                     padding:
