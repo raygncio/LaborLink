@@ -3,9 +3,7 @@ import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
-import 'dart:io';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
+import 'package:laborlink/models/database_service.dart';
 
 class ViewHandymanProfile extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -17,29 +15,21 @@ class ViewHandymanProfile extends StatefulWidget {
 }
 
 class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
-  File? defaultAvatar;
+  List<Map<String, dynamic>> results = [];
+  final DatabaseService service = DatabaseService();
 
   @override
   void initState() {
     super.initState();
-    // Call an async function to fetch data
-    _loadDefaultAvatar();
+    getReviews();
   }
 
-  Future<File> getImageFileFromAssets(String path) async {
-    final byteData = await rootBundle.load('assets/$path');
-
-    final file = File('${(await getTemporaryDirectory()).path}/$path');
-    await file.create(recursive: true);
-    await file.writeAsBytes(byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-
-    return file;
-  }
-
-  _loadDefaultAvatar() async {
-    defaultAvatar =
-        await getImageFileFromAssets('icons/person-circle-blue.png');
+  void getReviews() async {
+    try {
+      results = await service.getHandymanReviews(widget.handymanInfo["userId"]);
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
   }
 
   @override
@@ -105,18 +95,27 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                 child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: dummyReviews.length,
+                  itemCount: results.length,
                   itemBuilder: (context, index) {
-                    Map<String, dynamic> currentReview = dummyReviews[index];
+                    Map<String, dynamic> currentReview = results[index];
+                    String fullName = currentReview['firstName'] +
+                            ' ' +
+                            currentReview['middle'] ??
+                        "" +
+                            ' ' +
+                            currentReview['lastName'] +
+                            ' ' +
+                            currentReview['suffix'] ??
+                        "";
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 7),
                       child: ReviewCard(
-                          rate: currentReview["rating"],
-                          date: currentReview["date"],
-                          reviewerName: currentReview["name"],
-                          review: currentReview["review"],
-                          reviewerImgUrl: currentReview["img_url"]),
+                        rate: currentReview["rating"],
+                        date: currentReview["createdAt"],
+                        reviewerName: fullName,
+                        review: currentReview["comment"],
+                      ),
                     );
                   },
                 ),

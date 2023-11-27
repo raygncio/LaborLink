@@ -97,20 +97,20 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["specialization"],
+                                  label: widget.handymanInfo["specialization"] ?? '',
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["city"],
+                                label: widget.handymanInfo["city"] ?? '',
                                 type: BadgeType.normal)
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: RateWidget(
-                            rate: widget.handymanInfo["rating"], iconSize: 12),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 4),
+                      //   child: RateWidget(
+                      //       rate: widget.handymanInfo["rating"], iconSize: 12),
+                      // ),
                     ],
                   ),
                 ),

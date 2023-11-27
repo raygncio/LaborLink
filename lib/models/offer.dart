@@ -7,7 +7,7 @@ class Offer {
   final double bidPrice;
   final String status;
   final String description;
-  final File attachment;
+  final String attachment;
   final String userId;
   final String requestId;
 

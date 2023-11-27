@@ -6,6 +6,7 @@ import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/database_service.dart';
 
 class ViewHandymanProposal extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -22,6 +23,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
   late double addCharge;
   late double serviceFee;
   late double convenienceFee;
+  final DatabaseService service = DatabaseService();
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +339,55 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
         ),
       );
 
-      void hireHandyman () async {
-        
+  void hireHandyman() async {
+    bool confirmHire = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Hire Handyman'),
+          content: Text('Are you sure you want to hire this handyman?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false when cancel is pressed
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true when confirm is pressed
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmHire == true) {
+      try {
+        await service.updateOffer(
+            widget.handymanInfo['userId'], widget.handymanInfo['userId']);
+        await service.updateRequestProgress(
+            widget.handymanInfo['userId'], widget.handymanInfo['handymanId']);
+
+        print('Document updated successfully');
+        // Show SnackBar when request is successfully cancelled
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Handyman hired successfully'),
+            duration: Duration(seconds: 2),
+            backgroundColor: AppColors.tertiaryBlue,
+          ),
+        );
+        // Navigator.of(context).push(MaterialPageRoute(
+        //   builder: (context) => ClientMainPage(userId: userId),
+        // ));
+      } catch (e) {
+        print('Error updating document: $e');
       }
+    }
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
@@ -5,8 +7,11 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/offer.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
+
+DatabaseService service = DatabaseService();
 
 class DirectRequestCard extends StatefulWidget {
   final String userId;
@@ -21,6 +26,9 @@ class DirectRequestCard extends StatefulWidget {
 
 class _DirectRequestCardState extends State<DirectRequestCard> {
   late String fullname;
+  double _totalOffer = 0.0;
+  String _offerDesc = '';
+  File? _offerAttachment;
 
   @override
   void initState() {
@@ -133,16 +141,16 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextWithIcon(
-                                  icon: Icon(Icons.place,
+                                  icon: const Icon(Icons.place,
                                       size: 13, color: AppColors.accentOrange),
                                   text: widget.requestInfo["address"] ?? '',
                                   fontSize: 9,
                                   contentPadding: 8,
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 6.75),
+                                  padding: const EdgeInsets.only(top: 6.75),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.local_offer_rounded,
+                                    icon: const Icon(Icons.local_offer_rounded,
                                         size: 13,
                                         color: AppColors.accentOrange),
                                     text: widget.requestInfo["suggestedFee"] ??
@@ -160,16 +168,16 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextWithIcon(
-                                  icon: Icon(Icons.calendar_month_rounded,
+                                  icon: const Icon(Icons.calendar_month_rounded,
                                       size: 13, color: AppColors.accentOrange),
                                   text: widget.requestInfo["date"] ?? '',
                                   fontSize: 9,
                                   contentPadding: 8,
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 6.75),
+                                  padding: const EdgeInsets.only(top: 6.75),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.watch_later,
+                                    icon: const Icon(Icons.watch_later,
                                         size: 13,
                                         color: AppColors.accentOrange),
                                     text: widget.requestInfo["time"] ?? '',
@@ -291,15 +299,61 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
 
   void onAccept() {}
 
-  void onMakeOffer() {
-    makeOfferDialog(context).then((value) {
-      if (value == null) return;
-
-      if (value == "submit") {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const OfferSubmittedPage()));
-      }
+  _getTotalFee(double fee) {
+    setState(() {
+      _totalOffer = fee;
+      print('>>>>>>>makeoffer: $_totalOffer');
     });
+  }
+
+  _getOfferData(String desc, File file) {
+    setState(() {
+      _offerAttachment = file;
+      _offerDesc = desc;
+    });
+  }
+
+  _submitOffer() async {
+    try {
+      // Create a user in Firebase Authentication
+      String imageUrl =
+          await service.uploadOfferAttachment(widget.userId, _offerAttachment!);
+
+      print('>>>>>>>>>>>>submitoffer>>$_totalOffer,$_offerDesc,$imageUrl');
+
+      Offer offers = Offer(
+        bidPrice: _totalOffer,
+        status: 'pending',
+        description: _offerDesc,
+        attachment: imageUrl,
+        userId: widget.userId,
+        requestId: widget.requestInfo['requestId'],
+      );
+
+      await service.addOffers(offers);
+    } catch (e) {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error creating user: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void onMakeOffer() {
+    makeOfferDialog(context, _getTotalFee, _getOfferData).then(
+      (value) {
+        if (value == null) return;
+
+        if (value == "submit") {
+          _submitOffer();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const OfferSubmittedPage()));
+        }
+      },
+    );
   }
 
   void onDecline() async {

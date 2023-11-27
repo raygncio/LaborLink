@@ -5,6 +5,9 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class HandymanDirectRequestCard extends StatefulWidget {
   final Function(String) submitRequest;
@@ -24,6 +27,30 @@ class HandymanDirectRequestCard extends StatefulWidget {
 
 class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
   late String fullname;
+  File? defaultAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call an async function to fetch data
+    _loadDefaultAvatar();
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +74,13 @@ class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
               const EdgeInsets.only(left: 14, right: 10, top: 10, bottom: 10),
           child: Row(
             children: [
-              // SizedBox(
-              //   height: 61,
-              //   width: 61,
-              //   child: ClipOval(
-              //     child: Image.network(widget.handymanInfo["img_url"]),
-              //   ),
-              // ),
+              SizedBox(
+                height: 61,
+                width: 61,
+                child: ClipOval(
+                  child: Image.file(defaultAvatar!),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 14),
                 child: Column(

@@ -1,15 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/offer.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/database_service.dart';
 
 import '../Dialogs.dart';
+
+DatabaseService service = DatabaseService();
 
 class OpenRequestCard extends StatefulWidget {
   final Map<String, dynamic> clientRequestInfo;
@@ -23,6 +28,10 @@ class OpenRequestCard extends StatefulWidget {
 }
 
 class _OpenRequestCardState extends State<OpenRequestCard> {
+  double _totalOffer = 0.0;
+  String _offerDesc = '';
+  File? _offerAttachment;
+
   @override
   Widget build(BuildContext context) {
     String firstName = widget.clientRequestInfo['firstName'] ?? '';
@@ -45,12 +54,12 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     final String attachment = widget.clientRequestInfo['attachment'] ?? '';
 
     return Container(
-      height: 279,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 14, right: 10),
@@ -61,16 +70,20 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   child: Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: ClipOval(
-                          child: Image.network(
-                            imgUrl,
-                            width: 63,
-                            height: 60.72,
+                        padding: const EdgeInsets.only(right: 10),
+                        child: SizedBox(
+                          height: 55,
+                          width: 55,
+                          child: CircleAvatar(
+                            backgroundColor: AppColors.white,
+                            child: ClipOval(
+                                child: Image.asset(
+                                    'assets/icons/person-circle-blue.png')),
                           ),
                         ),
                       ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             fullname,
@@ -81,39 +94,37 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                                 fontSize: 15),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top: 1.27),
-                            child: AppBadge(
-                              label: requestId,
-                              type: BadgeType.normal,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 7, vertical: 1),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2.74),
+                            padding: const EdgeInsets.only(top: 2),
                             child: Row(
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(right: 3),
-                                  child: Container(
-                                    height: 12.35,
-                                    width: 12.35,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.dirtyWhite,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
+                                  child: SizedBox(
+                                    height: 25,
+                                    width: 25,
                                     child: Image.asset(
-                                      "assets/icons/plumbing.png",
+                                      "assets/icons/${widget.clientRequestInfo['category'].toString().toLowerCase()}.png",
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  title,
-                                  style: getTextStyle(
-                                      textColor: AppColors.secondaryBlue,
-                                      fontFamily: AppFonts.montserrat,
-                                      fontWeight: AppFontWeights.bold,
-                                      fontSize: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: getTextStyle(
+                                          textColor: AppColors.secondaryBlue,
+                                          fontFamily: AppFonts.montserrat,
+                                          fontWeight: AppFontWeights.medium,
+                                          fontSize: 12),
+                                    ),
+                                    AppBadge(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 3, horizontal: 8),
+                                        label:
+                                            '${widget.clientRequestInfo['category']}',
+                                        type: BadgeType.normal),
+                                  ],
                                 ),
                               ],
                             ),
@@ -179,19 +190,19 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextWithIcon(
-                            icon: Icon(Icons.place,
+                            icon: const Icon(Icons.place,
                                 size: 13, color: AppColors.accentOrange),
                             text: address,
-                            fontSize: 9,
+                            fontSize: 12,
                             contentPadding: 8,
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top: 6.75),
+                            padding: const EdgeInsets.only(top: 6.75),
                             child: TextWithIcon(
-                              icon: Icon(Icons.local_offer_rounded,
+                              icon: const Icon(Icons.local_offer_rounded,
                                   size: 13, color: AppColors.accentOrange),
                               text: suggestedFee.toString(),
-                              fontSize: 9,
+                              fontSize: 12,
                               contentPadding: 8,
                             ),
                           ),
@@ -204,19 +215,19 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextWithIcon(
-                            icon: Icon(Icons.calendar_month_rounded,
+                            icon: const Icon(Icons.calendar_month_rounded,
                                 size: 13, color: AppColors.accentOrange),
                             text: date,
-                            fontSize: 9,
+                            fontSize: 12,
                             contentPadding: 8,
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top: 6.75),
+                            padding: const EdgeInsets.only(top: 6.75),
                             child: TextWithIcon(
-                              icon: Icon(Icons.watch_later,
+                              icon: const Icon(Icons.watch_later,
                                   size: 13, color: AppColors.accentOrange),
                               text: time,
-                              fontSize: 9,
+                              fontSize: 12,
                               contentPadding: 8,
                             ),
                           ),
@@ -229,7 +240,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 13, right: 13, top: 8.27),
+            padding: const EdgeInsets.only(left: 13, right: 13, top: 12),
             child: Text(
               description,
               overflow: TextOverflow.visible,
@@ -237,36 +248,13 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   textColor: AppColors.black,
                   fontFamily: AppFonts.montserrat,
                   fontWeight: AppFontWeights.regular,
-                  fontSize: 9),
+                  fontSize: 14),
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
-          //   child: Row(
-          //     children: [
-          //       Expanded(
-          //         child: Padding(
-          //           padding: const EdgeInsets.only(right: 4.5),
-          //           child: Image.network(
-          //             imgPlaceholder,
-          //             height: 101,
-          //             fit: BoxFit.cover,
-          //           ),
-          //         ),
-          //       ),
-          //       Expanded(
-          //         child: Padding(
-          //           padding: const EdgeInsets.only(left: 4.5),
-          //           child: Image.network(
-          //             imgPlaceholder,
-          //             height: 101,
-          //             fit: BoxFit.cover,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // )
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Image.network(attachment),
+          ),
         ],
       ),
     );
@@ -277,8 +265,8 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('Do you really want to accept this request?'),
+          title: const Text('Confirmation'),
+          content: const Text('Do you really want to accept this request?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -308,7 +296,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
       HandymanApproval handymanApproval = HandymanApproval(
         status: 'pending',
         handymanId: widget.userId,
-        requestId: widget.clientRequestInfo["userId"],
+        requestId: widget.clientRequestInfo["requestId"],
       );
 
       await service.addHandymanApproval(handymanApproval);
@@ -320,14 +308,61 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     setState(() {});
   }
 
-  void onMakeOffer() {
-    makeOfferDialog(context).then((value) {
-      if (value == null) return;
-
-      if (value == "submit") {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const OfferSubmittedPage()));
-      }
+  _getTotalFee(double fee) {
+    setState(() {
+      _totalOffer = fee;
+      print('>>>>>>>makeoffer: $_totalOffer');
     });
+  }
+
+  _getOfferData(String desc, File file) {
+    setState(() {
+      _offerAttachment = file;
+      _offerDesc = desc;
+    });
+  }
+
+  _submitOffer() async {
+    try {
+      // Create a user in Firebase Authentication
+      String imageUrl =
+          await service.uploadOfferAttachment(widget.userId, _offerAttachment!);
+
+      print(
+          '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%submitoffer>>$_totalOffer,$_offerDesc,$imageUrl,${widget.userId},${widget.clientRequestInfo['requestId']}');
+
+      Offer offers = Offer(
+        bidPrice: _totalOffer,
+        status: 'pending',
+        description: _offerDesc,
+        attachment: imageUrl,
+        userId: widget.userId,
+        requestId: widget.clientRequestInfo['requestId'],
+      );
+
+      await service.addOffers(offers);
+    } catch (e) {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error creating user: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void onMakeOffer() {
+    makeOfferDialog(context, _getTotalFee, _getOfferData).then(
+      (value) {
+        if (value == null) return;
+
+        if (value == "submit") {
+          _submitOffer();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const OfferSubmittedPage()));
+        }
+      },
+    );
   }
 }

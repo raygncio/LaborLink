@@ -70,6 +70,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       interestedLaborerWithOffer =
           await service.getInterestedHandymanAndOffer(widget.userId);
+      print(interestedLaborerWithOffer);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -81,7 +82,6 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void fetchOffersOfLaborers() async {
     try {
       interestedLaborer = await service.getInterestedHandyman(widget.userId);
-      print(interestedLaborer);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -174,9 +174,22 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       );
 
   Widget displayTabContent(deviceWidth) {
-    return _selectedTabIndex == 0
-        ? ongoingTab(deviceWidth)
-        : historyTab(deviceWidth);
+    if (_selectedTabIndex == 0) {
+      return ongoingTab(deviceWidth);
+    } else {
+      return FutureBuilder<Widget>(
+        future: historyTab(deviceWidth),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}'); // Handle the error
+          } else {
+            return snapshot.data ?? SizedBox.shrink();
+          }
+        },
+      );
+    }
   }
 
   Widget ongoingTab(deviceWidth) {
@@ -408,7 +421,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
-                  print(hasOffer);
+                  print('>>>>>>>>>>>>>>>>>>>$hasOffer');
 
                   // Choose the appropriate card based on whether there's an offer or not
                   Widget card = hasOffer
@@ -431,9 +444,27 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     );
   }
 
-  Widget historyTab(deviceWidth) {
-    bool openCompletedRequest = true;
-    bool openCancelledRequest = true;
+  Future<Widget> historyTab(deviceWidth) async {
+    // get the request, completed and cancelled
+    bool openCompletedRequest = false;
+    bool openCancelledRequest = false;
+    List<Map<String, dynamic>> cancelledRequest = [];
+    List<Map<String, dynamic>> completedRequest = [];
+
+    try {
+      completedRequest = await service.getCompletedRequest(widget.userId);
+      cancelledRequest = await service.getCancelledRequest(widget.userId);
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
+    }
+
+    if (completedRequest.isNotEmpty) {
+      openCompletedRequest = true;
+    }
+
+    if (cancelledRequest.isNotEmpty) {
+      openCompletedRequest = true;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 54),
@@ -481,8 +512,10 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 10,
+                            itemCount: completedRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentRequest =
+                                  completedRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -490,7 +523,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
-                                      userId: widget.userId,
+                                      userId: currentRequest['requestId'],
                                     ),
                                   )),
                                   child: Container(
@@ -502,7 +535,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                           padding:
                                               const EdgeInsets.only(right: 15),
                                           child: Image.asset(
-                                            "assets/icons/plumbing.png",
+                                            "assets/icons/${currentRequest['category'].toString().toLowerCase()}.png",
                                             height: 32,
                                             width: 32,
                                           ),
@@ -516,7 +549,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  "My sink is leaking!",
+                                                  currentRequest['description'],
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -529,7 +562,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                               ],
                                             ),
                                             Text(
-                                              "07 Aug 2023, 11:12 AM",
+                                              "${currentRequest['date']}${','}${currentRequest['time']}",
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -547,7 +580,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                           child: Align(
                                             alignment: Alignment.topRight,
                                             child: Text(
-                                              "₱650.00",
+                                              currentRequest['suggestedPrice'],
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -606,8 +639,10 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 10,
+                            itemCount: cancelledRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentCancelledRequest =
+                                  cancelledRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -619,7 +654,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                         padding:
                                             const EdgeInsets.only(right: 15),
                                         child: Image.asset(
-                                          "assets/icons/pest-2.png",
+                                          "assets/icons/${currentCancelledRequest['category'].toString().toLowerCase()}.png",
                                           height: 32,
                                           width: 32,
                                         ),
@@ -633,7 +668,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                "Roaches everywhere",
+                                                currentCancelledRequest[
+                                                    'description'],
                                                 style: getTextStyle(
                                                     textColor: AppColors.grey,
                                                     fontFamily:
@@ -645,7 +681,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             ],
                                           ),
                                           Text(
-                                            "15 June 2023, 10:48 AM",
+                                            "${currentCancelledRequest['date']}${','}${currentCancelledRequest['time']}",
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,
@@ -661,7 +697,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                         child: Align(
                                           alignment: Alignment.topRight,
                                           child: Text(
-                                            "₱700.00",
+                                            currentCancelledRequest[
+                                                'suggestedPrice'],
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,

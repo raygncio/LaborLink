@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Pages/RatingsPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
 import 'package:laborlink/Widgets/FilePickers/ChooseFilePicker.dart';
 import 'package:laborlink/Widgets/SuggestedFee.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
+import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
 import 'package:laborlink/styles.dart';
 
 Future<String?> confirmationDialog(BuildContext context) => showDialog<String>(
@@ -195,10 +198,26 @@ Future<String?> suggestedFeeDialog(
       },
     ).then((value) => value);
 
-Future<String?> makeOfferDialog(BuildContext context) {
-  final descriptionController = TextEditingController();
+Future<String?> makeOfferDialog(
+  BuildContext context,
+  Function(double) getFee,
+  Function(String, File) getOfferData,
+) {
   final filePickerKey = GlobalKey<ChooseFilePickerState>();
+  final descriptionKey = GlobalKey<FormState>();
   final deviceHeight = MediaQuery.of(context).size.height;
+
+  TextEditingController descriptionController = TextEditingController();
+
+  _sendData() {
+    print('>>>>>>>>>${descriptionController.text}');
+    String text;
+    if (descriptionKey.currentState!.validate()) {
+      File offerAttachment = filePickerKey.currentState!.getFile;
+      text = descriptionController.text;
+      getOfferData(text, offerAttachment);
+    }
+  }
 
   return showModalBottomSheet<String>(
     useSafeArea: true,
@@ -211,92 +230,103 @@ Future<String?> makeOfferDialog(BuildContext context) {
     builder: (context) {
       return KeyboardVisibilityBuilder(
         builder: (context, isKeyboardVisible) {
-          return Container(
-            height: isKeyboardVisible ? deviceHeight : 503,
-            padding:
-                const EdgeInsets.only(left: 24, right: 24, top: 25, bottom: 22),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: [
-                  //SuggestedFee(getFee: ,),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 14.75),
-                    child: TextAreaFormField(
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 9, vertical: 10),
-                      controller: descriptionController,
-                      height: 119,
-                      inputTextStyle: getTextStyle(
-                          textColor: AppColors.black,
-                          fontFamily: AppFonts.montserrat,
-                          fontWeight: AppFontWeights.regular,
-                          fontSize: 10),
-                      hintText: "Description",
-                      hintTextStyle: getTextStyle(
-                          textColor: AppColors.grey,
-                          fontFamily: AppFonts.montserrat,
-                          fontWeight: AppFontWeights.regular,
-                          fontSize: 10),
-                      defaultBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                            const BorderSide(color: AppColors.grey, width: 0.7),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                            const BorderSide(color: AppColors.red, width: 0.7),
+          return Form(
+            key: descriptionKey,
+            child: Container(
+              height: isKeyboardVisible ? deviceHeight : 503,
+              padding: const EdgeInsets.only(
+                  left: 24, right: 24, top: 25, bottom: 22),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    // SUGGESTED FEE DIALOG
+                    SuggestedFee(
+                      getFee: getFee,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 14.75),
+                      child: TextAreaFormField(
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        },
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 9, vertical: 10),
+                        controller: descriptionController,
+                        height: 119,
+                        inputTextStyle: getTextStyle(
+                            textColor: AppColors.black,
+                            fontFamily: AppFonts.montserrat,
+                            fontWeight: AppFontWeights.regular,
+                            fontSize: 10),
+                        hintText: "Description",
+                        hintTextStyle: getTextStyle(
+                            textColor: AppColors.grey,
+                            fontFamily: AppFonts.montserrat,
+                            fontWeight: AppFontWeights.regular,
+                            fontSize: 10),
+                        defaultBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                              color: AppColors.grey, width: 0.7),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                              color: AppColors.red, width: 0.7),
+                        ),
                       ),
                     ),
-                  ),
-                  ChooseFilePicker(
-                    key: filePickerKey,
-                    label: "Attachment",
-                    labelTextStyle: getTextStyle(
-                        textColor: AppColors.accentOrange,
-                        fontFamily: AppFonts.montserrat,
-                        fontWeight: AppFontWeights.semiBold,
-                        fontSize: 15),
-                    buttonColor: AppColors.accentOrange,
-                    containerBorderWidth: 0.7,
-                    containerBorderColor: AppColors.grey,
-                    buttonBorderRadius: 8,
-                    containerPadding: const EdgeInsets.symmetric(
-                        vertical: 4.71, horizontal: 6.18),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: SizedBox(
-                      width: 147,
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        children: [
-                          AppFilledButton(
-                              text: "Submit",
-                              padding: const EdgeInsets.only(top: 18),
-                              fontSize: 15,
-                              height: 35,
-                              fontFamily: AppFonts.montserrat,
-                              color: AppColors.accentOrange,
-                              command: () =>
-                                  Navigator.of(context).pop("submit"),
-                              borderRadius: 8),
-                        ],
-                      ),
+                    ChooseFilePicker(
+                      key: filePickerKey,
+                      label: "Attachment",
+                      labelTextStyle: getTextStyle(
+                          textColor: AppColors.accentOrange,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.semiBold,
+                          fontSize: 15),
+                      buttonColor: AppColors.accentOrange,
+                      containerBorderWidth: 0.7,
+                      containerBorderColor: AppColors.grey,
+                      buttonBorderRadius: 8,
+                      containerPadding: const EdgeInsets.symmetric(
+                          vertical: 4.71, horizontal: 6.18),
                     ),
-                  )
-                ],
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: 147,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            AppFilledButton(
+                                text: "Submit",
+                                padding: const EdgeInsets.only(top: 18),
+                                fontSize: 15,
+                                height: 35,
+                                fontFamily: AppFonts.montserrat,
+                                color: AppColors.accentOrange,
+                                borderRadius: 8,
+                                command: () {
+                                  _sendData();
+                                  Navigator.of(context).pop("submit");
+                                }),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           );
         },
       );
     },
-  ).then((value) {
-    descriptionController.dispose();
-    return value;
-  });
+  );
 }
 
 Future<String?> yesCancelDialog(BuildContext context, String prompt) =>

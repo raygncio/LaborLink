@@ -5,6 +5,7 @@ import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/database_service.dart';
 
 class ClientViewHistory extends StatefulWidget {
   final String userId;
@@ -15,6 +16,33 @@ class ClientViewHistory extends StatefulWidget {
 }
 
 class _ClientViewHistoryState extends State<ClientViewHistory> {
+  Map<String, dynamic> completedRequest = {};
+  double serviceFee = 0.0;
+  double convenienceFee = 0.0;
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData().then((data) {
+      setState(() {
+        completedRequest = data;
+        serviceFee = completedRequest['suggestedFee'] / 1.10;
+        convenienceFee = completedRequest['suggestedFee'] - serviceFee;
+      });
+    });
+  }
+
+  Future<Map<String, dynamic>> fetchUserData() async {
+    DatabaseService service = DatabaseService();
+
+    try {
+      completedRequest = await service.getClientHistory(widget.userId);
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
+    }
+
+    return completedRequest;
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -42,7 +70,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                           ],
                         ),
                       ),
-                      HandymanInfoCard(handymanInfo: dummyFilteredHandyman[0]),
+                      HandymanInfoCard(handymanInfo: completedRequest),
                       const Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
@@ -87,14 +115,14 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                   ),
                   Align(
                     alignment: Alignment.center,
-                    child: Text(
-                      "Request ID: 12345",
-                      style: getTextStyle(
-                          textColor: AppColors.secondaryYellow,
-                          fontFamily: AppFonts.montserrat,
-                          fontWeight: AppFontWeights.bold,
-                          fontSize: 16),
-                    ),
+                    // child: Text(
+                    //   "Request ID: 12345",
+                    //   style: getTextStyle(
+                    //       textColor: AppColors.secondaryYellow,
+                    //       fontFamily: AppFonts.montserrat,
+                    //       fontWeight: AppFontWeights.bold,
+                    //       fontSize: 16),
+                    // ),
                   ),
                 ],
               ),
@@ -121,7 +149,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 13),
-                child: Text("Clogged Sink, need help!",
+                child: Text(completedRequest['title'],
                     style: getTextStyle(
                         textColor: AppColors.secondaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -132,7 +160,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 41, vertical: 11),
                 child: Text(
-                  "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days. Initially, I noticed that water was taking longer than usual to empty from the sink, and now it's barely draining at all.",
+                  completedRequest['description'],
                   overflow: TextOverflow.visible,
                   textAlign: TextAlign.center,
                   style: getTextStyle(
@@ -180,8 +208,8 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(right: 21),
-                                        child: Image.asset(
-                                          "assets/icons/before.png",
+                                        child: Image.network(
+                                          completedRequest['atttachment'],
                                           width: 107,
                                           height: 107,
                                         ),
@@ -218,8 +246,8 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(right: 21),
-                                        child: Image.asset(
-                                          "assets/icons/after.png",
+                                        child: Image.network(
+                                          completedRequest['completionProof'],
                                           width: 107,
                                           height: 107,
                                         ),
@@ -274,7 +302,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱700.00",
+                          completedRequest['suggestedFee'],
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -288,7 +316,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: Row(
                         children: [
                           Text(
-                            "Service Fee",
+                            serviceFee.toString(),
                             style: getTextStyle(
                                 textColor: AppColors.black,
                                 fontFamily: AppFonts.montserrat,
@@ -297,7 +325,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                           ),
                           const Spacer(),
                           Text(
-                            "₱650.00",
+                            convenienceFee.toString(),
                             style: getTextStyle(
                                 textColor: AppColors.black,
                                 fontFamily: AppFonts.montserrat,
@@ -342,7 +370,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                   thickness: 0.7,
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 15, top: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,7 +378,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                     TextWithIcon(
                       icon: Icon(Icons.place,
                           size: 17, color: AppColors.accentOrange),
-                      text: "556 Juan Luna Ave.",
+                      text: completedRequest['address'],
                       fontSize: 12,
                       contentPadding: 19,
                     ),
@@ -359,7 +387,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: "07 Aug 2023",
+                        text: completedRequest['date'],
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -369,7 +397,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.watch_later,
                             size: 17, color: AppColors.accentOrange),
-                        text: "12:00 - 1:00 PM",
+                        text: completedRequest['time'],
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -379,7 +407,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: "₱550",
+                        text: completedRequest['suggestedFee'],
                         fontSize: 12,
                         contentPadding: 19,
                       ),

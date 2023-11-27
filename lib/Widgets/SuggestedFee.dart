@@ -62,7 +62,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                       fontSize: 10,
                     ),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -78,7 +78,7 @@ class _SuggestedFeeState extends State<SuggestedFee> {
                           fontWeight: AppFontWeights.semiBold,
                           fontSize: 10,
                         ),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                         ),
                       ),

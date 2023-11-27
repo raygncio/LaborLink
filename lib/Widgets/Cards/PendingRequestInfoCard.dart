@@ -156,14 +156,14 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                     ],
                   ),
                 ),
-                Text(
-                  "Request ID",
-                  style: getTextStyle(
-                      textColor: AppColors.tertiaryBlue,
-                      fontFamily: AppFonts.montserrat,
-                      fontWeight: AppFontWeights.regular,
-                      fontSize: 13),
-                ),
+                // Text(
+                //   "Request ID",
+                //   style: getTextStyle(
+                //       textColor: AppColors.tertiaryBlue,
+                //       fontFamily: AppFonts.montserrat,
+                //       fontWeight: AppFontWeights.regular,
+                //       fontSize: 13),
+                // ),
                 Column(
                   children: [
                     Padding(
@@ -223,8 +223,10 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                       color: AppColors.dirtyWhite,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Image.asset("assets/icons/plumbing.png",
-                        width: 50, height: 48),
+                    child: Image.asset(
+                        "assets/icons/${widget.requestDetail['category'].toString().toLowerCase()}.png",
+                        width: 50,
+                        height: 48),
                   ),
                   SizedBox(
                     width: 85,

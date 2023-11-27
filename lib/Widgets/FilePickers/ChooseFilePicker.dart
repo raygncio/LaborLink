@@ -41,7 +41,9 @@ class ChooseFilePickerState extends State<ChooseFilePicker> {
   double defaultBorderRadius = 8;
 
   File? _pickedImageFile;
+  
   String get getFileName => _fileName;
+  File get getFile => _pickedImageFile!;
 
   String? validateAttachment() {
     if (_pickedImageFile == null) {
@@ -55,7 +57,7 @@ class ChooseFilePickerState extends State<ChooseFilePicker> {
     // max width: 150 -> small frame
     // -> lower bandwidth
     final pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.camera, imageQuality: 70, maxWidth: 180);
+        .pickImage(source: ImageSource.gallery, imageQuality: 100);
 
     // check if there's an image
     if (pickedImage == null) return;

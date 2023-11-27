@@ -20,11 +20,14 @@ class HandymanInfoCard extends StatefulWidget {
 
 class HandymanInfoCardState extends State<HandymanInfoCard> {
   late String fullname;
+  File? defaultAvatar;
 
   @override
   void initState() {
     initializeFullname();
     super.initState();
+    // Call an async function to fetch data
+    _loadDefaultAvatar();
   }
 
   void initializeFullname() {
@@ -34,6 +37,22 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
     String suffix = widget.handymanInfo['suffix'] ?? '';
 
     fullname = '$firstName $middleName $lastName $suffix';
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.create(recursive: true);
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  _loadDefaultAvatar() async {
+    defaultAvatar =
+        await getImageFileFromAssets('icons/person-circle-blue.png');
   }
 
   @override
@@ -62,8 +81,7 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
               width: 45,
               child: CircleAvatar(
                 backgroundColor: AppColors.white,
-                child: ClipOval(
-                    child: Image.asset('assets/icons/person-circle-blue.png')),
+                child: ClipOval(child: Image.file(defaultAvatar!)),
               ),
             ),
             Padding(
@@ -98,10 +116,11 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                     ),
                   ),
                   // *************** RATINGS
+                  // static ratings
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: RatingBar.builder(
-                        initialRating: 3,
+                        initialRating: 3, // input
                         itemCount: 5,
                         itemSize: 15,
                         ignoreGestures: true,

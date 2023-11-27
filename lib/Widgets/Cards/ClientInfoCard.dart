@@ -4,6 +4,7 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ClientInfoCard extends StatefulWidget {
   final Map<String, dynamic> clientInfo;
@@ -62,11 +63,21 @@ class ClientInfoCardState extends State<ClientInfoCard> {
                       ],
                     ),
                   ),
+                  // *************** RATINGS
+                  // static ratings
                   Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: RateWidget(
-                        rate: widget.clientInfo["rating"], iconSize: 12),
-                  ),
+                    padding: const EdgeInsets.only(top: 3),
+                    child: RatingBar.builder(
+                        initialRating: 3, // input
+                        itemCount: 5,
+                        itemSize: 15,
+                        ignoreGestures: true,
+                        itemBuilder: (ctx, index) => const Icon(
+                              Icons.star,
+                              color: AppColors.secondaryYellow,
+                            ),
+                        onRatingUpdate: (rating) {}),
+                  )
                 ],
               ),
             ),
