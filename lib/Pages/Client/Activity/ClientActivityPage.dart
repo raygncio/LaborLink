@@ -69,7 +69,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void fetchInterestedLaborers() async {
     try {
       interestedLaborerWithOffer =
-          await service.getInterestedHandyman(widget.userId);
+          await service.getInterestedHandymanAndOffer(widget.userId);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -81,7 +81,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void fetchOffersOfLaborers() async {
     try {
       interestedLaborer =
-          await service.getInterestedHandymanAndOffer(widget.userId);
+          await service.getInterestedHandyman(widget.userId);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }

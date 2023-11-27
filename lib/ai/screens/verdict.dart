@@ -7,6 +7,7 @@ import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/handyman.dart';
+import 'package:laborlink/services/analytics_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/providers/registration_data_provider.dart';
@@ -15,6 +16,7 @@ import 'package:laborlink/models/client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final _firebase = FirebaseAuth.instance;
+final AnalyticsService _analytics = AnalyticsService();
 
 class VerdictPage extends ConsumerStatefulWidget {
   const VerdictPage(
@@ -130,6 +132,10 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
               email: savedUserData["email"],
               password: savedUserData["password"]);
 
+      await _analytics.setUserProperties(
+          userId: userCredential.user!.uid,
+          userRole: savedUserData['userRole']);
+
       // Upload files to Firebase Storage
       String imageUrl = await service.uploadNBIClearance(
           userCredential.user!.uid, savedUserData["idFile"]);
@@ -171,6 +177,10 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
           await _firebase.createUserWithEmailAndPassword(
               email: savedUserData["email"],
               password: savedUserData["password"]);
+
+      await _analytics.setUserProperties(
+          userId: userCredential.user!.uid,
+          userRole: savedUserData['userRole']);
 
       //for uploading nbi clearance
       String imageUrl = await service.uploadNBIClearance(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
@@ -10,7 +11,11 @@ import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
 import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Pages/Report/ReportSubmittedPage.dart';
 import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
+import 'package:laborlink/services/analytics_service.dart';
 import 'package:laborlink/styles.dart';
+
+FirebaseAuth _auth = FirebaseAuth.instance;
+AnalyticsService _analytics = AnalyticsService();
 
 class HandymanMainPage extends StatefulWidget {
   final String userId;
@@ -23,6 +28,19 @@ class HandymanMainPage extends StatefulWidget {
 class _HandymanMainPageState extends State<HandymanMainPage> {
   int _selectedIndex = 0;
   DateTime? currentBackPressTime;
+
+  _login() async {
+    print('>>>>> ${_auth.currentUser!.uid}');
+    await _analytics.setUserProperties(
+        userId: _auth.currentUser!.uid, userRole: 'handyman');
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _login();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

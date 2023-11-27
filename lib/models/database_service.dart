@@ -9,6 +9,7 @@ import 'package:laborlink/models/offer.dart';
 import 'package:laborlink/models/report.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/review.dart';
+import 'package:laborlink/services/analytics_service.dart';
 
 class UserAndRequest {
   final Client client;
@@ -22,6 +23,7 @@ class DatabaseService {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final AnalyticsService _analytics = AnalyticsService();
 
   // PATHS
 
@@ -564,32 +566,45 @@ class DatabaseService {
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
 
-    // Query 'user' collection
+    // Query 'handymanApproval' collection
     final handymanQuery = await _db
         .collection('handymanApproval')
         .where('requestId', isEqualTo: requestId)
         .get();
 
-    // Process 'user' query results
+    // Process 'handymanApproval' query results
     for (var handymanDoc in handymanQuery.docs) {
-      //final handymanId = handymanDoc.id;
-      final offerData = offerDoc.data();
-      final userIdOnOffer = offerData["userId"];
+      final handymanData = handymanDoc.data();
+      final handymanId = handymanData["handymanId"];
 
-      // Query 'request' collection using userId
+      // Query 'user' collection using handymanId
       final userQuery = await _db
           .collection('user')
           .where('userId', isEqualTo: handymanId)
           .get();
 
-      // Process 'request' query results
+      // Process 'user' query results
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
-        final handymanData = handymanDoc.data();
 
-        // Combine user and request data into a single map
-        Map<String, dynamic> combinedData = {...userData, ...handymanData};
-        resultList.add(combinedData);
+        // Query 'reviewCollection' using some key from userData
+        final reviewsQuery = await _db
+            .collection('reviews')
+            .where('userId', isEqualTo: handymanId)
+            .get();
+
+        // Process 'reviewCollection' query results
+        for (var reviewDoc in reviewsQuery.docs) {
+          final reviewData = reviewDoc.data();
+
+          // Combine all data into a single map
+          Map<String, dynamic> combinedData = {
+            ...userData,
+            ...handymanData,
+            ...reviewData
+          };
+          resultList.add(combinedData);
+        }
       }
     }
     return resultList;
@@ -616,32 +631,46 @@ class DatabaseService {
       String requestId) async {
     List<Map<String, dynamic>> resultList = [];
 
-    // Query 'user' collection
+    // Query 'offer' collection
     final offerQuery = await _db
         .collection('offer')
         .where('status', isEqualTo: 'pending')
         .get();
 
-    // Process 'user' query results
+    // Process 'offer' query results
     for (var offerDoc in offerQuery.docs) {
-      //final offerId = offerDoc.id; for doc id
       final offerData = offerDoc.data();
       final userIdOnOffer = offerData["userId"];
 
-      // Query 'request' collection using userId
+      // Query 'user' collection using userId from 'offer'
       final userQuery = await _db
           .collection('user')
           .where('userId', isEqualTo: userIdOnOffer)
           .where('userRole', isEqualTo: 'handyman')
           .get();
 
-      // Process 'request' query results
+      // Process 'user' query results
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
 
-        // Combine user and request data into a single map
-        Map<String, dynamic> combinedData = {...userData, ...offerData};
-        resultList.add(combinedData);
+        // Query 'review' collection using some key from userData, adjust as needed
+        final reviewQuery = await _db
+            .collection('reviews')
+            .where('userId', isEqualTo: userIdOnOffer)
+            .get();
+
+        // Process 'review' query results
+        for (var reviewDoc in reviewQuery.docs) {
+          final reviewData = reviewDoc.data();
+
+          // Combine all data into a single map
+          Map<String, dynamic> combinedData = {
+            ...userData,
+            ...offerData,
+            ...reviewData
+          };
+          resultList.add(combinedData);
+        }
       }
     }
     return resultList;

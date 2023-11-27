@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
@@ -6,7 +7,11 @@ import 'package:laborlink/Pages/Profile/ProfilePage.dart';
 import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
 import 'package:laborlink/Pages/LoadingPage.dart';
 import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
+import 'package:laborlink/services/analytics_service.dart';
 import 'package:laborlink/styles.dart';
+
+FirebaseAuth _auth = FirebaseAuth.instance;
+AnalyticsService _analytics = AnalyticsService();
 
 class ClientMainPage extends StatefulWidget {
   final String userId;
@@ -19,6 +24,18 @@ class ClientMainPage extends StatefulWidget {
 class _ClientMainPageState extends State<ClientMainPage> {
   int _selectedIndex = 0;
   DateTime? currentBackPressTime;
+
+  _login() async {
+    await _analytics.setUserProperties(
+        userId: _auth.currentUser!.uid, userRole: 'client');
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _login();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

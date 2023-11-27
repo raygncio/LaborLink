@@ -22,6 +22,7 @@ import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
+final DatabaseService service = DatabaseService();
 
 class ClientHomePage extends StatefulWidget {
   final Function(int)? navigateToNewPage;
@@ -83,7 +84,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
-    DatabaseService service = DatabaseService();
+    // DatabaseService service = DatabaseService();
     if (searchText == null) return;
 
     try {
@@ -115,7 +116,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       }
     });
 
-    DatabaseService service = DatabaseService();
+    // DatabaseService service = DatabaseService();
 
     if (requestFormKey.currentState!.hasFile() &&
         requestFormKey.currentState!.validateForm()) {
@@ -185,7 +186,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
       if (value == "proceed") {
         suggestedFeeDialog(context, _getTotalFee).then((value) {
-    
           submitRequest('open');
         });
       }
@@ -404,7 +404,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   Future<Widget> getOngoingRequestContent() async {
     // TODO: Add logic for ongoing Request
-    DatabaseService service = DatabaseService();
+    //DatabaseService service = DatabaseService();
     Request? requestInfo = await service.getRequestsData(widget.userId);
 
     if (requestInfo != null) {
