@@ -324,7 +324,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                               fontSize: 15,
                               fontFamily: AppFonts.montserrat,
                               color: AppColors.accentOrange,
-                              command: () {},
+                              command: hireHandyman,
                               borderRadius: 8),
                         ],
                       ),
@@ -336,4 +336,8 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
           ],
         ),
       );
+
+      void hireHandyman () async {
+        
+      }
 }

@@ -96,6 +96,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     delayed = TextButton(
       onPressed: () {
+        ref.invalidate(registrationDataProvider);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (ctx) {
@@ -246,7 +247,6 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   @override
   void dispose() {
-    ref.invalidate(registrationDataProvider);
     super.dispose();
   }
 
