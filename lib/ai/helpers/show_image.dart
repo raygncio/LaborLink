@@ -21,10 +21,10 @@ class ShowImage extends StatelessWidget {
             width: 200,
             child: images[1],
           ),
-          Container(
-            width: 200,
-            child: images[2],
-          ),
+          // Container(
+          //   width: 200,
+          //   child: images[],
+          // ),
           for (var result in regulaResults) 
             Text('Regula face match: $result')
         ],
