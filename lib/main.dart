@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
+import 'package:laborlink/Pages/LoginPage.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/providers/current_user_provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
@@ -32,12 +36,12 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application...
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'LaborLink',
       debugShowCheckedModeBanner: false,
@@ -50,7 +54,16 @@ class MyApp extends StatelessWidget {
 
           if (snapshot.hasData) {
             // means a user is logged in  (has token)
-            return const ChatScreen();
+            String? userRole =
+                ref.read(currentUserProvider.notifier).currentUserRole;
+
+            if (userRole == 'client') {
+              return ClientMainPage(userId: userId);
+            } else if (userRole == 'handyman') {
+              return HandymanMainPage(userId: userId);
+            } else {
+              return const LoginPage();
+            }
           }
 
           return const LandingPage();
@@ -58,20 +71,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-
-  getUserInfo() async {
-    DatabaseService service = DatabaseService();
-
-    Client clientInfo = await service.getUserData(userCredential.user!.uid);
-
-        if (clientInfo.userRole == "handyman") {
-          // User is a handyman, navigate to the handyman page.
-          toHandyman();
-        } else if (clientInfo.userRole == "client") {
-          // User is a client, navigate to the client page.
-          toClient();
-        } 
-  }
 }
-
-

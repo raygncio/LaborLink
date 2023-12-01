@@ -1,38 +1,57 @@
 // provider that simply stores all client registration data
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/handyman.dart';
 
 class CurrentUserNotifier extends StateNotifier<Map<String, dynamic>> {
   CurrentUserNotifier() : super({});
-  // reach out to the parent class and pass the initial data
-  // set the initial data that will be stored in the Notifier and the Provider below
-  // in this, an empty list of maps
 
-  // Basic Info, Address Info, Account Info, Client Info Maps
-  // state -> saved data maps
+  DatabaseService service = DatabaseService();
+  String? userRole;
+  String? get currentUserRole => userRole;
 
-  // NOTE: storing to state should be assigned, not edited
+  saveCurrentUserInfo(UserCredential userCredential) async {
+    //gets and save current user info
 
-  saveCurrentUserInfo(Map<String, dynamic> userData) {
-    // state contains the list of maps
+    Client clientInfo = await service.getUserData(userCredential.user!.uid);
+    Map<String, dynamic> clientInfoMap = clientInfo.toFirestore();
+    
+    // store user role
+    userRole = clientInfo.userRole;
 
-    final isEmpty = state.isEmpty;
+    // IF HANDYMAN
+    if (clientInfo.userRole == 'handyman') {
+      // User is a handyman, navigate to the handyman page.
 
-    // spread operator pulls out all the elements
-    // and add them as invidual elements to the new list
-    // pull out all the existing and ADD the new meal to a list
-    if (isEmpty) {
-      state = {...state, ...userData};
-      return;
+      Handyman handymanInfo =
+          await service.getHandymanData(userCredential.user!.uid);
+
+      Map<String, dynamic> handymanInfoMap = handymanInfo.toFirestore();
+
+      // store data to state provider
+      if (state.isEmpty) {
+        state = {...state, ...clientInfoMap, ...handymanInfoMap};
+      }
+
+      // IF CLIENT
+    } else if (clientInfo.userRole == 'client') {
+      // store data to state provider
+      if (state.isEmpty) {
+        state = {...state, ...clientInfoMap};
+      }
     }
-    return;
   }
+
 }
 
-final registrationDataProvider =
+final currentUserProvider =
     StateNotifierProvider<CurrentUserNotifier, Map<String, dynamic>>(
-        (ref) {
-  // instance of the notifier class
-  // for editing and retrieving the state
-  return CurrentUserNotifier();
-});
+  (ref) {
+    // instance of the notifier class
+    // for editing and retrieving the state
+    return CurrentUserNotifier();
+  },
+);
