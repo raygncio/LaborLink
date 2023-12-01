@@ -1,7 +1,6 @@
 // provider that simply stores all client registration data
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class RegistrationDataNotifier extends StateNotifier<Map<String, dynamic>> {
   RegistrationDataNotifier() : super({});

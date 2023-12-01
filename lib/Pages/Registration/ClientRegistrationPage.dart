@@ -8,8 +8,6 @@ import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/models/client.dart';
 import 'dart:async';
 import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/splash/splash_one.dart';

@@ -55,10 +55,11 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
       setState(() {
         if (progress == "pending") {
-          _haveActiveRequest = false;
           _havePendingOpenRequest = true;
           _havePendingDirectRequest = true;
           _forApproval = true;
+        } else if (progress == "hired") {
+          _haveActiveRequest = true;
         }
       });
     } catch (error) {

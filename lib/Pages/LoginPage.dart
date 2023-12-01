@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
-import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
-import 'package:laborlink/Pages/LandingPage.dart';
-import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Forms/LoginForm.dart';
-import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/styles.dart';
-import '../Widgets/Buttons/FilledButton.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
+import 'package:laborlink/styles.dart';
+import '../Widgets/Buttons/FilledButton.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -45,10 +39,11 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Image.asset("assets/icons/LOGO 1.png"),
                   Padding(
-                      padding: const EdgeInsets.only(top: 28),
-                      child: Image.asset(
-                        "assets/icons/login_img.png",
-                      )),
+                    padding: const EdgeInsets.only(top: 28),
+                    child: Image.asset(
+                      "assets/icons/login_img.png",
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 21),
                     child: LoginForm(key: loginFormKey),
@@ -130,33 +125,10 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
 
-        Client clientInfo = await service.getUserData(userCredential.user!.uid);
-
-        if (clientInfo.userRole == "handyman") {
-          // User is a handyman, navigate to the handyman page.
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) =>
-                HandymanMainPage(userId: userCredential.user!.uid),
-          ));
-        } else if (clientInfo.userRole == "client") {
-          // User is a client, navigate to the client page.
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) =>
-                ClientMainPage(userId: userCredential.user!.uid),
-          ));
-        } else {
-          print("Unknown user role");
-        }
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.
         print("Login error: $e");
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message ?? 'Authentication Failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        displaySnackbar(e);
       }
     } else {
       // Show an error message for not entering valid credentials
@@ -167,6 +139,16 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }
+  }
+
+  void displaySnackbar(FirebaseAuthException e) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(e.message ?? 'Authentication Failed'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void onBack() {

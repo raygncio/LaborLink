@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 
