@@ -1,6 +1,7 @@
 // provider that simply stores all client registration data
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
@@ -9,30 +10,31 @@ import 'package:laborlink/models/handyman.dart';
 class CurrentUserNotifier extends StateNotifier<Map<String, dynamic>> {
   CurrentUserNotifier() : super({});
 
+  FirebaseAuth auth = FirebaseAuth.instance;
   DatabaseService service = DatabaseService();
-  String? userRole;
-  String? get currentUserRole => userRole;
 
-  saveCurrentUserInfo(UserCredential userCredential) async {
+  saveCurrentUserInfo() async {
+    print('>>>> Saving Current user info provider');
+
     //gets and save current user info
 
-    Client clientInfo = await service.getUserData(userCredential.user!.uid);
+    Client clientInfo = await service.getUserData(auth.currentUser!.uid);
     Map<String, dynamic> clientInfoMap = clientInfo.toFirestore();
-    
-    // store user role
-    userRole = clientInfo.userRole;
+
+    print('>>>> ${clientInfo.userRole}');
 
     // IF HANDYMAN
     if (clientInfo.userRole == 'handyman') {
       // User is a handyman, navigate to the handyman page.
 
       Handyman handymanInfo =
-          await service.getHandymanData(userCredential.user!.uid);
+          await service.getHandymanData(auth.currentUser!.uid);
 
       Map<String, dynamic> handymanInfoMap = handymanInfo.toFirestore();
 
       // store data to state provider
       if (state.isEmpty) {
+        print('>>>> saving state');
         state = {...state, ...clientInfoMap, ...handymanInfoMap};
       }
 
@@ -44,7 +46,6 @@ class CurrentUserNotifier extends StateNotifier<Map<String, dynamic>> {
       }
     }
   }
-
 }
 
 final currentUserProvider =

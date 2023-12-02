@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
+import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LogoutButton extends StatefulWidget {
+class LogoutButton extends ConsumerStatefulWidget {
   const LogoutButton({Key? key}) : super(key: key);
 
   @override
-  State<LogoutButton> createState() => _LogoutButtonState();
+  ConsumerState<LogoutButton> createState() => _LogoutButtonState();
 }
 
-class _LogoutButtonState extends State<LogoutButton> {
+class _LogoutButtonState extends ConsumerState<LogoutButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -38,16 +40,8 @@ class _LogoutButtonState extends State<LogoutButton> {
   void onLogout() {
     yesCancelDialog(context, "Are you sure you want to log out?").then((value) {
       if (value == "yes") {
-        FirebaseAuth.instance.signOut().then((_) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => LandingPage()),
-            (Route<dynamic> route) => false, // Removes all previous routes
-          );
-        }).catchError((error) {
-          print("Error signing out: $error");
-          // Handle error while signing out
-        });
+        ref.invalidate(currentUserProvider);
+        FirebaseAuth.instance.signOut();
       }
     });
   }

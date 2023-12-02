@@ -10,7 +10,7 @@ import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
 import 'package:laborlink/Widgets/Forms/HandymanRequirementForm.dart';
 import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/providers/registration_data_provider.dart';
-import 'package:laborlink/splash/splash_one.dart';
+import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:laborlink/styles.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +55,7 @@ class _HandymanRegistrationPageState
     final deviceWidth = MediaQuery.of(context).size.width;
 
     if (_isLoading) {
-      return const SplashOnePage();
+      return const SplashHandymanPage();
     }
 
     return Scaffold(

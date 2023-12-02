@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
@@ -7,19 +8,20 @@ import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Forms/LoginForm.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
+import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/styles.dart';
 import '../Widgets/Buttons/FilledButton.dart';
 
 final _firebase = FirebaseAuth.instance;
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   GlobalKey<LoginFormState> loginFormKey = GlobalKey<LoginFormState>();
 
   @override
@@ -100,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
       bool isEmail = enteredEmail.contains('@');
 
       try {
-        UserCredential userCredential;
+        late UserCredential userCredential;
 
         if (isEmail) {
           // Sign in using email and password directly
@@ -119,11 +121,15 @@ class _LoginPageState extends State<LoginPage> {
               email: emailFromUsername,
               password: enteredPassword,
             );
-          } else {
-            // Handle case when username is not found
-            throw 'Username not found';
-          }
+          } 
         }
+
+        // save current user data
+        ref
+            .read(currentUserProvider.notifier)
+            .saveCurrentUserInfo();
+
+        Navigator.of(context).pop();
 
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.

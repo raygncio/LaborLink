@@ -4,17 +4,13 @@ import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
-import 'package:laborlink/Pages/LoginPage.dart';
-import 'package:laborlink/ai/screens/splash_one.dart';
-import 'package:laborlink/models/client.dart';
-import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
+import 'package:laborlink/splash/splash_handyman.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
 import 'package:laborlink/ai/screens/face_verification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,23 +45,33 @@ class MyApp extends ConsumerWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashOnePage();
+            print('>>>>>>>>>>> connection state waiting');
+            return const SplashHandymanPage();
           }
+
+          Future.delayed(const Duration(seconds: 5), () {});
 
           if (snapshot.hasData) {
             // means a user is logged in  (has token)
-            String? userRole =
-                ref.read(currentUserProvider.notifier).currentUserRole;
+            print('>>>>>>>>>>> snapshot has data');
+
+            ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
+
+            Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
+            String? userId = userInfo['userId'];
+            String? userRole = userInfo['userRole'];
+
+            print('>>>>>>>>>>> userId: $userId');
+            print('>>>>>>>>>>> userrole: $userRole');
 
             if (userRole == 'client') {
-              return ClientMainPage(userId: userId);
+              return ClientMainPage(userId: userId!);
             } else if (userRole == 'handyman') {
-              return HandymanMainPage(userId: userId);
-            } else {
-              return const LoginPage();
+              return HandymanMainPage(userId: userId!);
             }
           }
 
+          print('>>>>>>>>>>> no login data');
           return const LandingPage();
         },
       ),
