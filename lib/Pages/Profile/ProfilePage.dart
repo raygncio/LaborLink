@@ -3,9 +3,7 @@ import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
-import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
@@ -14,24 +12,26 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _firebase = FirebaseAuth.instance;
 
-class ProfilePage extends StatefulWidget {
-  final String userId;
-  const ProfilePage({Key? key, required this.userId}) : super(key: key);
+// class ProfilePage extends StatefulWidget {
+//   final String userId;
+//   const ProfilePage({Key? key, required this.userId}) : super(key: key);
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
+//   @override
+//   State<ProfilePage> createState() => _ProfilePageState();
+// }
 
-class _ProfilePageState extends State<ProfilePage> {
+class ProfilePage extends ConsumerWidget {
+  ProfilePage({super.key});
   final _fullNameController = TextEditingController();
   final _birthdateController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
-  File? defaultAvatar;
+  // File? defaultAvatar;
   final _labelTextStyle = getTextStyle(
       textColor: AppColors.black,
       fontFamily: AppFonts.montserrat,
@@ -52,77 +52,77 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // @override
+  // void initState() {
+  // _fullNameController.text = "Allan Ray C. Escueta";
+  // _birthdateController.text = "August 8, 2023";
+  // _emailController.text = "customer@gmail.com";
+  // _phoneNumberController.text = "09171234567";
+  // _addressController.text = "Tønsberg, Norway";
+
+  //super.initState();
+  //fetchUserData();
+  //_loadDefaultAvatar();
+  //}
+
+  // Future<void> _loadDefaultAvatar() async {
+  //   defaultAvatar =
+  //       await getImageFileFromAssets('icons/person-circle-blue.png');
+  //   setState(() {}); // Update the state to display the default avatar
+  // }
+
+  // Future<File> getImageFileFromAssets(String path) async {
+  //   final byteData = await rootBundle.load('assets/$path');
+
+  //   final file = File('${(await getTemporaryDirectory()).path}/$path');
+  //   await file.create(recursive: true);
+  //   await file.writeAsBytes(byteData.buffer
+  //       .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+  //   return file;
+  // }
+
+  // Future<void> fetchUserData() async {
+  //   DatabaseService service = DatabaseService();
+  //   try {
+  //     Client clientInfo = await service.getUserData(widget.userId);
+
+  //     String fullName = clientInfo.firstName +
+  //         ' ' +
+  //         (clientInfo.middleName ?? "") +
+  //         ' ' +
+  //         clientInfo.lastName +
+  //         ' ' +
+  //         (clientInfo.suffix ?? "");
+
+  //     String formattedDate =
+  //         DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
+
+  //     // setState(() {
+  //     //   _fullNameController.text = fullName;
+  //     //   _birthdateController.text = formattedDate;
+  //     //   _emailController.text = clientInfo.emailAdd;
+  //     //   _phoneNumberController.text = clientInfo.phoneNumber;
+  //     //   _addressController.text = clientInfo.streetAddress;
+  //     // });
+  //   } catch (error) {
+  //     print('Error fetching user data: $error');
+  //   }
+  // }
+
+  // @override
+  // void dispose() {
+  //   _fullNameController.dispose();
+  //   _birthdateController.dispose();
+  //   _emailController.dispose();
+  //   _phoneNumberController.dispose();
+  //   _addressController.dispose();
+
+  //   super.dispose();
+  // }
+
   @override
-  void initState() {
-    // _fullNameController.text = "Allan Ray C. Escueta";
-    // _birthdateController.text = "August 8, 2023";
-    // _emailController.text = "customer@gmail.com";
-    // _phoneNumberController.text = "09171234567";
-    // _addressController.text = "Tønsberg, Norway";
-
-    super.initState();
-    fetchUserData();
-    _loadDefaultAvatar();
-  }
-
-  Future<void> _loadDefaultAvatar() async {
-    defaultAvatar =
-        await getImageFileFromAssets('icons/person-circle-blue.png');
-    setState(() {}); // Update the state to display the default avatar
-  }
-
-  Future<File> getImageFileFromAssets(String path) async {
-    final byteData = await rootBundle.load('assets/$path');
-
-    final file = File('${(await getTemporaryDirectory()).path}/$path');
-    await file.create(recursive: true);
-    await file.writeAsBytes(byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-
-    return file;
-  }
-
-  Future<void> fetchUserData() async {
-    DatabaseService service = DatabaseService();
-    try {
-      Client clientInfo = await service.getUserData(widget.userId);
-
-      String fullName = clientInfo.firstName +
-          ' ' +
-          (clientInfo.middleName ?? "") +
-          ' ' +
-          clientInfo.lastName +
-          ' ' +
-          (clientInfo.suffix ?? "");
-
-      String formattedDate =
-          DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
-
-      setState(() {
-        _fullNameController.text = fullName;
-        _birthdateController.text = formattedDate;
-        _emailController.text = clientInfo.emailAdd;
-        _phoneNumberController.text = clientInfo.phoneNumber;
-        _addressController.text = clientInfo.streetAddress;
-      });
-    } catch (error) {
-      print('Error fetching user data: $error');
-    }
-  }
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _birthdateController.dispose();
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _addressController.dispose();
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -567,7 +567,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void onChangePassword() {}
 
-  void onReportAnIssue() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ReportIssuePage(userId: widget.userId),
-      ));
+   onReportAnIssue() {
+    return const ReportIssuePage(userId: "TEST");
+  }
 }

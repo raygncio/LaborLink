@@ -11,13 +11,6 @@ import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/review.dart';
 import 'package:laborlink/services/analytics_service.dart';
 
-class UserAndRequest {
-  final Client client;
-  final Request request;
-
-  UserAndRequest({required this.client, required this.request});
-}
-
 class DatabaseService {
   // INITIALIZE
 
@@ -381,41 +374,6 @@ class DatabaseService {
         resultList.add(combinedData);
       }
     }
-    return resultList;
-  }
-
-  // Update the getAllUserAndItsRequest method
-  Future<List<UserAndRequest>> getAllUserAndItsRequest(String userId) async {
-    List<UserAndRequest> resultList = [];
-
-    // // Query 'user' collection
-    // final userQuery = await _db.collection('user').get();
-
-    // // Loop through each user document
-    // for (QueryDocumentSnapshot userDoc in userQuery.docs) {
-    //   // Get user data
-    //   Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-
-    //   // Create a Client instance from the user data
-    //   Client client = Client.fromFireStore(userData);
-
-    //   // Query 'request' collection using userId
-    //   final requestQuery = await _db
-    //       .collection('request')
-    //       .where('userId', isEqualTo: userDoc.id)
-    //       .get();
-
-    //   // Get list of requests for this user
-    //   List<Map<String, dynamic>> requestList = requestQuery.docs
-    //       .map((requestDoc) => requestDoc.data() as Map<String, dynamic>)
-    //       .toList();
-
-    //   // Create a UserAndRequest object and add it to the result list
-    //   UserAndRequest userAndRequest =
-    //       UserAndRequest(client: client, request: requestList);
-    //   resultList.add(userAndRequest);
-    // }
-
     return resultList;
   }
 

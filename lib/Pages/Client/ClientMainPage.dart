@@ -87,6 +87,6 @@ class _ClientMainPageState extends State<ClientMainPage> {
       return IssuesReportedPage(userId: widget.userId);
     }
 
-    return ProfilePage(userId: widget.userId);
+    return ProfilePage();
   }
 }

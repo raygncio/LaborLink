@@ -92,6 +92,6 @@ class _HandymanMainPageState extends State<HandymanMainPage> {
       return IssuesReportedPage(userId: widget.userId);
     }
 
-    return ProfilePage(userId: widget.userId);
+    return ProfilePage();
   }
 }

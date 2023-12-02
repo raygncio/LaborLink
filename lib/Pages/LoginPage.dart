@@ -124,11 +124,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           } 
         }
 
-        // save current user data
-        ref
-            .read(currentUserProvider.notifier)
-            .saveCurrentUserInfo();
-
         Navigator.of(context).pop();
 
       } on FirebaseAuthException catch (e) {
