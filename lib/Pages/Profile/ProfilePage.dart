@@ -13,6 +13,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laborlink/providers/current_user_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -51,19 +52,6 @@ class ProfilePage extends ConsumerWidget {
       child: iconWidget,
     );
   }
-
-  // @override
-  // void initState() {
-  // _fullNameController.text = "Allan Ray C. Escueta";
-  // _birthdateController.text = "August 8, 2023";
-  // _emailController.text = "customer@gmail.com";
-  // _phoneNumberController.text = "09171234567";
-  // _addressController.text = "Tønsberg, Norway";
-
-  //super.initState();
-  //fetchUserData();
-  //_loadDefaultAvatar();
-  //}
 
   // Future<void> _loadDefaultAvatar() async {
   //   defaultAvatar =
@@ -110,19 +98,27 @@ class ProfilePage extends ConsumerWidget {
   //   }
   // }
 
-  // @override
-  // void dispose() {
-  //   _fullNameController.dispose();
-  //   _birthdateController.dispose();
-  //   _emailController.dispose();
-  //   _phoneNumberController.dispose();
-  //   _addressController.dispose();
-
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
+
+    Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
+    // String? userId = userInfo['userId'];
+    String? fullName = userInfo['firstName'] +
+        ' ' +
+        (userInfo['middleName'] ?? "") +
+        ' ' +
+        userInfo['lastName'] +
+        ' ' +
+        (userInfo['suffix'] ?? "");
+    String formattedDate =
+        DateFormat('MMMM d, y').format(userInfo['dob']!); // Format the date
+    _fullNameController.text = fullName ?? '';
+    _birthdateController.text = formattedDate;
+    _emailController.text = userInfo['emailAdd'] ?? '';
+    _phoneNumberController.text = userInfo['phoneNumber'] ?? '';
+    _addressController.text = userInfo['streetAddress'] ?? '';
+
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -567,7 +563,7 @@ class ProfilePage extends ConsumerWidget {
 
   void onChangePassword() {}
 
-   onReportAnIssue() {
+  onReportAnIssue() {
     return const ReportIssuePage(userId: "TEST");
   }
 }

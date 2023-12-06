@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +10,7 @@ import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
 import 'package:laborlink/Pages/LoadingPage.dart';
 import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
 import 'package:laborlink/services/analytics_service.dart';
+import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:laborlink/styles.dart';
 
 FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,6 +28,8 @@ class _ClientMainPageState extends State<ClientMainPage> {
   int _selectedIndex = 0;
   DateTime? currentBackPressTime;
 
+  bool firstTime = true;
+
   _login() async {
     print('>>>>>>>${_auth.currentUser!.uid}');
     await _analytics.setUserProperties(
@@ -40,6 +45,15 @@ class _ClientMainPageState extends State<ClientMainPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (firstTime) {
+      Timer(const Duration(milliseconds: 2500), () {
+        setState(() {
+          firstTime = false;
+        });
+      });
+      return const SplashHandymanPage();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
       body: WillPopScope(
@@ -84,7 +98,7 @@ class _ClientMainPageState extends State<ClientMainPage> {
       return ClientActivityPage(
           navigateToNewPage: updateSelectedIndex, userId: widget.userId);
     } else if (_selectedIndex == 2) {
-      return IssuesReportedPage(userId: widget.userId);
+      return IssuesReportedPage();
     }
 
     return ProfilePage();

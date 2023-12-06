@@ -4,8 +4,10 @@ import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
+import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
+import 'package:laborlink/splash/splash_loading.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
@@ -44,16 +46,18 @@ class MyApp extends ConsumerWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          bool isLoadingLoginData = false;
+
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              isLoadingLoginData) {
             print('>>>>>>>>>>> connection state waiting');
             return const SplashHandymanPage();
           }
 
-          Future.delayed(const Duration(seconds: 5), () {});
-
           if (snapshot.hasData) {
             // means a user is logged in  (has token)
             print('>>>>>>>>>>> snapshot has data');
+            isLoadingLoginData = true;
 
             ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
 
@@ -64,15 +68,25 @@ class MyApp extends ConsumerWidget {
             print('>>>>>>>>>>> userId: $userId');
             print('>>>>>>>>>>> userrole: $userRole');
 
+            if (userId != null || userRole != null) {
+              isLoadingLoginData = false;
+            }
+
             if (userRole == 'client') {
-              return ClientMainPage(userId: userId!);
+              return ClientMainPage(userId: userId ?? '');
             } else if (userRole == 'handyman') {
               return HandymanMainPage(userId: userId!);
             }
           }
 
-          print('>>>>>>>>>>> no login data');
-          return const LandingPage();
+          if (isLoadingLoginData) {
+            return const Scaffold(
+              backgroundColor: AppColors.white,
+            );
+          } else {
+            print('>>>>>>>>>>> no login data');
+            return const LandingPage();
+          }
         },
       ),
     );
