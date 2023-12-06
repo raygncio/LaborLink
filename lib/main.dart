@@ -80,6 +80,7 @@ class MyApp extends ConsumerWidget {
           }
 
           if (isLoadingLoginData) {
+            // display white bg (very fast)
             return const Scaffold(
               backgroundColor: AppColors.white,
             );
