@@ -2,18 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/styles.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laborlink/providers/current_user_provider.dart';
 
-class ReportSubmittedPage extends StatefulWidget {
-  final String userId;
-  const ReportSubmittedPage({Key? key, required this.userId}) : super(key: key);
+// class ReportSubmittedPage extends StatefulWidget {
+//   final String userId;
+//   const ReportSubmittedPage({Key? key, required this.userId}) : super(key: key);
 
+//   @override
+//   State<ReportSubmittedPage> createState() => _ReportSubmittedPageState();
+// }
+
+class ReportSubmittedPage extends ConsumerWidget {
+  //late String userId;
   @override
-  State<ReportSubmittedPage> createState() => _ReportSubmittedPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
 
-class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
-  @override
-  Widget build(BuildContext context) {
+    //Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
+    //userId = userInfo['userId'] ?? '';
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -66,7 +73,7 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
                           fontSize: 15,
                           fontFamily: AppFonts.montserrat,
                           color: AppColors.secondaryBlue,
-                          command: onCheckReports,
+                          command: () => onCheckReports(context),
                           borderRadius: 8),
                     ],
                   ),
@@ -74,7 +81,7 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 22),
                   child: GestureDetector(
-                    onTap: onContinue,
+                    onTap: () => onContinue(context),
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.accentOrange,
@@ -107,10 +114,10 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
     );
   }
 
-  void onCheckReports() =>
+  void onCheckReports(BuildContext context) =>
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => IssuesReportedPage(),
       ));
 
-  void onContinue() => Navigator.of(context).pop();
+  void onContinue(BuildContext context) => Navigator.of(context).pop();
 }

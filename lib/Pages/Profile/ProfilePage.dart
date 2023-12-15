@@ -564,6 +564,6 @@ class ProfilePage extends ConsumerWidget {
   void onChangePassword() {}
 
   onReportAnIssue() {
-    return const ReportIssuePage(userId: "TEST");
+    return ReportIssuePage();
   }
 }

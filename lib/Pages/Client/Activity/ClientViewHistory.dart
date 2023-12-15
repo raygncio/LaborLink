@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/ReportIssueButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 
@@ -36,6 +34,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
 
     try {
       completedRequest = await service.getClientHistory(widget.userId);
+      print(completedRequest);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }

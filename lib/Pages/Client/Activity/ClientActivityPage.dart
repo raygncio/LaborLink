@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientActiveRequest.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import 'package:laborlink/Widgets/Cards/HandymanHireCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/HandymanProposalCard.dart';
 import 'package:laborlink/Widgets/Cards/HandymanSelectedCard.dart';
 import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/client.dart';
@@ -455,6 +453,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
+      print('*************************COMPLETED REQUEST $completedRequest');
+      print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -466,6 +466,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     if (cancelledRequest.isNotEmpty) {
       openCompletedRequest = true;
     }
+
+    print(
+        '*************************CHECK THE BOOLEAN FOR CANCELLED REQUEST $openCompletedRequest');
 
     return Padding(
       padding: const EdgeInsets.only(top: 54),

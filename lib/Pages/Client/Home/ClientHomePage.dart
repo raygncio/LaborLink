@@ -10,13 +10,11 @@ import 'package:laborlink/Widgets/Forms/RequestForm.dart';
 import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
-import 'package:laborlink/models/client.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 

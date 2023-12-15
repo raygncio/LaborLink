@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Badge.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/report.dart';
-import 'package:laborlink/models/client.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +38,6 @@ class IssuesReportedPage extends ConsumerWidget {
   // Define an async function to fetch data
   _loadData(String userId) async {
     // Use await to wait for the result
-    // need ko ata i connect yung user id ng client sa user id ng reports?
     List<Report> reports = await getAllReportData(userId);
     issues = reports;
   }
