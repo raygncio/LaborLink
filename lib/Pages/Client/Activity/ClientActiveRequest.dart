@@ -27,9 +27,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
 
   @override
   Widget build(BuildContext context) {
-    _currentProgress = widget.requestDetail["progress"];
+    if (widget.requestDetail["progress"] == 'completed') {
+      _currentProgress = 4;
+    } else {
+      _currentProgress = 1;
+    }
     _requestCompleted = _currentProgress == 4;
-
+    print('Request Detail: ${widget.requestDetail}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,7 +57,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: Text(
-                                    widget.requestDetail["title"],
+                                    widget.requestDetail["title"] ?? '',
                                     style: getTextStyle(
                                         textColor: AppColors.tertiaryBlue,
                                         fontFamily: AppFonts.montserrat,
@@ -88,7 +92,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     icon: Icon(Icons.place,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: widget.requestDetail["address"],
+                                    text: widget.requestDetail["address"] ?? '',
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
@@ -99,7 +103,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     icon: Icon(Icons.calendar_month_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: widget.requestDetail["date"],
+                                    text: widget.requestDetail["date"] ?? '',
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
@@ -110,7 +114,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     icon: Icon(Icons.watch_later,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: widget.requestDetail["time"],
+                                    text: widget.requestDetail["time"] ?? '',
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
@@ -121,7 +125,8 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     icon: Icon(Icons.local_offer_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
-                                    text: widget.requestDetail["suggestedFee"],
+                                    text: widget.requestDetail["suggestedFee"]
+                                        .toString(),
                                     fontSize: 12,
                                     contentPadding: 19,
                                   ),
@@ -177,7 +182,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                     child: ReportIssueButton(),
                   ),
                 ),
-                HandymanInfoCard(handymanInfo: dummyFilteredHandyman[0]),
+                HandymanInfoCard(handymanInfo: widget.requestDetail),
               ],
             ),
           ),

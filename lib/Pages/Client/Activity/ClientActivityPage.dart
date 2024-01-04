@@ -35,13 +35,16 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   List<Map<String, dynamic>> interestedLaborer = [];
   List<Map<String, dynamic>> interestedLaborerWithOffer = [];
   List<Map<String, dynamic>> combinedInterestedLaborers = [];
+  Map<String, dynamic> getActiveRequest = {};
+  Future<Map<String, dynamic>>? activeRequestFuture;
 
   @override
   void initState() {
     super.initState();
     checkForRequests();
-    fetchInterestedLaborers();
+    // fetchInterestedLaborers();
     fetchOffersOfLaborers();
+    activeRequestFuture = getTheActiveRequest();
   }
 
   void checkForRequests() async {
@@ -55,7 +58,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         if (progress == "pending") {
           _havePendingOpenRequest = true;
           _havePendingDirectRequest = true;
-          _forApproval = true;
+          // _forApproval = true;
         } else if (progress == "hired") {
           _haveActiveRequest = true;
         }
@@ -69,21 +72,37 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       interestedLaborerWithOffer =
           await service.getInterestedHandymanAndOffer(widget.userId);
-      print(interestedLaborerWithOffer);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
+
     // Combine the lists
-    combinedInterestedLaborers.addAll(interestedLaborer);
     combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+  }
+
+  Future<Map<String, dynamic>> getTheActiveRequest() async {
+    try {
+      return await service.getActiveRequest(widget.userId);
+    } catch (error) {
+      print('Error fetching active request: $error');
+      return {};
+    }
   }
 
   void fetchOffersOfLaborers() async {
     try {
       interestedLaborer = await service.getInterestedHandyman(widget.userId);
+      print(
+          "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
+
+    combinedInterestedLaborers.addAll(interestedLaborer);
+    // print(
+    //     "*************************CHECK THE COMBINE 2 ${combinedInterestedLaborers.length}");
+    // print(
+    //     "*************************CHECK THE COMBINE 2 NEW $combinedInterestedLaborers");
   }
 
   Future<Map<String, dynamic>> convertRequestToMap(Request request) async {
@@ -93,7 +112,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     } catch (error) {
       print('Error fetching user data 2: $error');
     }
-    print(clientInfo);
+    // print(clientInfo);
 
     // Implement the conversion logic based on the structure of Request
     return {
@@ -367,26 +386,24 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     );
   }
 
-  Widget activeRequest() => Padding(
-        padding: const EdgeInsets.only(top: 54),
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: convertRequestToMap(requestInfo!),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              // Return a loading indicator or placeholder
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              // Handle the error
-              return Text('Error: ${snapshot.error}');
-            } else {
-              // Use the data from the snapshot
-              Map<String, dynamic> requestDetail = snapshot.data!;
-
-              return ClientActiveRequest(requestDetail: requestDetail);
-            }
-          },
-        ),
-      );
+  Widget activeRequest() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: activeRequestFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          Map<String, dynamic> getActiveRequest = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.only(top: 54),
+            child: ClientActiveRequest(requestDetail: getActiveRequest),
+          );
+        }
+      },
+    );
+  }
 
   Widget interestedLaborers() {
     return SingleChildScrollView(
@@ -417,10 +434,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                 itemBuilder: (context, index) {
                   Map<String, dynamic> currentHandyman =
                       combinedInterestedLaborers[index];
+                  print("Index: $index");
+                  print(
+                      "*************************CHECK THE CURRENT HANDYMAN ${combinedInterestedLaborers.length}");
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
-                  print('>>>>>>>>>>>>>>>>>>>$hasOffer');
+                  print('>>>>>>>>>>>>>>>>>>> HAS OFFER $hasOffer');
 
                   // Choose the appropriate card based on whether there's an offer or not
                   Widget card = hasOffer
@@ -453,8 +473,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      print('*************************COMPLETED REQUEST $completedRequest');
-      print('*************************CANCELLED REQUEST $cancelledRequest');
+      // print('*************************COMPLETED REQUEST $completedRequest');
+      // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -464,11 +484,11 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     }
 
     if (cancelledRequest.isNotEmpty) {
-      openCompletedRequest = true;
+      openCancelledRequest = true;
     }
 
-    print(
-        '*************************CHECK THE BOOLEAN FOR CANCELLED REQUEST $openCompletedRequest');
+    // print(
+    //     '*************************CHECK THE BOOLEAN FOR CANCELLED REQUEST $openCompletedRequest');
 
     return Padding(
       padding: const EdgeInsets.only(top: 54),
@@ -702,7 +722,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             currentCancelledRequest[
-                                                'suggestedPrice'],
+                                                    'suggestedPrice']
+                                                .toString(),
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,

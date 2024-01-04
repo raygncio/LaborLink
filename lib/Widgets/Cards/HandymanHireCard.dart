@@ -59,6 +59,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
 
     // Concatenate non-null values
     fullname = '$firstName $middleName $lastName $suffix';
+    print("*************************CHECK THE FULL NAME $fullname");
     return Container(
       height: 81,
       decoration: const BoxDecoration(
@@ -97,7 +98,9 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["specialization"] ?? '',
+                                  label:
+                                      widget.handymanInfo["specialization"] ??
+                                          '',
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
@@ -188,35 +191,36 @@ class HandymanHireCardState extends State<HandymanHireCard> {
     // assign the handyman id to the request
     // update the request progress to hired
     bool confirmHire = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Hire Handyman'),
-          content: Text('Are you sure you want to hire this handyman?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(false); // Return false when cancel is pressed
-              },
-              child: Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(true); // Return true when confirm is pressed
-              },
-              child: Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Hire Handyman'),
+              content: Text('Are you sure you want to hire this handyman?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // Return false when cancel is pressed
+                  },
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(true); // Return true when confirm is pressed
+                  },
+                  child: Text('Yes'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
 
     if (confirmHire == true) {
       try {
         await service.hiredHandyman(
-            widget.handymanInfo['userId'], widget.requestId);
+            widget.handymanInfo['userId'], widget.handymanInfo['requestId']);
         await service.updateRequestProgress(
             widget.requestId, widget.handymanInfo['handymanId']);
 

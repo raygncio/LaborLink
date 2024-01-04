@@ -71,7 +71,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.file(defaultAvatar!),
+                    child: Image.file(File('icons/person-circle-blue.png')),
                   ),
                 ),
                 Padding(
@@ -93,11 +93,13 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["specialization"],
+                                  label:
+                                      widget.handymanInfo["specialization"] ??
+                                          '',
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["city"],
+                                label: widget.handymanInfo["city"] ?? '',
                                 type: BadgeType.normal)
                           ],
                         ),
@@ -105,7 +107,8 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: RateWidget(
-                            rate: widget.handymanInfo["rating"], iconSize: 12),
+                            rate: widget.handymanInfo["rating"] ?? 0,
+                            iconSize: 12),
                       ),
                     ],
                   ),
@@ -121,7 +124,8 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                 children: [
                   AppBadge(
                     label: "Offered ₱ " +
-                        widget.handymanInfo["bidPrice"].toString(),
+                            widget.handymanInfo["bidPrice"].toString() ??
+                        '',
                     type: BadgeType.offer,
                     padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                   ),

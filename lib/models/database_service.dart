@@ -496,7 +496,7 @@ class DatabaseService {
   Future<Request?> getRequestsData(String userId) async {
     final querySnap = await _db
         .collection('request')
-        .where('progress', whereIn: ['pending', 'inprogress'])
+        .where('progress', whereIn: ['pending', 'inprogress', 'hired'])
         .where('userId', isEqualTo: userId)
         .get();
 
@@ -671,7 +671,6 @@ class DatabaseService {
     await _db.collection('handymanApproval').add(approvalData.toFirestore());
   }
 
-  // Get all interested handyman
   Future<List<Map<String, dynamic>>> getInterestedHandyman(
       String userId) async {
     List<Map<String, dynamic>> resultList = [];
@@ -679,24 +678,26 @@ class DatabaseService {
     final requestQuery = await _db
         .collection('request')
         .where('userId', isEqualTo: userId)
+        .where('progress', isEqualTo: 'pending')
         .get();
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
-      resultList.add(requestData);
-      final handymanId = requestData['handymanId'];
+      final requestId = requestDoc.id;
+
+      Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
 
       final handymanQuery = await _db
           .collection('handymanApproval')
-          .where('handymanId', isEqualTo: handymanId)
+          .where('requestId', isEqualTo: requestId)
           .where('status', isEqualTo: 'pending')
           .get();
 
       // Process 'handyman approval' query results
       for (var handymanDoc in handymanQuery.docs) {
         final handymanData = handymanDoc.data();
-        resultList.add(handymanData);
-        final userID = handymanData['userId'];
+        groupData.addAll(handymanData);
+        final userID = handymanData['handymanId'];
 
         final userQuery = await _db
             .collection('user')
@@ -706,7 +707,7 @@ class DatabaseService {
         // Process 'user' query results
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
-          resultList.add(userData);
+          groupData.addAll(userData);
 
           // Query 'review' using key from userData
           final reviewsQuery = await _db
@@ -716,12 +717,74 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewsQuery.docs) {
             final reviewData = reviewDoc.data();
-            resultList.add(reviewData);
+            groupData.addAll(reviewData);
           }
         }
       }
+
+      // Add the combined data to the resultList
+      resultList.add(groupData);
     }
+
     return resultList;
+  }
+
+  Future<Map<String, Map<String, dynamic>>> getActiveRequest(
+      String userId) async {
+    Map<String, Map<String, dynamic>> resultMap = {};
+
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: userId)
+        .where('progress', isEqualTo: 'hired')
+        .get();
+
+    for (var requestDoc in requestQuery.docs) {
+      final requestData = requestDoc.data();
+      final requestId = requestDoc.id;
+
+      Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
+
+      final handymanQuery = await _db
+          .collection('handymanApproval')
+          .where('requestId', isEqualTo: requestId)
+          .where('status', isEqualTo: 'hired')
+          .get();
+
+      // Process 'handyman approval' query results
+      for (var handymanDoc in handymanQuery.docs) {
+        final handymanData = handymanDoc.data();
+        groupData.addAll(handymanData);
+        final userID = handymanData['handymanId'];
+
+        final userQuery = await _db
+            .collection('user')
+            .where('userId', isEqualTo: userID)
+            .get();
+
+        // Process 'user' query results
+        for (var userDoc in userQuery.docs) {
+          final userData = userDoc.data();
+          groupData.addAll(userData);
+
+          // Query 'review' using key from userData
+          final reviewsQuery = await _db
+              .collection('reviews')
+              .where('userId', isEqualTo: userID)
+              .get();
+          // Process 'review' query results
+          for (var reviewDoc in reviewsQuery.docs) {
+            final reviewData = reviewDoc.data();
+            groupData.addAll(reviewData);
+          }
+        }
+      }
+
+      // Add the combined data to the resultMap
+      resultMap[requestId] = groupData;
+    }
+
+    return resultMap;
   }
 
   // OFFERS
@@ -737,7 +800,6 @@ class DatabaseService {
     return Offer.fromFireStore(docSnap);
   }
 
-  // Get all interested handyman and its offers to the request
   Future<List<Map<String, dynamic>>> getInterestedHandymanAndOffer(
       String userId) async {
     List<Map<String, dynamic>> resultList = [];
@@ -752,7 +814,10 @@ class DatabaseService {
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
-      resultList.add({...requestData, 'requestId': requestId});
+
+      Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
+      resultList.add(groupData);
+      print("*************************CHECK THE USER DATA123 $requestData");
 
       // Query 'offer' collection
       final offerQuery = await _db
@@ -764,7 +829,7 @@ class DatabaseService {
       for (var offerDoc in offerQuery.docs) {
         final offerData = offerDoc.data();
         final userIdOnOffer = offerData["userId"];
-        resultList.add(offerData);
+        groupData.addAll(offerData);
 
         // Query 'user' collection using userId from 'offer'
         final userQuery = await _db
@@ -776,7 +841,7 @@ class DatabaseService {
         // Process 'user' query results
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
-          resultList.add(userData);
+          groupData.addAll(userData);
 
           // Query 'review' collection using some key from userData, adjust as needed
           final reviewQuery = await _db
@@ -787,11 +852,15 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewQuery.docs) {
             final reviewData = reviewDoc.data();
-            resultList.add(reviewData);
+            groupData.addAll(reviewData);
           }
         }
       }
+
+      // Add the combined data to the resultList
+      resultList.add(groupData);
     }
+
     return resultList;
   }
 

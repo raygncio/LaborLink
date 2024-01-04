@@ -148,7 +148,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 13),
-                child: Text(completedRequest['title'],
+                child: Text(completedRequest['title'] ?? '',
                     style: getTextStyle(
                         textColor: AppColors.secondaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -159,7 +159,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 41, vertical: 11),
                 child: Text(
-                  completedRequest['description'],
+                  completedRequest['description'] ?? '',
                   overflow: TextOverflow.visible,
                   textAlign: TextAlign.center,
                   style: getTextStyle(
@@ -208,7 +208,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                         padding:
                                             const EdgeInsets.only(right: 21),
                                         child: Image.network(
-                                          completedRequest['atttachment'],
+                                          completedRequest['atttachment'] ?? '',
                                           width: 107,
                                           height: 107,
                                         ),
@@ -246,7 +246,8 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                         padding:
                                             const EdgeInsets.only(right: 21),
                                         child: Image.network(
-                                          completedRequest['completionProof'],
+                                          completedRequest['completionProof'] ??
+                                              '',
                                           width: 107,
                                           height: 107,
                                         ),
@@ -301,7 +302,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                         ),
                         const Spacer(),
                         Text(
-                          completedRequest['suggestedFee'],
+                          completedRequest['suggestedFee'] ?? '',
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -377,7 +378,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                     TextWithIcon(
                       icon: Icon(Icons.place,
                           size: 17, color: AppColors.accentOrange),
-                      text: completedRequest['address'],
+                      text: completedRequest['address'] ?? '',
                       fontSize: 12,
                       contentPadding: 19,
                     ),
@@ -386,7 +387,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: completedRequest['date'],
+                        text: completedRequest['date'] ?? '',
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -396,7 +397,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.watch_later,
                             size: 17, color: AppColors.accentOrange),
-                        text: completedRequest['time'],
+                        text: completedRequest['time'] ?? '',
                         fontSize: 12,
                         contentPadding: 19,
                       ),
@@ -406,7 +407,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: completedRequest['suggestedFee'],
+                        text: completedRequest['suggestedFee'] ?? '',
                         fontSize: 12,
                         contentPadding: 19,
                       ),
