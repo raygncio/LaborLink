@@ -391,10 +391,35 @@ class DatabaseService {
     for (var requestDoc in requestQuery.docs) {
       final requestId = requestDoc.id;
       final requestData = requestDoc.data();
+      final handymanId = requestData["handymanId"];
       Map<String, dynamic> combinedData = {
         'requestId': requestId,
         ...requestData,
       };
+      // resultList.add(combinedData);
+
+      final userQuery = await _db
+          .collection('user')
+          .where('userId', isEqualTo: handymanId)
+          .where('userRole', isEqualTo: 'handyman')
+          .get();
+
+      // Process 'user' query results
+      for (var userDoc in userQuery.docs) {
+        final userData = userDoc.data();
+        combinedData.addAll(userData);
+
+        // Query 'review' using key from userData
+        final reviewsQuery = await _db
+            .collection('reviews')
+            .where('userId', isEqualTo: handymanId)
+            .get();
+        // Process 'review' query results
+        for (var reviewDoc in reviewsQuery.docs) {
+          final reviewData = reviewDoc.data();
+          combinedData.addAll(reviewData);
+        }
+      }
       resultList.add(combinedData);
     }
     return resultList;

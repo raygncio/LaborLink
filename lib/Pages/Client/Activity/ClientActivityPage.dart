@@ -473,7 +473,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      // print('*************************COMPLETED REQUEST $completedRequest');
+      print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: $error');
@@ -573,7 +573,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  currentRequest['description'],
+                                                  currentRequest[
+                                                          'description'] ??
+                                                      '',
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -604,7 +606,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                           child: Align(
                                             alignment: Alignment.topRight,
                                             child: Text(
-                                              currentRequest['suggestedPrice'],
+                                              currentRequest['suggestedPrice']
+                                                  .toString(),
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
