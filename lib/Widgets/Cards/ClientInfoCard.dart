@@ -17,6 +17,12 @@ class ClientInfoCard extends StatefulWidget {
 class ClientInfoCardState extends State<ClientInfoCard> {
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.clientInfo['firstName'] ?? '';
+    String middleName = widget.clientInfo['middleName'] ?? '';
+    String lastName = widget.clientInfo['lastName'] ?? '';
+    String suffix = widget.clientInfo['suffix'] ?? '';
+
+    String fullname = '$firstName $middleName $lastName $suffix';
     return Container(
       decoration: const BoxDecoration(
           color: AppColors.white,
@@ -38,7 +44,7 @@ class ClientInfoCardState extends State<ClientInfoCard> {
               height: 61,
               width: 61,
               child: ClipOval(
-                child: Image.network(widget.clientInfo["img_url"]),
+                child: Image.asset('assets/icons/person-circle-blue.png'),
               ),
             ),
             Padding(
@@ -47,7 +53,7 @@ class ClientInfoCardState extends State<ClientInfoCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.clientInfo['name'],
+                  Text(fullname,
                       style: getTextStyle(
                           textColor: AppColors.primaryBlue,
                           fontFamily: AppFonts.montserrat,
@@ -58,7 +64,7 @@ class ClientInfoCardState extends State<ClientInfoCard> {
                     child: Row(
                       children: [
                         AppBadge(
-                            label: widget.clientInfo["area"],
+                            label: widget.clientInfo["city"] ?? '',
                             type: BadgeType.normal)
                       ],
                     ),

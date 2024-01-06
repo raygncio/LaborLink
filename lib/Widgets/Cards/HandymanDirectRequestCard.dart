@@ -78,8 +78,7 @@ class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
                 height: 61,
                 width: 61,
                 child: ClipOval(
-                  child: Image.file(
-                      defaultAvatar ?? File('icons/person-circle-blue.png')),
+                  child: Image.asset('assets/icons/person-circle-blue.png'),
                 ),
               ),
               Padding(

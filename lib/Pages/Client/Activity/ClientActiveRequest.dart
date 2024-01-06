@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/RequestCompleteSuccessPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
@@ -9,6 +10,7 @@ import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,16 +26,32 @@ class ClientActiveRequest extends StatefulWidget {
 class _ClientActiveRequestState extends State<ClientActiveRequest> {
   late int _currentProgress;
   late bool _requestCompleted;
+  DatabaseService service = DatabaseService();
+  List<String> progressDescriptions = [
+    "Waiting for the handyman",
+    "Handyman is on the way to your location!",
+    "Handyman has arrived!",
+    "Your service is now in progress!",
+    "Service complete!",
+    "Service complete on both parties!"
+  ];
 
   @override
   Widget build(BuildContext context) {
-    if (widget.requestDetail["progress"] == 'completed') {
+    if (widget.requestDetail["progress"] == 'completion') {
       _currentProgress = 4;
-    } else {
+    } else if (widget.requestDetail["progress"] == 'omw') {
       _currentProgress = 1;
+    } else if (widget.requestDetail["progress"] == 'arrived') {
+      _currentProgress = 2;
+    } else if (widget.requestDetail["progress"] == 'inprogress') {
+      _currentProgress = 3;
+    } else {
+      _currentProgress = 0;
     }
     _requestCompleted = _currentProgress == 4;
     print('Request Detail: ${widget.requestDetail}');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -77,7 +95,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                               ],
                             ),
                             Text(
-                              "Request ID",
+                              widget.requestDetail["requestId"] ?? '',
                               style: getTextStyle(
                                   textColor: AppColors.tertiaryBlue,
                                   fontFamily: AppFonts.montserrat,
@@ -119,21 +137,25 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     contentPadding: 19,
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 12),
-                                  child: TextWithIcon(
-                                    icon: Icon(Icons.local_offer_rounded,
-                                        size: 17,
-                                        color: AppColors.accentOrange),
-                                    text: widget.requestDetail["suggestedFee"]
-                                        .toString(),
-                                    fontSize: 12,
-                                    contentPadding: 19,
+                                InkWell(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: 12),
+                                    child: TextWithIcon(
+                                      icon: Icon(Icons.local_offer_rounded,
+                                          size: 17,
+                                          color: AppColors.accentOrange),
+                                      text: widget
+                                          .requestDetail["suggestedPrice"]
+                                          .toString(),
+                                      fontSize: 12,
+                                      contentPadding: 19,
+                                    ),
                                   ),
                                 ),
                                 AppProgressIndicator(
                                     padding: const EdgeInsets.only(top: 51),
-                                    description: "Handyman has arrived!",
+                                    description:
+                                        progressDescriptions[_currentProgress],
                                     max: 4,
                                     currentProgress: _currentProgress),
                               ],
@@ -218,7 +240,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     }
   }
 
-  void onConfirm() {
+  void onConfirm() async {
+    try {
+      // await service.updateRequest(widget.requestDetail["requestId"]);
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => const RequestCompleteSuccessPage(),
     ));

@@ -11,12 +11,15 @@ import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HandymanActiveRequest extends StatefulWidget {
   final Map<String, dynamic> requestDetail;
-  const HandymanActiveRequest({Key? key, required this.requestDetail})
+  final Map<String, dynamic> clientDetail;
+  const HandymanActiveRequest(
+      {Key? key, required this.requestDetail, required this.clientDetail})
       : super(key: key);
 
   @override
@@ -26,6 +29,8 @@ class HandymanActiveRequest extends StatefulWidget {
 class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
   late int _currentProgress;
   bool _requestCompleted = false;
+  // Map<String, dynamic> getActiveRequest = {};
+  DatabaseService service = DatabaseService();
 
   List<String> progressDescriptions = [
     "Click the button below if you're on your way!",
@@ -46,10 +51,38 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
 
   @override
   void initState() {
-    _currentProgress = widget.requestDetail["progress"];
+    print("new test");
+    print(widget.requestDetail['progress']);
+    if (widget.requestDetail["progress"] == 'completed') {
+      _currentProgress = 5;
+    } else if (widget.requestDetail["progress"] == 'omw') {
+      _currentProgress = 1;
+    } else if (widget.requestDetail["progress"] == 'arrived') {
+      _currentProgress = 2;
+    } else if (widget.requestDetail["progress"] == 'inprogress') {
+      _currentProgress = 3;
+    } else if (widget.requestDetail["progress"] == 'completion') {
+      _currentProgress = 4;
+    } else {
+      _currentProgress = 0;
+    }
     _requestCompleted = _currentProgress == 5;
     super.initState();
+    // Future.delayed(Duration(seconds: 1), () {
+    //   getClientInfo();
+    // });
   }
+
+  // void getClientInfo() async {
+  //   print(widget.requestDetail['userId']);
+  //   try {
+  //     getActiveRequest =
+  //         await service.getActiveRequestClient(widget.requestDetail["userId"]);
+  //     print(getActiveRequest);
+  //   } catch (error) {
+  //     print('Error fetching user data: $error');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +107,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: Text(
-                                "Request Title",
+                                widget.requestDetail["title"] ?? '',
                                 style: getTextStyle(
                                     textColor: AppColors.tertiaryBlue,
                                     fontFamily: AppFonts.montserrat,
@@ -94,7 +127,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                           ],
                         ),
                         Text(
-                          "Request ID",
+                          widget.requestDetail["requestId"] ?? '',
                           style: getTextStyle(
                               textColor: AppColors.tertiaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -104,7 +137,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                         Padding(
                           padding: const EdgeInsets.only(top: 13),
                           child: Text(
-                            "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+                            widget.requestDetail["description"] ?? '',
                             overflow: TextOverflow.visible,
                             style: getTextStyle(
                                 textColor: AppColors.black,
@@ -115,42 +148,44 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                         ),
                         Column(
                           children: [
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 16),
                               child: TextWithIcon(
                                 icon: Icon(Icons.place,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "556 Juan Luna Ave.",
+                                text: widget.requestDetail["address"] ?? '',
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 12),
                               child: TextWithIcon(
                                 icon: Icon(Icons.calendar_month_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "Today",
+                                text: widget.requestDetail["date"] ?? '',
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 12),
                               child: TextWithIcon(
                                 icon: Icon(Icons.watch_later,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "12:00 - 1:00 PM",
+                                text: widget.requestDetail["time"] ?? '',
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 12),
                               child: TextWithIcon(
                                 icon: Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "₱550",
+                                text: widget.requestDetail["suggestedPrice"]
+                                        .toString() ??
+                                    '',
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -195,7 +230,20 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                   ),
                 ),
                 Stack(children: [
-                  ClientInfoCard(clientInfo: dummyClients[4]),
+                  Visibility(
+                    visible: _currentProgress >= 0,
+                    child: FutureBuilder(
+                      future: Future.delayed(Duration(seconds: -1)),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return ClientInfoCard(
+                              clientInfo: widget.clientDetail);
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  ),
                   Positioned(
                       top: 13,
                       right: 22,
@@ -236,12 +284,18 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
     }
   }
 
-  void updateProgress() {
+  void updateProgress() async {
     if (!_requestCompleted) {
       setState(() {
         _currentProgress += 1;
         _requestCompleted = _currentProgress == 5;
       });
+
+      // Update the progress in the database
+      await service.updateRequestProgressHandyman(
+        widget.requestDetail["requestId"],
+        _currentProgress,
+      );
     } else {
       attachServiceProofDialog(context);
     }

@@ -13,13 +13,16 @@ import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 
 import '../../../Widgets/Badge.dart';
 
 class HandymanActivityPage extends StatefulWidget {
   final Function(int) navigateToNewPage;
-  const HandymanActivityPage({Key? key, required this.navigateToNewPage})
+  final String userId;
+  const HandymanActivityPage(
+      {Key? key, required this.navigateToNewPage, required this.userId})
       : super(key: key);
 
   @override
@@ -28,9 +31,36 @@ class HandymanActivityPage extends StatefulWidget {
 
 class _HandymanActivityPageState extends State<HandymanActivityPage> {
   int _selectedTabIndex = 0;
+  Map<String, dynamic> getActiveRequest = {};
+  Map<String, dynamic> getClientRequest = {};
+  DatabaseService service = DatabaseService();
 
   bool _haveActiveRequest = true;
   bool _forApproval = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkForRequests();
+    // fetchInterestedLaborers();
+  }
+
+  void checkForRequests() async {
+    try {
+      getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+      getClientRequest = await service.getActiveRequestClient(widget.userId);
+      print("testingggggggg $getActiveRequest");
+      setState(() {
+        if (getActiveRequest["approvalStatus"] == "pending") {
+          _forApproval = true;
+        } else if (getActiveRequest["approvalStatus"] == "hired") {
+          _haveActiveRequest = true;
+        }
+      });
+    } catch (error) {
+      print('Error fetching user data:1 $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -346,10 +376,25 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
         ],
       );
 
-  Widget activeRequest() => Padding(
-        padding: const EdgeInsets.only(top: 54),
-        child: HandymanActiveRequest(requestDetail: dummyActiveRequest[0]),
-      );
+  Widget activeRequest() {
+    return FutureBuilder(
+      future: Future.delayed(
+          Duration(seconds: 1)), // Adjust the delay duration as needed
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 54),
+            child: HandymanActiveRequest(
+                requestDetail: getActiveRequest,
+                clientDetail: getClientRequest),
+          );
+        } else {
+          // You can return a loading indicator or an empty container while waiting
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
 
   Widget historyTab(deviceWidth) {
     bool openCompletedRequest = true;

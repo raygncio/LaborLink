@@ -55,18 +55,18 @@ class _OngoingRequestCardState extends State<OngoingRequestCard> {
                   ),
                 ),
               ),
-              // Container(
-              //   padding: const EdgeInsets.all(2),
-              //   decoration: const BoxDecoration(
-              //       color: AppColors.accentOrange, shape: BoxShape.circle),
-              //   child: ClipOval(
-              //     child: Image.network(
-              //       widget.imgUrl ?? "",
-              //       width: 30,
-              //       height: 30,
-              //     ),
-              //   ),
-              // )
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                    color: AppColors.accentOrange, shape: BoxShape.circle),
+                child: ClipOval(
+                  child: Image.asset(
+                    widget.imgUrl ?? 'assets/icons/person-circle-blue.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
+              )
             ],
           ),
         ),

@@ -76,15 +76,15 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
             const EdgeInsets.only(left: 14, right: 10, top: 10, bottom: 10),
         child: Row(
           children: [
-            // SizedBox(
-            //   height: 45,
-            //   width: 45,
-            //   child: CircleAvatar(
-            //     backgroundColor: AppColors.white,
-            //     child: ClipOval(
-            //         child: Image.file(File('icons/person-circ le-blue.png'))),
-            //   ),
-            // ),
+            SizedBox(
+              height: 45,
+              width: 45,
+              child: CircleAvatar(
+                backgroundColor: AppColors.white,
+                child: ClipOval(
+                    child: Image.asset('assets/icons/person-circle-blue.png')),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: Column(
@@ -142,10 +142,10 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                 color: AppColors.dirtyWhite,
                 borderRadius: BorderRadius.circular(50),
               ),
-              // child: Image.asset(
-              //     "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
-              //     width: 50,
-              //     height: 48),
+              child: Image.asset(
+                  "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
+                  width: 50,
+                  height: 48),
             ),
           ],
         ),
