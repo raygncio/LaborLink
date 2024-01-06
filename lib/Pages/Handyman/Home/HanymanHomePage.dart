@@ -87,7 +87,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
     try {
       List<Map<String, dynamic>> results =
-          await service.getUserAndRequestBaseOnSearch(searchText);
+          await service.getUserAndRequestBaseOnSearch(searchText.toLowerCase());
 
       // searchResultSection();
       // print(searchText);
@@ -346,7 +346,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   Future<Widget> getOngoingService() async {
     DatabaseService service = DatabaseService();
     Request? requestInfo = await service.getHandymanService(widget.userId);
-
+    print(">>>>>>>>>>>>$requestInfo");
     if (requestInfo != null) {
       return OngoingRequestCard(
         title: requestInfo.title,

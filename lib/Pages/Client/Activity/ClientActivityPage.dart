@@ -52,14 +52,18 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       requestInfo = await service.getRequestsData(widget.userId);
 
       String progress = requestInfo!.progress;
-      print(progress);
+      print('progress: $progress');
 
       setState(() {
         if (progress == "pending") {
           _havePendingOpenRequest = true;
           _havePendingDirectRequest = true;
           // _forApproval = true;
-        } else if (progress == "hired") {
+        } else if (progress == "hired" ||
+            progress == "omw" ||
+            progress == "arrived" ||
+            progress == "inprogress" ||
+            progress == "completion") {
           _haveActiveRequest = true;
         }
       });
