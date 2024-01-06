@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/ai/style.dart';
+import 'package:laborlink/otp/verify_email_page.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:laborlink/splash/splash_loading.dart';
@@ -57,37 +58,39 @@ class MyApp extends ConsumerWidget {
           if (snapshot.hasData) {
             // means a user is logged in  (has token)
             print('>>>>>>>>>>> snapshot has data');
-            isLoadingLoginData = true;
 
-            ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
+            return const VerifyEmailPage();
 
-            Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-            String? userId = userInfo['userId'];
-            String? userRole = userInfo['userRole'];
+            // isLoadingLoginData = true;
 
-            print('>>>>>>>>>>> userId: $userId');
-            print('>>>>>>>>>>> userrole: $userRole');
+            // ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
 
-            if (userId != null || userRole != null) {
-              isLoadingLoginData = false;
-            }
+            // Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
+            // String? userId = userInfo['userId'];
+            // String? userRole = userInfo['userRole'];
 
-            if (userRole == 'client') {
-              return ClientMainPage(userId: userId ?? '');
-            } else if (userRole == 'handyman') {
-              return HandymanMainPage(userId: userId!);
-            }
+            // print('>>>>>>>>>>> userId: $userId');
+            // print('>>>>>>>>>>> userrole: $userRole');
+
+            // if (userId != null || userRole != null) {
+            //   isLoadingLoginData = false;
+            // }
+
+            // if (userRole == 'client') {
+            //   return ClientMainPage(userId: userId ?? '');
+            // } else if (userRole == 'handyman') {
+            //   return HandymanMainPage(userId: userId!);
+            // }
           }
 
-          if (isLoadingLoginData) {
-            // display white bg (very fast)
-            return const Scaffold(
-              backgroundColor: AppColors.white,
-            );
-          } else {
-            print('>>>>>>>>>>> no login data');
-            return const LandingPage();
-          }
+          // if (isLoadingLoginData) {
+          //   // display white bg (very fast)
+          //   return const Scaffold(
+          //     backgroundColor: AppColors.white,
+          //   );
+          // }
+          print('>>>>>>>>>>> no login data');
+          return const LandingPage();
         },
       ),
     );
