@@ -6,7 +6,8 @@ import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 
 class RatingsPage extends StatefulWidget {
-  const RatingsPage({Key? key}) : super(key: key);
+  final Map<String, dynamic> ratings;
+  const RatingsPage({Key? key, required this.ratings}) : super(key: key);
 
   @override
   State<RatingsPage> createState() => _RatingsPageState();
@@ -18,6 +19,12 @@ class _RatingsPageState extends State<RatingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.ratings['firstName'] ?? '';
+    String middleName = widget.ratings['middleName'] ?? '';
+    String lastName = widget.ratings['lastName'] ?? '';
+    String suffix = widget.ratings['suffix'] ?? '';
+
+    String fullname = '$firstName $middleName $lastName $suffix';
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -37,7 +44,7 @@ class _RatingsPageState extends State<RatingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "Rob Shandell Bautista",
+                          fullname,
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -56,14 +63,16 @@ class _RatingsPageState extends State<RatingsPage> {
                                   color: AppColors.dirtyWhite,
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                child: Image.asset("assets/icons/plumbing.png",
-                                    width: 23.53, height: 22.59),
+                                child: Image.asset(
+                                    "assets/icons/${widget.ratings['specialization'].toString().toLowerCase()}.png",
+                                    width: 23.53,
+                                    height: 22.59),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 7),
                               child: Text(
-                                "Clogged Toilet",
+                                widget.ratings['title'],
                                 style: getTextStyle(
                                     textColor: AppColors.secondaryBlue,
                                     fontFamily: AppFonts.montserrat,

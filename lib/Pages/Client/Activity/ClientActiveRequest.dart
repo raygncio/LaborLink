@@ -242,13 +242,14 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
 
   void onConfirm() async {
     try {
-      // await service.updateRequest(widget.requestDetail["requestId"]);
+      await service.updateRequest(widget.requestDetail["clientId"]);
     } catch (error) {
       print('Error fetching user data: $error');
     }
 
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const RequestCompleteSuccessPage(),
+      builder: (context) =>
+          RequestCompleteSuccessPage(details: widget.requestDetail),
     ));
   }
 }

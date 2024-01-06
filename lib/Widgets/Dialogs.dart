@@ -457,10 +457,10 @@ Future<String?> attachServiceProofDialog(BuildContext context) {
                         fontFamily: AppFonts.montserrat,
                         color: AppColors.accentOrange,
                         command: () {
-                          Navigator.of(context)
-                              .pushReplacement(MaterialPageRoute(
-                            builder: (context) => const RatingsPage(),
-                          ));
+                          // Navigator.of(context)
+                          //     .pushReplacement(MaterialPageRoute(
+                          //   builder: (context) => const RatingsPage(),
+                          // ));
                         },
                         borderRadius: 8),
                   ],

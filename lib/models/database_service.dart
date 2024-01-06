@@ -531,8 +531,7 @@ class DatabaseService {
           'omw',
           'arrived',
           'inprogress',
-          'completion',
-          'completed'
+          'completion'
         ])
         .where('userId', isEqualTo: userId)
         .get();
@@ -676,6 +675,21 @@ class DatabaseService {
     }
   }
 
+  // Update the progress to cancelled request
+  Future<void> updateRequest(String userId) async {
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: userId)
+        .where('progress', isEqualTo: 'completion')
+        .get();
+
+    for (var doc in requestQuery.docs) {
+      await doc.reference.update({
+        'progress': 'completed',
+      });
+    }
+  }
+
   // Update the request to hired and assign the handyman selected
   Future<void> updateRequestProgressHandyman(
       String requestId, int progress) async {
@@ -813,8 +827,14 @@ class DatabaseService {
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
+      final clientId = requestData['userId'];
 
-      Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
+      Map<String, dynamic> groupData = {
+        ...requestData,
+        'requestId': requestId,
+        'clientId': clientId
+      };
+
       resultMap.addAll(groupData);
       final handymanQuery = await _db
           .collection('handymanApproval')

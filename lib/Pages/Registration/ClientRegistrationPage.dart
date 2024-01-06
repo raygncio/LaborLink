@@ -4,7 +4,6 @@ import 'package:laborlink/Widgets/Forms/AccountDetailsForm.dart';
 import 'package:laborlink/Widgets/Forms/AddressForm.dart';
 import 'package:laborlink/Widgets/Forms/BasicInformationForm.dart';
 import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
-import 'package:laborlink/ai/screens/id_client.dart';
 import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
