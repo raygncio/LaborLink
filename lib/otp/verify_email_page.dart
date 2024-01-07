@@ -7,11 +7,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/ai/style.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:lottie/lottie.dart';
 
 class VerifyEmailPage extends ConsumerStatefulWidget {
-  const VerifyEmailPage({super.key});
+  const VerifyEmailPage(
+      {super.key, required this.userId, required this.userRole});
+
+  final String userId;
+  final String userRole;
 
   @override
   ConsumerState<VerifyEmailPage> createState() {
@@ -22,6 +28,7 @@ class VerifyEmailPage extends ConsumerStatefulWidget {
 class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   bool isEmailVerified = false;
   bool canResendEmail = false;
+  String loginUserRole = '';
   Timer? timer;
 
   @override
@@ -95,19 +102,10 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   @override
   Widget build(BuildContext context) {
     if (isEmailVerified) {
-      ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
-
-      Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-      String? userId = userInfo['userId'];
-      String? userRole = userInfo['userRole'];
-
-      print('>>>>>>>>>>> userId: $userId');
-      print('>>>>>>>>>>> userrole: $userRole');
-
-      if (userRole == 'client') {
-        return ClientMainPage(userId: userId ?? '');
-      } else if (userRole == 'handyman') {
-        return HandymanMainPage(userId: userId!);
+      if (widget.userRole == 'client') {
+        return ClientMainPage(userId: widget.userId ?? '');
+      } else if (widget.userRole == 'handyman') {
+        return HandymanMainPage(userId: widget.userId!);
       }
     }
 
@@ -119,20 +117,27 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Lottie.asset('assets/animations/handyman.json'),
-              const SizedBox(
-                height: 12,
+              Padding(
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'A verification email has been sent to your email.',
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                        style: getTextStyle(
+                            textColor: AppColors.secondaryBlue,
+                            fontFamily: AppFonts.poppins,
+                            fontWeight: AppFontWeights.bold,
+                            fontSize: 24),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Text(
-                'A verification email has been sent to your email.',
-                textAlign: TextAlign.center,
-                style: getTextStyle(
-                    textColor: AppColors.secondaryBlue,
-                    fontFamily: AppFonts.poppins,
-                    fontWeight: AppFontWeights.bold,
-                    fontSize: 24),
-              ),
               const SizedBox(
-                height: 12,
+                height: 30,
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -150,9 +155,6 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
                       fontSize: 15),
                 ),
                 onPressed: canResendEmail ? sendVerificationEmail : null,
-              ),
-              const SizedBox(
-                height: 12,
               ),
               TextButton(
                 style: ElevatedButton.styleFrom(

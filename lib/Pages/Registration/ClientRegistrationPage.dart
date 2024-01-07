@@ -239,7 +239,7 @@ class _ClientRegistrationPageState
 
           fileAttachments = [
             {
-              'type': 'any',
+              'type': 'nbi',
               'file': clientInfo['idFile'],
             }
           ];

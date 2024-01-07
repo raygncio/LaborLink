@@ -59,28 +59,39 @@ class MyApp extends ConsumerWidget {
             // means a user is logged in  (has token)
             print('>>>>>>>>>>> snapshot has data');
 
-            return const VerifyEmailPage();
-
-            // isLoadingLoginData = true;
-
             // ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
 
             // Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
             // String? userId = userInfo['userId'];
             // String? userRole = userInfo['userRole'];
 
+            // print('$userInfo');
             // print('>>>>>>>>>>> userId: $userId');
             // print('>>>>>>>>>>> userrole: $userRole');
+            // print('${FirebaseAuth.instance.currentUser!.uid}');
 
-            // if (userId != null || userRole != null) {
-            //   isLoadingLoginData = false;
-            // }
+            //return VerifyEmailPage(userId: userId!, userRole: userRole!);
 
-            // if (userRole == 'client') {
-            //   return ClientMainPage(userId: userId ?? '');
-            // } else if (userRole == 'handyman') {
-            //   return HandymanMainPage(userId: userId!);
-            // }
+            isLoadingLoginData = true;
+
+            ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
+
+            Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
+            String? userId = userInfo['userId'];
+            String? userRole = userInfo['userRole'];
+
+            print('>>>>>>>>>>> userId: $userId');
+            print('>>>>>>>>>>> userrole: $userRole');
+
+            if (userId != null || userRole != null) {
+              isLoadingLoginData = false;
+            }
+
+            if (userRole == 'client') {
+              return ClientMainPage(userId: userId ?? '');
+            } else if (userRole == 'handyman') {
+              return HandymanMainPage(userId: userId!);
+            }
           }
 
           // if (isLoadingLoginData) {
