@@ -28,7 +28,7 @@ class VerifyEmailPage extends ConsumerStatefulWidget {
 class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   bool isEmailVerified = false;
   bool canResendEmail = false;
-  String loginUserRole = '';
+  bool isSameUserId = false;
   Timer? timer;
 
   @override
@@ -37,6 +37,7 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
 
     // check registered user if email is verified
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    isSameUserId = checkUserId();
 
     if (!isEmailVerified) {
       sendVerificationEmail();
@@ -53,6 +54,13 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   void dispose() {
     timer?.cancel(); // dispose timer when not used
     super.dispose();
+  }
+
+  checkUserId() {
+    if (widget.userId == FirebaseAuth.instance.currentUser!.uid) {
+      return true;
+    }
+    return false;
   }
 
   Future checkEmailVerified() async {
@@ -101,7 +109,7 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isEmailVerified) {
+    if (isEmailVerified && isSameUserId) {
       if (widget.userRole == 'client') {
         return ClientMainPage(userId: widget.userId ?? '');
       } else if (widget.userRole == 'handyman') {
