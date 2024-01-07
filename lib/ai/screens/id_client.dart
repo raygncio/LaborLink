@@ -24,11 +24,17 @@ class _IdClientState extends State<IdClient> {
   File? image;
   String? type;
 
+  Widget? content;
+
   _loadFiles() {
     files = widget.data;
     print('%%%%%%%%%%%%%%%%%%%%%%%%%%$files');
+    setState(() {});
+  }
+
+  _loadImage() {
     setState(() {
-      image = files[--files.length]['file'];
+      image = files[0]['file']; // NOTE: gets the first file
     });
   }
 
@@ -41,8 +47,14 @@ class _IdClientState extends State<IdClient> {
     return imageFiles;
   }
 
+  _showSplashId() {
+    setState(() {
+      content = const SplashId();
+    });
+  }
+
   _toFaceVerif() {
-    Timer(const Duration(seconds: 7), () {
+    Timer(const Duration(seconds: 4), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (ctx) => FaceVerificationPage(
@@ -56,6 +68,7 @@ class _IdClientState extends State<IdClient> {
   @override
   void initState() {
     _loadFiles();
+    _loadImage();
     super.initState();
   }
 
@@ -66,10 +79,8 @@ class _IdClientState extends State<IdClient> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
-    Timer(const Duration(seconds: 3), () {
-      content = const SplashId();
+    Timer(const Duration(seconds: 4), () {
+      _showSplashId();
       _toFaceVerif();
     });
 

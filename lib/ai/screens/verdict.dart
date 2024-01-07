@@ -252,7 +252,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
   showResultsButton() {
     setState(() {
       resultsButton = TextButton(
-        onPressed: () {},
+        onPressed: showResultsDialog,
         child: Text(
           'Show Results',
           style: getTextStyle(
@@ -272,33 +272,44 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ListView.builder(
-            //   scrollDirection: Axis.horizontal,
-            //   itemCount: resultImages.length,
-            //   itemBuilder: (context, index) {
-            //     return Container(
-            //       width: 200,
-            //       child: resultImages[index],
-            //     );
-            //   },
-            // ),
-            Row(
-              children: [
-                for (var image in resultImages)
-                  Container(
-                    width: 200,
-                    child: image,
-                  ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            for (var result in regulaResults) Text('$result'),
-          ],
+        insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        content: Container(
+          height: 230,
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ListView.builder(
+              //   scrollDirection: Axis.horizontal,
+              //   itemCount: resultImages.length,
+              //   itemBuilder: (context, index) {
+              //     return Container(
+              //       width: 200,
+              //       child: resultImages[index],
+              //     );
+              //   },
+              // ),
+              Row(
+                children: [
+                  for (var image in resultImages)
+                    Container(
+                      padding: const EdgeInsets.only(
+                        right: 10,
+                        left: 10,
+                      ),
+                      width: 150,
+                      child: image,
+                    ),
+                ],
+              ),
+
+              const SizedBox(
+                height: 40,
+              ),
+              for (var result in regulaResults)
+                Text('Match Percentage: $result'),
+            ],
+          ),
         ),
         actions: [
           TextButton(

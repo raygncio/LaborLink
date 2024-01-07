@@ -171,7 +171,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
 
   void onViewOffer() => Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            ViewClientProposal(handymanInfo: dummyFilteredHandyman[0]),
+            ViewClientProposal(handymanInfo: getActiveRequest),
       ));
 
   Widget noRequest(deviceWidth) => Padding(
@@ -325,35 +325,37 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           ],
                         ),
                         const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: 71,
-                              child: Row(
-                                children: [
-                                  AppFilledButton(
-                                      height: 20,
-                                      text: "View Offer",
-                                      fontSize: 9,
-                                      fontFamily: AppFonts.montserrat,
-                                      color: AppColors.secondaryBlue,
-                                      command: onViewOffer,
-                                      borderRadius: 8),
-                                ],
+                        if (getActiveRequest['hasOffer'] == true)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: 71,
+                                child: Row(
+                                  children: [
+                                    AppFilledButton(
+                                        height: 20,
+                                        text: "View Offer",
+                                        fontSize: 9,
+                                        fontFamily: AppFonts.montserrat,
+                                        color: AppColors.secondaryBlue,
+                                        command: onViewOffer,
+                                        borderRadius: 8),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 7.76),
-                              child: AppBadge(
-                                label: "Offered ₱650",
-                                type: BadgeType.offer,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 7, vertical: 1),
+                              Padding(
+                                padding: EdgeInsets.only(top: 7.76),
+                                child: AppBadge(
+                                  label: "Offered ₱" +
+                                      getActiveRequest['bidPrice'].toString(),
+                                  type: BadgeType.offer,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 7, vertical: 1),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
@@ -365,22 +367,22 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4.5),
                             child: Image.network(
-                              imgPlaceholder,
-                              height: 101,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4.5),
-                            child: Image.network(
                               getActiveRequest['attachment'],
-                              height: 101,
-                              fit: BoxFit.cover,
+                              height: 160,
+                              fit: BoxFit.fill,
                             ),
                           ),
                         ),
+                        // Expanded(
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.only(left: 4.5),
+                        //     child: Image.network(
+                        //       getActiveRequest['attachment'],
+                        //       height: 101,
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   )

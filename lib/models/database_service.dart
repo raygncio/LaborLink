@@ -1114,7 +1114,7 @@ class DatabaseService {
       for (var offerDoc in offerQuery.docs) {
         final offerData = offerDoc.data();
         final offerStatus = offerData['status'];
-        resultMap.addAll({'approvalStatus': offerStatus});
+        resultMap.addAll({'approvalStatus': offerStatus, 'hasOffer': true});
         final requestId = offerData["requestId"];
         resultMap.addAll(offerData);
 
@@ -1168,7 +1168,7 @@ class DatabaseService {
       for (var approvalDoc in approvalQuery.docs) {
         final approvalData = approvalDoc.data();
         final approvalStatus = approvalData['status'];
-        resultMap.addAll({'approvalStatus': approvalStatus});
+        resultMap.addAll({'approvalStatus': approvalStatus, 'hasOffer': false});
         final requestId = approvalData["requestId"];
 
         resultMap.addAll(approvalData);
