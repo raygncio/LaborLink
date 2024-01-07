@@ -53,12 +53,12 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
       setState(() {
         if (getActiveRequest["approvalStatus"] == "pending") {
           _forApproval = true;
-        } else if (getActiveRequest["approvalStatus"] == "hired" ||
-            getActiveRequest["approvalStatus"] == "omw" ||
-            getActiveRequest["approvalStatus"] == "arrived" ||
-            getActiveRequest["approvalStatus"] == "inprogress" ||
-            getActiveRequest["approvalStatus"] == "completion" ||
-            getActiveRequest["approvalStatus"] == "rating") {
+        } else if (getActiveRequest["progress"] == "hired" ||
+            getActiveRequest["progress"] == "omw" ||
+            getActiveRequest["progress"] == "arrived" ||
+            getActiveRequest["progress"] == "inprogress" ||
+            getActiveRequest["progress"] == "completion" ||
+            getActiveRequest["progress"] == "rating") {
           _haveActiveRequest = true;
         }
       });

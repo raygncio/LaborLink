@@ -340,6 +340,7 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
                 builder: (ctx) => VerdictPage(
+                    images: showImage,
                     outputs: results,
                     regulaOutputs: regulaResults,
                     isSuccessful: isMatch)),

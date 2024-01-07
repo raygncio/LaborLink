@@ -23,10 +23,12 @@ class VerdictPage extends ConsumerStatefulWidget {
       {super.key,
       required this.outputs,
       this.regulaOutputs,
+      this.images,
       required this.isSuccessful});
 
   final List<String> outputs;
   final List<double>? regulaOutputs;
+  final List<Image>? images;
   final bool isSuccessful;
 
   @override
@@ -34,9 +36,19 @@ class VerdictPage extends ConsumerStatefulWidget {
 }
 
 class _VerdictPageState extends ConsumerState<VerdictPage> {
+  Widget resultsButton = const SizedBox();
   Widget button = const SizedBox();
   Map<String, dynamic> savedUserData = {};
   bool isRegistered = false;
+
+  bool hasFaceResults = false;
+
+  checkFaceResults() {
+    if (widget.images != null && widget.regulaOutputs != null) {
+      return true;
+    }
+    return false;
+  }
 
   String processOutputs() {
     if (widget.outputs.isEmpty) return '';
@@ -237,11 +249,82 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     }
   }
 
+  showResultsButton() {
+    setState(() {
+      resultsButton = TextButton(
+        onPressed: () {},
+        child: Text(
+          'Show Results',
+          style: getTextStyle(
+              textColor: AppColors.primaryBlue,
+              fontFamily: AppFonts.montserrat,
+              fontWeight: AppFontWeights.bold,
+              fontSize: 15),
+        ),
+      );
+    });
+  }
+
+  showResultsDialog() {
+    List<Image> resultImages = widget.images!;
+    List<double> regulaResults = widget.regulaOutputs!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ListView.builder(
+            //   scrollDirection: Axis.horizontal,
+            //   itemCount: resultImages.length,
+            //   itemBuilder: (context, index) {
+            //     return Container(
+            //       width: 200,
+            //       child: resultImages[index],
+            //     );
+            //   },
+            // ),
+            Row(
+              children: [
+                for (var image in resultImages)
+                  Container(
+                    width: 200,
+                    child: image,
+                  ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            for (var result in regulaResults) Text('$result'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Okay',
+              style: getTextStyle(
+                  textColor: AppColors.primaryBlue,
+                  fontFamily: AppFonts.poppins,
+                  fontWeight: AppFontWeights.bold,
+                  fontSize: 15),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     Timer(const Duration(seconds: 4), () {
       showButton();
     });
+    hasFaceResults = checkFaceResults();
     super.initState();
   }
 
@@ -272,6 +355,10 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
       lottie = Lottie.asset('assets/animations/check.json');
     }
 
+    if (hasFaceResults) {
+      showResultsButton();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Column(
@@ -295,6 +382,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
           const SizedBox(
             height: 15,
           ),
+          resultsButton,
           button,
         ],
       ),
