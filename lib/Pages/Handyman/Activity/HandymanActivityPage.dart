@@ -35,7 +35,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
   Map<String, dynamic> getClientRequest = {};
   DatabaseService service = DatabaseService();
 
-  bool _haveActiveRequest = true;
+  bool _haveActiveRequest = false;
   bool _forApproval = false;
 
   @override
@@ -53,7 +53,12 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
       setState(() {
         if (getActiveRequest["approvalStatus"] == "pending") {
           _forApproval = true;
-        } else if (getActiveRequest["approvalStatus"] == "hired") {
+        } else if (getActiveRequest["approvalStatus"] == "hired" ||
+            getActiveRequest["approvalStatus"] == "omw" ||
+            getActiveRequest["approvalStatus"] == "arrived" ||
+            getActiveRequest["approvalStatus"] == "inprogress" ||
+            getActiveRequest["approvalStatus"] == "completion" ||
+            getActiveRequest["approvalStatus"] == "rating") {
           _haveActiveRequest = true;
         }
       });
@@ -129,9 +134,22 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
       );
 
   Widget displayTabContent(deviceWidth) {
-    return _selectedTabIndex == 0
-        ? ongoingTab(deviceWidth)
-        : historyTab(deviceWidth);
+    if (_selectedTabIndex == 0) {
+      return ongoingTab(deviceWidth);
+    } else {
+      return FutureBuilder<Widget>(
+        future: historyTab(deviceWidth),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}'); // Handle the error
+          } else {
+            return snapshot.data ?? SizedBox.shrink();
+          }
+        },
+      );
+    }
   }
 
   Widget ongoingTab(deviceWidth) {
@@ -223,7 +241,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Text(
-                          "Request Title",
+                          getActiveRequest['title'],
                           style: getTextStyle(
                               textColor: AppColors.tertiaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -239,7 +257,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                     ],
                   ),
                   Text(
-                    "Request ID",
+                    getActiveRequest['requestId'],
                     style: getTextStyle(
                         textColor: AppColors.tertiaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -249,7 +267,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 13),
                     child: Text(
-                      "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+                      getActiveRequest['description'],
                       overflow: TextOverflow.visible,
                       style: getTextStyle(
                           textColor: AppColors.black,
@@ -263,13 +281,13 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextWithIcon(
                               icon: Icon(Icons.place,
                                   size: 17, color: AppColors.accentOrange),
-                              text: "556 Juan Luna Ave.",
+                              text: getActiveRequest['address'],
                               fontSize: 12,
                               contentPadding: 19,
                             ),
@@ -278,7 +296,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               child: TextWithIcon(
                                 icon: Icon(Icons.calendar_month_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "Today",
+                                text: getActiveRequest['date'],
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -288,7 +306,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               child: TextWithIcon(
                                 icon: Icon(Icons.watch_later,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "12:00 - 1:00 PM",
+                                text: getActiveRequest['time'],
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -298,7 +316,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               child: TextWithIcon(
                                 icon: Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "₱550",
+                                text: getActiveRequest['suggestedPrice'],
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -396,9 +414,32 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
     );
   }
 
-  Widget historyTab(deviceWidth) {
-    bool openCompletedRequest = true;
-    bool openCancelledRequest = true;
+  Future<Widget> historyTab(deviceWidth) async {
+    bool openCompletedRequest = false;
+    bool openCancelledRequest = false;
+
+    List<Map<String, dynamic>> cancelledRequest = [];
+    List<Map<String, dynamic>> completedRequest = [];
+
+    try {
+      completedRequest =
+          await service.getCompletedRequestHandyman(widget.userId);
+      cancelledRequest =
+          await service.getCancelledRequestHandyman(widget.userId);
+      //print('*************************COMPLETED REQUEST $completedRequest');
+
+      print('*************************CANCELLED REQUEST $cancelledRequest');
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
+    }
+
+    if (completedRequest.isNotEmpty) {
+      openCompletedRequest = true;
+    }
+
+    if (cancelledRequest.isNotEmpty) {
+      openCancelledRequest = true;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 54),
@@ -446,13 +487,20 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 10,
+                            itemCount: completedRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentRequest =
+                                  completedRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: () => Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => ClientViewHistory(
+                                      userId: currentRequest['requestId'],
+                                    ),
+                                  )),
                                   child: Container(
                                     height: 52,
                                     color: AppColors.white,
@@ -462,7 +510,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           padding:
                                               const EdgeInsets.only(right: 15),
                                           child: Image.asset(
-                                            "assets/icons/plumbing.png",
+                                            "assets/icons/${currentRequest['category'].toString().toLowerCase()}.png",
                                             height: 32,
                                             width: 32,
                                           ),
@@ -476,7 +524,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  "My sink is leaking!",
+                                                  currentRequest['title'] ?? '',
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -489,7 +537,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                               ],
                                             ),
                                             Text(
-                                              "07 Aug 2023, 11:12 AM",
+                                              "${currentRequest['date']}${','}${currentRequest['time']}",
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -507,7 +555,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           child: Align(
                                             alignment: Alignment.topRight,
                                             child: Text(
-                                              "₱650.00",
+                                              currentRequest['suggestedPrice']
+                                                  .toString(),
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -566,8 +615,10 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 0,
+                            itemCount: cancelledRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentCancelledRequest =
+                                  cancelledRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -579,7 +630,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                         padding:
                                             const EdgeInsets.only(right: 15),
                                         child: Image.asset(
-                                          "assets/icons/pest-2.png",
+                                          "assets/icons/${currentCancelledRequest['category'].toString().toLowerCase()}.png",
                                           height: 32,
                                           width: 32,
                                         ),
@@ -593,7 +644,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                "Roaches everywhere",
+                                                currentCancelledRequest[
+                                                    'title'],
                                                 style: getTextStyle(
                                                     textColor: AppColors.grey,
                                                     fontFamily:
@@ -605,7 +657,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                             ],
                                           ),
                                           Text(
-                                            "15 June 2023, 10:48 AM",
+                                            "${currentCancelledRequest['date']}${','}${currentCancelledRequest['time']}",
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,
@@ -621,7 +673,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                         child: Align(
                                           alignment: Alignment.topRight,
                                           child: Text(
-                                            "₱700.00",
+                                            currentCancelledRequest['bidPrice']
+                                                .toString(),
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,

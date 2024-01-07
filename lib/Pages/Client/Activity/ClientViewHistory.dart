@@ -17,14 +17,23 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
   Map<String, dynamic> completedRequest = {};
   double serviceFee = 0.0;
   double convenienceFee = 0.0;
+  bool showCompletionProof = false;
   @override
   void initState() {
     super.initState();
     fetchUserData().then((data) {
       setState(() {
         completedRequest = data;
-        serviceFee = completedRequest['suggestedFee'] / 1.10;
-        convenienceFee = completedRequest['suggestedFee'] - serviceFee;
+
+        serviceFee = completedRequest['suggestedPrice'] / 1.10;
+        convenienceFee = completedRequest['suggestedPrice'] - serviceFee;
+
+        // Schedule the completion proof to be shown after a delay
+        Future.delayed(Duration(seconds: 1), () {
+          setState(() {
+            showCompletionProof = true;
+          });
+        });
       });
     });
   }
@@ -69,7 +78,8 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                           ],
                         ),
                       ),
-                      HandymanInfoCard(handymanInfo: completedRequest),
+                      if (showCompletionProof)
+                        HandymanInfoCard(handymanInfo: completedRequest),
                       const Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
@@ -114,14 +124,14 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                   ),
                   Align(
                     alignment: Alignment.center,
-                    // child: Text(
-                    //   "Request ID: 12345",
-                    //   style: getTextStyle(
-                    //       textColor: AppColors.secondaryYellow,
-                    //       fontFamily: AppFonts.montserrat,
-                    //       fontWeight: AppFontWeights.bold,
-                    //       fontSize: 16),
-                    // ),
+                    child: Text(
+                      completedRequest['requestId'] ?? '',
+                      style: getTextStyle(
+                          textColor: AppColors.secondaryYellow,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.bold,
+                          fontSize: 16),
+                    ),
                   ),
                 ],
               ),
@@ -204,15 +214,17 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                             fontWeight: AppFontWeights.regular,
                                             fontSize: 15),
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 21),
-                                        child: Image.network(
-                                          completedRequest['atttachment'] ?? '',
-                                          width: 107,
-                                          height: 107,
-                                        ),
-                                      )
+                                      if (showCompletionProof)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 21),
+                                          child: Image.network(
+                                            completedRequest['attachment'] ??
+                                                '',
+                                            width: 130,
+                                            height: 130,
+                                          ),
+                                        )
                                     ],
                                   ),
                                 ),
@@ -242,16 +254,18 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                                               fontSize: 15),
                                         ),
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 21),
-                                        child: Image.network(
-                                          completedRequest['completionProof'] ??
-                                              '',
-                                          width: 107,
-                                          height: 107,
-                                        ),
-                                      )
+                                      if (showCompletionProof)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 21),
+                                          child: Image.network(
+                                            completedRequest[
+                                                    'completionProof'] ??
+                                                '',
+                                            width: 130,
+                                            height: 130,
+                                          ),
+                                        )
                                     ],
                                   ),
                                 ),
@@ -302,7 +316,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                         ),
                         const Spacer(),
                         Text(
-                          completedRequest['suggestedFee'] ?? '',
+                          completedRequest['suggestedPrice'].toString() ?? '',
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -316,7 +330,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: Row(
                         children: [
                           Text(
-                            serviceFee.toString(),
+                            "Service Fee",
                             style: getTextStyle(
                                 textColor: AppColors.black,
                                 fontFamily: AppFonts.montserrat,
@@ -325,7 +339,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                           ),
                           const Spacer(),
                           Text(
-                            convenienceFee.toString(),
+                            serviceFee.toStringAsFixed(2),
                             style: getTextStyle(
                                 textColor: AppColors.black,
                                 fontFamily: AppFonts.montserrat,
@@ -349,7 +363,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                           ),
                           const Spacer(),
                           Text(
-                            "₱50.00",
+                            convenienceFee.toStringAsFixed(2),
                             style: getTextStyle(
                                 textColor: AppColors.black,
                                 fontFamily: AppFonts.montserrat,
@@ -407,7 +421,8 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       child: TextWithIcon(
                         icon: Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
-                        text: completedRequest['suggestedFee'] ?? '',
+                        text:
+                            completedRequest['suggestedPrice'].toString() ?? '',
                         fontSize: 12,
                         contentPadding: 19,
                       ),

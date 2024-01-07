@@ -53,7 +53,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
   void initState() {
     print("new test");
     print(widget.requestDetail['progress']);
-    if (widget.requestDetail["progress"] == 'completed') {
+    if (widget.requestDetail["progress"] == 'rating') {
       _currentProgress = 5;
     } else if (widget.requestDetail["progress"] == 'omw') {
       _currentProgress = 1;
@@ -297,7 +297,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
         _currentProgress,
       );
     } else {
-      attachServiceProofDialog(context);
+      attachServiceProofDialog(context, widget.clientDetail);
     }
   }
 }

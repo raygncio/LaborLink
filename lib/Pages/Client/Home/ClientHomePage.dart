@@ -314,7 +314,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 getOngoingRequest(),
-                                HistoryButton(command: onHistoryButtonClick),
+                                // HistoryButton(command: onHistoryButtonClick),
                               ],
                             )
                           ]),

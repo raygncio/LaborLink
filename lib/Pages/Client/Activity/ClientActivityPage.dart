@@ -477,7 +477,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      print('*************************COMPLETED REQUEST $completedRequest');
+      //print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: $error');
@@ -544,6 +544,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                             itemBuilder: (context, index) {
                               Map<String, dynamic> currentRequest =
                                   completedRequest[index];
+                              print(">>>>>>>>>>>>$currentRequest");
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -577,9 +578,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  currentRequest[
-                                                          'description'] ??
-                                                      '',
+                                                  currentRequest['title'] ?? '',
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -700,7 +699,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             children: [
                                               Text(
                                                 currentCancelledRequest[
-                                                    'description'],
+                                                    'title'],
                                                 style: getTextStyle(
                                                     textColor: AppColors.grey,
                                                     fontFamily:

@@ -4,6 +4,9 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/review.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 
 class RatingsPage extends StatefulWidget {
   final Map<String, dynamic> ratings;
@@ -15,7 +18,13 @@ class RatingsPage extends StatefulWidget {
 
 class _RatingsPageState extends State<RatingsPage> {
   final _reviewController = TextEditingController();
-  int rating = 0;
+  double rating = 0;
+
+  @override
+  void dispose() {
+    _reviewController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +166,7 @@ class _RatingsPageState extends State<RatingsPage> {
                                     fontSize: 15,
                                     fontFamily: AppFonts.montserrat,
                                     color: AppColors.accentOrange,
-                                    command: () {},
+                                    command: submitRating,
                                     borderRadius: 5),
                               ],
                             ),
@@ -293,6 +302,57 @@ class _RatingsPageState extends State<RatingsPage> {
           ],
         ),
       );
+
+  void submitRating() async {
+    // Get the values
+    double selectedRating = rating;
+    String review = _reviewController.text;
+
+    // Validate if the user has selected a rating
+    if (selectedRating == 0 || review == " ") {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please rate the user before submitting."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      DatabaseService service = DatabaseService();
+      try {
+        Review reviews = Review(
+          rating: selectedRating,
+          comment: review,
+          userId: widget.ratings["userId"],
+          requestId: widget.ratings["requestId"],
+        );
+
+        await service.addReviews(reviews);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Reviews submitted succesfully."),
+            backgroundColor: Colors.orangeAccent,
+          ),
+        );
+
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) =>
+                ClientMainPage(userId: widget.ratings["userId"]),
+          ));
+        });
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error creating user: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   void onBack() => Navigator.of(context).pop();
 }

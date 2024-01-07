@@ -203,44 +203,38 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   Widget findLaborTab() => Padding(
         padding: const EdgeInsets.only(top: 54),
-        child: Container(
-          color: AppColors.dirtyWhite,
-          child: Stack(
-            children: [
-              openRequestsSection(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 10, right: 13, bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Use FutureBuilder here
-                      FutureBuilder<Widget>(
-                        future: getOngoingService(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text("Error: ${snapshot.error}");
-                          } else {
-                            return snapshot.data ?? const SizedBox();
-                          }
-                        },
+        child: Stack(
+          children: [
+            openRequestsSection(),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 505),
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 23),
+                    child: Column(children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Use FutureBuilder here
+                          getOngoingService(),
+
+                          // HistoryButton(
+                          //   command: onHistoryButtonClick,
+                          //   backgroundColor: AppColors.white,
+                          // ),
+                        ],
                       ),
-                      HistoryButton(
-                        command: onHistoryButtonClick,
-                        backgroundColor: AppColors.white,
-                      ),
-                    ],
+                    ]),
                   ),
                 ),
               ),
-              searchSection(),
-            ],
-          ),
+            ),
+            searchSection(),
+          ],
         ),
       );
 
@@ -343,10 +337,24 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     );
   }
 
-  Future<Widget> getOngoingService() async {
+  Widget getOngoingService() {
+    return FutureBuilder<Widget>(
+      future: getOngoingServiceContent(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return snapshot.data ?? const NoOngoingRequestCard();
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Future<Widget> getOngoingServiceContent() async {
     DatabaseService service = DatabaseService();
     Request? requestInfo = await service.getHandymanService(widget.userId);
     print(">>>>>>>>>>>>$requestInfo");
+    print('$requestInfo.title');
     if (requestInfo != null) {
       return OngoingRequestCard(
         title: requestInfo.title,
