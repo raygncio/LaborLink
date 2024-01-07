@@ -153,7 +153,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
   }
 
   Widget ongoingTab(deviceWidth) {
-    final noActiveRequest = !_haveActiveRequest;
+    final noActiveRequest = !_haveActiveRequest && !_forApproval;
 
     // IF NO ACTIVE REQUEST
     if (noActiveRequest) {
@@ -316,7 +316,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               child: TextWithIcon(
                                 icon: Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: getActiveRequest['suggestedPrice'],
+                                text: getActiveRequest['suggestedPrice']
+                                    .toString(),
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -374,7 +375,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 4.5),
                             child: Image.network(
-                              imgPlaceholder,
+                              getActiveRequest['attachment'],
                               height: 101,
                               fit: BoxFit.cover,
                             ),
