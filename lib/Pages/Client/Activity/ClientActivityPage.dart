@@ -444,13 +444,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
-                  print(
-                      '>>>>>>>>>>>>>>>>>>> HAS OFFER ${currentHandyman.containsKey('suggestedPrice')}');
+                  // print(
+                  //     '>>>>>>>>>>>>>>>>>>> HAS OFFER ${currentHandyman.containsKey('suggestedPrice')}');
                   if (hasOffer) {
                     HandymanProposalCard(handymanInfo: currentHandyman);
                   } else if (currentHandyman.containsKey('suggestedPrice')) {
                     print("checking");
-                    HandymanHireCard(
+                    return HandymanHireCard(
                         handymanInfo: currentHandyman,
                         requestId: widget.userId);
                   } else {}

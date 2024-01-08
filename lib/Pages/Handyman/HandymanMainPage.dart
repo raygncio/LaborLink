@@ -31,6 +31,7 @@ class _HandymanMainPageState extends State<HandymanMainPage> {
 
   _login() async {
     print('>>>>> ${_auth.currentUser!.uid}');
+    print('>>>>>>>registered phone:${_auth.currentUser!.phoneNumber}');
     await _analytics.setUserProperties(
         userId: _auth.currentUser!.uid, userRole: 'handyman');
   }

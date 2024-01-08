@@ -130,7 +130,9 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
           }
           return const Scaffold(
             backgroundColor: AppColors.white,
-            body: CircularProgressIndicator(),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         },
       );
