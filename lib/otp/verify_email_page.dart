@@ -9,7 +9,6 @@ import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:lottie/lottie.dart';
 
 class VerifyEmailPage extends ConsumerStatefulWidget {
@@ -51,7 +50,7 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
 
       //check email verification status every 3 sec
       timer = Timer.periodic(
-        Duration(seconds: 3),
+        const Duration(seconds: 3),
         (timer) => checkEmailVerified(),
       );
     }
