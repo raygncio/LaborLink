@@ -921,6 +921,8 @@ class DatabaseService {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
 
+      print('Request ID: $requestId');
+
       Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
 
       final handymanQuery = await _db
@@ -929,12 +931,17 @@ class DatabaseService {
           .where('status', isEqualTo: 'pending')
           .get();
 
+      print('Number of Handyman Approvals: ${handymanQuery.docs.length}');
+
       // Process 'handyman approval' query results
       for (var handymanDoc in handymanQuery.docs) {
+        // Create a new map for each iteration
+        Map<String, dynamic> tempData = {...groupData};
+
         final handymanData = handymanDoc.data();
         final check = true;
-        groupData.addAll({...handymanData, 'check': check});
-        groupData.addAll(handymanData);
+        tempData.addAll({...handymanData, 'check': check});
+        tempData.addAll(handymanData);
         final userID = handymanData['handymanId'];
         print(check);
         final userQuery = await _db
@@ -945,7 +952,7 @@ class DatabaseService {
         // Process 'user' query results
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
-          groupData.addAll(userData);
+          tempData.addAll(userData);
 
           // Query 'review' using key from userData
           final reviewsQuery = await _db
@@ -955,13 +962,13 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewsQuery.docs) {
             final reviewData = reviewDoc.data();
-            groupData.addAll(reviewData);
+            tempData.addAll(reviewData);
           }
         }
-      }
 
-      // Add the combined data to the resultList
-      resultList.add(groupData);
+        // Add the combined data to the resultList
+        resultList.add(tempData);
+      }
     }
 
     return resultList;
