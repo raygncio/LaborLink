@@ -910,7 +910,7 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getInterestedHandyman(
       String userId) async {
     List<Map<String, dynamic>> resultList = [];
-
+    print(userId);
     final requestQuery = await _db
         .collection('request')
         .where('userId', isEqualTo: userId)
@@ -932,9 +932,11 @@ class DatabaseService {
       // Process 'handyman approval' query results
       for (var handymanDoc in handymanQuery.docs) {
         final handymanData = handymanDoc.data();
+        final check = true;
+        groupData.addAll({...handymanData, 'check': check});
         groupData.addAll(handymanData);
         final userID = handymanData['handymanId'];
-
+        print(check);
         final userQuery = await _db
             .collection('user')
             .where('userId', isEqualTo: userID)
@@ -1248,7 +1250,7 @@ class DatabaseService {
 
       Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
       resultList.add(groupData);
-      print("*************************CHECK THE USER DATA123 $requestData");
+      //print("*************************CHECK THE USER DATA123 $requestData");
 
       // Query 'offer' collection
       final offerQuery = await _db

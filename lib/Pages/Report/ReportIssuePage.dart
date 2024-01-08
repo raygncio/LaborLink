@@ -14,6 +14,7 @@ import 'package:laborlink/providers/current_user_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
+DatabaseService service = DatabaseService();
 
 // class ReportIssuePage extends StatefulWidget {
 //   final String userId;
@@ -26,10 +27,13 @@ final _firestore = FirebaseFirestore.instance;
 // get the user id
 
 class ReportIssuePage extends ConsumerWidget {
+  ReportIssuePage({super.key});
+
   final _descriptionController = TextEditingController();
   final _filePickerKey = GlobalKey<UploadFilePickerState>();
+
   //file
-   File? _selectedImage;
+  File? _selectedImage;
   late String userId;
 
   final _labelTextStyle = getTextStyle(
@@ -46,12 +50,14 @@ class ReportIssuePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('>>>>>>>>>>>>report an issue');
     ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
 
     Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-    userId = userInfo['userId'] ?? '';
+    userId = userInfo['userId'];
     final deviceWidth = MediaQuery.of(context).size.width;
 
+    print('>>>>>>>>>>>>report an issue return');
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
       body: SafeArea(

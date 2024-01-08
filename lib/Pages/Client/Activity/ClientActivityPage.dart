@@ -42,7 +42,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void initState() {
     super.initState();
     checkForRequests();
-    // fetchInterestedLaborers();
+    fetchInterestedLaborers();
     fetchOffersOfLaborers();
     activeRequestFuture = getTheActiveRequest();
   }
@@ -444,19 +444,28 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
-                  print('>>>>>>>>>>>>>>>>>>> HAS OFFER $hasOffer');
+                  print(
+                      '>>>>>>>>>>>>>>>>>>> HAS OFFER ${currentHandyman.containsKey('suggestedPrice')}');
+                  if (hasOffer) {
+                    HandymanProposalCard(handymanInfo: currentHandyman);
+                  } else if (currentHandyman.containsKey('suggestedPrice')) {
+                    print("checking");
+                    HandymanHireCard(
+                        handymanInfo: currentHandyman,
+                        requestId: widget.userId);
+                  } else {}
 
-                  // Choose the appropriate card based on whether there's an offer or not
-                  Widget card = hasOffer
-                      ? HandymanProposalCard(handymanInfo: currentHandyman)
-                      : HandymanHireCard(
-                          handymanInfo: currentHandyman,
-                          requestId: widget.userId);
+                  // // Choose the appropriate card based on whether there's an offer or not
+                  // Widget card = hasOffer
+                  //     ? HandymanProposalCard(handymanInfo: currentHandyman)
+                  //     : HandymanHireCard(
+                  //         handymanInfo: currentHandyman,
+                  //         requestId: widget.userId);
 
                   return Padding(
                     padding:
                         EdgeInsets.only(top: index == 0 ? 5 : 0, bottom: 8),
-                    child: card,
+                    //child: card,
                   );
                 },
               ),
