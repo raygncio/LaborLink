@@ -583,7 +583,6 @@ class DatabaseService {
 
     // Process 'request' query results
     if (requestDoc.exists) {
-      final requestId = requestDoc.id;
       final requestData = requestDoc.data();
       final handymanId = requestData!["handymanId"];
       final clientId = requestData["userId"];

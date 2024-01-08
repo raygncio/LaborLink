@@ -544,7 +544,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                             itemBuilder: (context, index) {
                               Map<String, dynamic> currentRequest =
                                   completedRequest[index];
-                              print(">>>>>>>>>>>>$currentRequest");
+                              // print(">>>>>>>>>>>>$currentRequest");
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),

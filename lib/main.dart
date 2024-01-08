@@ -47,37 +47,17 @@ class MyApp extends ConsumerWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, snapshot) {
-          bool isLoadingLoginData = false;
+          // bool isLoadingLoginData = false;
 
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              isLoadingLoginData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             print('>>>>>>>>>>> connection state waiting');
             return const SplashHandymanPage();
           }
 
           if (snapshot.hasData) {
-            String? userId;
-            String? userRole;
-
-            // means a user is logged in  (has token)
             print('>>>>>>>>>>> snapshot has data');
-            print('userid: ${FirebaseAuth.instance.currentUser!.uid}');
 
-            isLoadingLoginData = true;
-
-            ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
-
-            Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-            userId = userInfo['userId'];
-            userRole = userInfo['userRole'];
-
-            print('>>>>>>>>>>> userId: $userId');
-            print('>>>>>>>>>>> userrole: $userRole');
-
-            if (userId != null || userRole != null) {
-              isLoadingLoginData = false;
-              return VerifyEmailPage(userId: userId!, userRole: userRole!);
-            }
+            return VerifyEmailPage();
 
             // return VerifyEmailPage(userId: userId!, userRole: userRole!);
 
@@ -86,13 +66,6 @@ class MyApp extends ConsumerWidget {
             // } else if (userRole == 'handyman') {
             //   return HandymanMainPage(userId: userId!);
             // }
-          }
-
-          if (isLoadingLoginData) {
-            // display white bg (very fast)
-            return const Scaffold(
-              backgroundColor: AppColors.white,
-            );
           }
 
           print('>>>>>>>>>>> no login data');

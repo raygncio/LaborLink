@@ -13,11 +13,7 @@ import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:lottie/lottie.dart';
 
 class VerifyEmailPage extends ConsumerStatefulWidget {
-  const VerifyEmailPage(
-      {super.key, required this.userId, required this.userRole});
-
-  final String userId;
-  final String userRole;
+  const VerifyEmailPage({super.key});
 
   @override
   ConsumerState<VerifyEmailPage> createState() {
@@ -26,18 +22,29 @@ class VerifyEmailPage extends ConsumerStatefulWidget {
 }
 
 class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
+  DatabaseService service = DatabaseService();
+  Client? clientInfo;
+
   bool isEmailVerified = false;
   bool canResendEmail = false;
   bool isSameUserId = false;
   Timer? timer;
 
+  Future<String>? userRole;
+  String? userId;
+
   @override
   void initState() {
     super.initState();
 
+    // get userId
+    userId = FirebaseAuth.instance.currentUser!.uid;
+
+    // get userRole
+    userRole = getUserRole();
+
     // check registered user if email is verified
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
-    isSameUserId = checkUserId();
 
     if (!isEmailVerified) {
       sendVerificationEmail();
@@ -54,13 +61,6 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   void dispose() {
     timer?.cancel(); // dispose timer when not used
     super.dispose();
-  }
-
-  checkUserId() {
-    if (widget.userId == FirebaseAuth.instance.currentUser!.uid) {
-      return true;
-    }
-    return false;
   }
 
   Future checkEmailVerified() async {
@@ -107,14 +107,34 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
     }
   }
 
+  Future<String> getUserRole() async {
+    clientInfo =
+        await service.getUserData(FirebaseAuth.instance.currentUser!.uid);
+
+    return clientInfo!.userRole;
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (isEmailVerified && isSameUserId) {
-      if (widget.userRole == 'client') {
-        return ClientMainPage(userId: widget.userId ?? '');
-      } else if (widget.userRole == 'handyman') {
-        return HandymanMainPage(userId: widget.userId!);
-      }
+    if (isEmailVerified) {
+      print('>>>>>>>>>>>>userRole: $userRole');
+
+      return FutureBuilder(
+        future: userRole,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data == 'client') {
+              return ClientMainPage(userId: userId ?? '');
+            } else if (snapshot.data == 'handyman') {
+              return HandymanMainPage(userId: userId!);
+            }
+          }
+          return const Scaffold(
+            backgroundColor: AppColors.white,
+            body: CircularProgressIndicator(),
+          );
+        },
+      );
     }
 
     return Scaffold(
