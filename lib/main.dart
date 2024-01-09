@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:laborlink/Pages/Admin/AdminDashboard.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/ai/style.dart';
@@ -56,7 +57,15 @@ class MyApp extends ConsumerWidget {
 
           if (snapshot.hasData) {
             print('>>>>>>>>>>> snapshot has data');
-            return VerifyEmailPage();
+
+            // ADMIN
+            if (FirebaseAuth.instance.currentUser!.email ==
+                'laborlink@gmail.com') {
+              return const AdminDashboard();
+            }
+
+            // USERS!
+            return const VerifyEmailPage();
 
             // return VerifyEmailPage(userId: userId!, userRole: userRole!);
 
