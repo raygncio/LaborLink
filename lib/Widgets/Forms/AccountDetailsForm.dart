@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
+import 'package:laborlink/Widgets/TextFormFields/PhoneFormField.dart';
 import 'package:laborlink/styles.dart';
 
 class AccountDetailsForm extends StatefulWidget {
@@ -120,9 +121,10 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(left: 3.5),
-                          child: AppNormalTextFormField(
+                          child: PhoneFormField(
                             controller: _phoneNumberController,
                             height: 32,
+                            prefix: "+63 ",
                             label: "PHONE NUMBER*",
                             labelTextStyle: _labelTextStyle,
                             defaultBorder: _defaultBorder,
@@ -130,7 +132,7 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
                             borderRadius: _borderRadius,
                             inputTextStyle: _inputTextStyle,
                             fillColor: AppColors.white,
-                            validator: validateField,
+                            validator: validatePhoneNumber,
                           ),
                         ),
                       ),
@@ -188,6 +190,18 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
         return "Password must contain at least 2 digits";
       }
     }
+    return null;
+  }
+
+  String? validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return "This field is required";
+    }
+
+    if (value.length != 10 || value[0] != '9') {
+      return "Invalid phone number";
+    }
+
     return null;
   }
 
