@@ -56,7 +56,6 @@ class MyApp extends ConsumerWidget {
 
           if (snapshot.hasData) {
             print('>>>>>>>>>>> snapshot has data');
-
             return VerifyEmailPage();
 
             // return VerifyEmailPage(userId: userId!, userRole: userRole!);

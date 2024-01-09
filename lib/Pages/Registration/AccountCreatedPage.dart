@@ -99,10 +99,11 @@ class _AccountCreatedPageState extends State<AccountCreatedPage> {
       isLoading = true;
     });
     Timer(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (ctx) => const LoginPage(),
         ),
+        (route) => false,
       );
     });
   }

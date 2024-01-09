@@ -121,11 +121,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               email: emailFromUsername,
               password: enteredPassword,
             );
-          } 
+          }
         }
 
         Navigator.of(context).pop();
-
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.
         print("Login error: $e");
