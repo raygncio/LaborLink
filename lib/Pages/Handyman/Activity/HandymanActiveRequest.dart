@@ -104,15 +104,19 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                       children: [
                         Row(
                           children: [
-                            Padding(
+                            Container(
                               padding: const EdgeInsets.only(right: 8),
-                              child: Text(
-                                widget.requestDetail["title"] ?? '',
-                                style: getTextStyle(
-                                    textColor: AppColors.tertiaryBlue,
-                                    fontFamily: AppFonts.montserrat,
-                                    fontWeight: AppFontWeights.bold,
-                                    fontSize: 17),
+                              width: 200,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(
+                                  widget.requestDetail["title"] ?? '',
+                                  style: getTextStyle(
+                                      textColor: AppColors.tertiaryBlue,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.bold,
+                                      fontSize: 17),
+                                ),
                               ),
                             ),
                             AppBadge(
@@ -126,13 +130,16 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                                     horizontal: 7, vertical: 2)),
                           ],
                         ),
-                        Text(
-                          widget.requestDetail["requestId"] ?? '',
-                          style: getTextStyle(
-                              textColor: AppColors.tertiaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.regular,
-                              fontSize: 13),
+                        Container(
+                          width: 150,
+                          child: Text(
+                            widget.requestDetail["requestId"] ?? '',
+                            style: getTextStyle(
+                                textColor: AppColors.tertiaryBlue,
+                                fontFamily: AppFonts.montserrat,
+                                fontWeight: AppFontWeights.regular,
+                                fontSize: 13),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 13),

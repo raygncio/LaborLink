@@ -26,6 +26,7 @@ class ClientActiveRequest extends StatefulWidget {
 class _ClientActiveRequestState extends State<ClientActiveRequest> {
   late int _currentProgress;
   late bool _requestCompleted;
+  late String _progress;
   DatabaseService service = DatabaseService();
   List<String> progressDescriptions = [
     "Waiting for the handyman",
@@ -40,12 +41,16 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
   Widget build(BuildContext context) {
     if (widget.requestDetail["progress"] == 'completion') {
       _currentProgress = 4;
+      _progress = 'Completion';
     } else if (widget.requestDetail["progress"] == 'omw') {
       _currentProgress = 1;
+      _progress = 'On the way';
     } else if (widget.requestDetail["progress"] == 'arrived') {
       _currentProgress = 2;
+      _progress = 'Arrived';
     } else if (widget.requestDetail["progress"] == 'inprogress') {
       _currentProgress = 3;
+      _progress = 'In Progress';
     } else {
       _currentProgress = 0;
     }
@@ -72,21 +77,26 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                           children: [
                             Row(
                               children: [
-                                Padding(
+                                Container(
                                   padding: const EdgeInsets.only(right: 8),
-                                  child: Text(
-                                    widget.requestDetail["title"] ?? '',
-                                    style: getTextStyle(
-                                        textColor: AppColors.tertiaryBlue,
-                                        fontFamily: AppFonts.montserrat,
-                                        fontWeight: AppFontWeights.bold,
-                                        fontSize: 17),
+                                  width: 200,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Text(
+                                      widget.requestDetail["title"] ?? '',
+                                      softWrap: false,
+                                      style: getTextStyle(
+                                          textColor: AppColors.tertiaryBlue,
+                                          fontFamily: AppFonts.montserrat,
+                                          fontWeight: AppFontWeights.bold,
+                                          fontSize: 17),
+                                    ),
                                   ),
                                 ),
                                 AppBadge(
                                     label: _requestCompleted
                                         ? "Completed"
-                                        : "In Progress",
+                                        : _progress,
                                     type: _requestCompleted
                                         ? BadgeType.complete
                                         : BadgeType.inProgress,
@@ -94,13 +104,20 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                         horizontal: 7, vertical: 2)),
                               ],
                             ),
-                            Text(
-                              widget.requestDetail["requestId"] ?? '',
-                              style: getTextStyle(
-                                  textColor: AppColors.tertiaryBlue,
-                                  fontFamily: AppFonts.montserrat,
-                                  fontWeight: AppFontWeights.regular,
-                                  fontSize: 13),
+                            Container(
+                              width: 150,
+                              child: Text(
+                                "Request ID: " +
+                                        widget.requestDetail["requestId"] ??
+                                    '',
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                style: getTextStyle(
+                                    textColor: AppColors.tertiaryBlue,
+                                    fontFamily: AppFonts.montserrat,
+                                    fontWeight: AppFontWeights.regular,
+                                    fontSize: 13),
+                              ),
                             ),
                             Column(
                               children: [
@@ -152,6 +169,29 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     ),
                                   ),
                                 ),
+                                // Update the padding for the description text
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 15,
+                                      left: 10,
+                                      right:
+                                          10), // Adjust left padding as needed
+                                  child: Text(
+                                    widget.requestDetail["requestDesc"] ?? '',
+                                    textAlign: TextAlign.justify,
+                                    overflow: TextOverflow
+                                        .ellipsis, // You can adjust overflow property based on your requirement
+                                    maxLines:
+                                        3, // You can adjust maxLines based on your requirement
+                                    style: getTextStyle(
+                                      textColor: AppColors.black,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.regular,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+
                                 AppProgressIndicator(
                                     padding: const EdgeInsets.only(top: 51),
                                     description:

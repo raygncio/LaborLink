@@ -68,7 +68,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         }
       });
     } catch (error) {
-      print('Error fetching user data:1 $error');
+      print('Error fetching get user data: $error');
     }
   }
 
@@ -80,8 +80,11 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       print('Error fetching interested laborers: $error');
     }
 
-    // Combine the lists
-    combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+    if (interestedLaborerWithOffer.isNotEmpty) {
+      // Combine the lists
+      // print("NANANANNANANANA");
+      combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+    }
   }
 
   Future<Map<String, dynamic>> getTheActiveRequest() async {
@@ -102,7 +105,10 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       print('Error fetching interested laborers: $error');
     }
 
-    combinedInterestedLaborers.addAll(interestedLaborer);
+    if (interestedLaborer.isNotEmpty) {
+      combinedInterestedLaborers.addAll(interestedLaborer);
+    }
+
     // print(
     //     "*************************CHECK THE COMBINE 2 ${combinedInterestedLaborers.length}");
     // print(
@@ -438,16 +444,16 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                 itemBuilder: (context, index) {
                   Map<String, dynamic> currentHandyman =
                       combinedInterestedLaborers[index];
-                  print("Index: $index");
                   print(
                       "*************************CHECK THE CURRENT HANDYMAN ${combinedInterestedLaborers.length}");
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
+
                   // print(
                   //     '>>>>>>>>>>>>>>>>>>> HAS OFFER ${currentHandyman.containsKey('suggestedPrice')}');
                   if (hasOffer) {
-                    HandymanProposalCard(handymanInfo: currentHandyman);
+                    return HandymanProposalCard(handymanInfo: currentHandyman);
                   } else if (currentHandyman.containsKey('suggestedPrice')) {
                     print("checking");
                     return HandymanHireCard(
@@ -486,7 +492,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      //print('*************************COMPLETED REQUEST $completedRequest');
+      print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: $error');

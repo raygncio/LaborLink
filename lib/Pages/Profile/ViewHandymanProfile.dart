@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/styles.dart';
@@ -16,16 +17,26 @@ class ViewHandymanProfile extends StatefulWidget {
 class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   List<Map<String, dynamic>> results = [];
   final DatabaseService service = DatabaseService();
+  bool isReviewsVisible = false;
 
   @override
   void initState() {
     super.initState();
-    getReviews();
+    Future.delayed(Duration(seconds: 2), () {
+      getReviews();
+      setState(() {
+        isReviewsVisible = true;
+      });
+    });
   }
 
   void getReviews() async {
     try {
       results = await service.getHandymanReviews(widget.handymanInfo["userId"]);
+      print(results);
+      setState(() {
+        results = results;
+      });
     } catch (error) {
       print('Error fetching user data: $error');
     }
@@ -49,7 +60,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                   color: AppColors.dirtyWhite,
                   child: Stack(
                     children: [
-                      reviewsSection(),
+                      if (isReviewsVisible) reviewsSection(),
                       HandymanInfoCard(handymanInfo: widget.handymanInfo),
                     ],
                   ),
@@ -96,24 +107,34 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                   shrinkWrap: true,
                   itemCount: results.length,
                   itemBuilder: (context, index) {
+                    print('>>>>>>>>>>>>>>>>>>>>>$results.length');
                     Map<String, dynamic> currentReview = results[index];
-                    String fullName = currentReview['firstName'] +
-                            ' ' +
-                            currentReview['middle'] ??
-                        "" +
-                            ' ' +
-                            currentReview['lastName'] +
-                            ' ' +
-                            currentReview['suffix'] ??
-                        "";
+                    String fullName = '';
+
+                    if (currentReview['firstName'] != null) {
+                      fullName += currentReview['firstName'] + ' ';
+                    }
+                    if (currentReview['middle'] != null) {
+                      fullName += currentReview['middle'] + ' ';
+                    }
+                    if (currentReview['lastName'] != null) {
+                      fullName += currentReview['lastName'] + ' ';
+                    }
+                    if (currentReview['suffix'] != null) {
+                      fullName += currentReview['suffix'] + ' ';
+                    }
+                    DateTime? createdAt = currentReview['createdAt']?.toDate();
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 7),
                       child: ReviewCard(
-                        rate: currentReview["rating"],
-                        date: currentReview["createdAt"],
+                        rate:
+                            (currentReview["rating"] as double?)?.toInt() ?? 0,
+                        date: createdAt != null
+                            ? DateFormat.yMMMMd().format(createdAt)
+                            : DateFormat.yMMMMd().format(DateTime.now()),
                         reviewerName: fullName,
-                        review: currentReview["comment"],
+                        review: currentReview["comment"] ?? ' ',
                       ),
                     );
                   },

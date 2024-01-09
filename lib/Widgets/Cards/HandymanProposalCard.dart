@@ -71,7 +71,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.file(File('icons/person-circle-blue.png')),
+                    child: Image.asset('assets/icons/person-circle-blue.png'),
                   ),
                 ),
                 Padding(

@@ -86,8 +86,8 @@ class _ReviewCardState extends State<ReviewCard> {
                 ),
               ),
               ClipOval(
-                child: Image.file(
-                  defaultAvatar!,
+                child: Image.asset(
+                  'assets/icons/person-circle-blue.png',
                   width: 20,
                   height: 20,
                 ),

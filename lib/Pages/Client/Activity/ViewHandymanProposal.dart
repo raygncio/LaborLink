@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
@@ -26,8 +27,8 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
 
   @override
   Widget build(BuildContext context) {
-    bidPrice = widget.handymanInfo["bidPrice"];
-    suggestedPrice = widget.handymanInfo["suggestedPrice"];
+    bidPrice = (widget.handymanInfo["bidPrice"] as num).toDouble();
+    suggestedPrice = (widget.handymanInfo["suggestedPrice"] as num).toDouble();
     addCharge = bidPrice - suggestedPrice;
     serviceFee = suggestedPrice / 1.10;
     convenienceFee = suggestedPrice - serviceFee;
@@ -107,7 +108,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  loremIpsumLong,
+                  widget.handymanInfo["description"],
                   overflow: TextOverflow.visible,
                   style: getTextStyle(
                       textColor: AppColors.black,
@@ -118,24 +119,34 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 11,
-                    mainAxisSpacing: 11,
+                child: Center(
+                  child: Image.network(
+                    widget.handymanInfo["attachment"],
+                    width: 300,
+                    height: 300,
                   ),
-                  itemCount: proposalImg.length,
-                  itemBuilder: (context, index) {
-                    return Image.asset(
-                      proposalImg[index],
-                      width: 140,
-                      height: 140,
-                    );
-                  },
                 ),
               ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 16),
+              //   child: GridView.builder(
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     shrinkWrap: true,
+              //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //       crossAxisCount: 2,
+              //       crossAxisSpacing: 11,
+              //       mainAxisSpacing: 11,
+              //     ),
+              //     itemCount: proposalImg.length,
+              //     itemBuilder: (context, index) {
+              //       return Image.asset(
+              //         proposalImg[index],
+              //         width: 140,
+              //         height: 140,
+              //       );
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -195,7 +206,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          serviceFee.toString(),
+                          serviceFee.toDouble().toStringAsFixed(2),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -219,7 +230,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          convenienceFee.toString(),
+                          convenienceFee.toDouble().toStringAsFixed(2),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -367,10 +378,11 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
 
     if (confirmHire == true) {
       try {
-        await service.updateOffer(
-            widget.handymanInfo['userId'], widget.handymanInfo['userId']);
-        await service.updateRequestProgress(
-            widget.handymanInfo['userId'], widget.handymanInfo['handymanId']);
+        await service.updateOffer(widget.handymanInfo['handymanId']);
+        await service.updateRequestProgressWithOffer(
+            widget.handymanInfo['requestId'],
+            widget.handymanInfo['handymanId'],
+            widget.handymanInfo['bidPrice']);
 
         print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
@@ -381,9 +393,10 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
             backgroundColor: AppColors.tertiaryBlue,
           ),
         );
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => ClientMainPage(userId: userId),
-        // ));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) =>
+              ClientMainPage(userId: widget.handymanInfo['userId']),
+        ));
       } catch (e) {
         print('Error updating document: $e');
       }
