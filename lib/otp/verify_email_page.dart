@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
+import 'package:laborlink/otp/verify_phone_page.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
@@ -116,26 +117,29 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
   @override
   Widget build(BuildContext context) {
     if (isEmailVerified) {
-      print('>>>>>>>>>>>>userRole: $userRole');
+      print('>>>>>>>>>>>isEmailVerified: $isEmailVerified');
+      return const VerifyPhonePage();
 
-      return FutureBuilder(
-        future: userRole,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data == 'client') {
-              return ClientMainPage(userId: userId ?? '');
-            } else if (snapshot.data == 'handyman') {
-              return HandymanMainPage(userId: userId!);
-            }
-          }
-          return const Scaffold(
-            backgroundColor: AppColors.white,
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
-      );
+      // print('>>>>>>>>>>>>userRole: $userRole');
+
+      // return FutureBuilder(
+      //   future: userRole,
+      //   builder: (context, snapshot) {
+      //     if (snapshot.hasData) {
+      //       if (snapshot.data == 'client') {
+      //         return ClientMainPage(userId: userId ?? '');
+      //       } else if (snapshot.data == 'handyman') {
+      //         return HandymanMainPage(userId: userId!);
+      //       }
+      //     }
+      //     return const Scaffold(
+      //       backgroundColor: AppColors.white,
+      //       body: Center(
+      //         child: CircularProgressIndicator(),
+      //       ),
+      //     );
+      //   },
+      // );
     }
 
     return Scaffold(
