@@ -272,7 +272,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         content: Container(
           height: 230,
           width: double.infinity,
@@ -289,20 +289,24 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
               //     );
               //   },
               // ),
-              Row(
-                children: [
-                  for (var image in resultImages)
-                    Container(
-                      padding: const EdgeInsets.only(
-                        right: 10,
-                        left: 10,
-                      ),
-                      width: 150,
-                      child: image,
-                    ),
-                ],
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (var image in resultImages)
+                        Container(
+                          padding: const EdgeInsets.only(
+                            right: 10,
+                            left: 10,
+                          ),
+                          width: 150,
+                          child: image,
+                        ),
+                    ],
+                  ),
+                ),
               ),
-
               const SizedBox(
                 height: 40,
               ),
