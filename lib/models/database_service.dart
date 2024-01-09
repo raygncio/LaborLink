@@ -10,6 +10,8 @@ import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/offer.dart';
 import 'package:laborlink/models/report.dart';
 import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/models/review.dart';
 import 'package:laborlink/services/analytics_service.dart';
 
@@ -113,7 +115,7 @@ class DatabaseService {
   }
 
   // Face Verification Results [ADMIN]
-  Future<String> uploadFace(String faceResultId, File selectedImage) async {
+  Future<String> uploadFace1(String faceResultId, File selectedImage) async {
     String filename = '$faceResultId-${DateTime.now()}';
     final faceResultsStorage =
         _storage.ref().child('face-results').child('$filename.jpg');
@@ -121,6 +123,75 @@ class DatabaseService {
     final imageUrl = await faceResultsStorage.getDownloadURL();
 
     return imageUrl;
+  }
+
+  Future<String> uploadFace2(String faceResultId, File selectedImage) async {
+    String filename = '$faceResultId-2-${DateTime.now()}';
+    final faceResultsStorage =
+        _storage.ref().child('face-results').child('$filename.jpg');
+    await faceResultsStorage.putFile(selectedImage);
+    final imageUrl = await faceResultsStorage.getDownloadURL();
+
+    return imageUrl;
+  }
+
+  Future<String> uploadFace3(String faceResultId, File selectedImage) async {
+    String filename = '$faceResultId-3-${DateTime.now()}';
+    final faceResultsStorage =
+        _storage.ref().child('face-results').child('$filename.jpg');
+    await faceResultsStorage.putFile(selectedImage);
+    final imageUrl = await faceResultsStorage.getDownloadURL();
+
+    return imageUrl;
+  }
+
+  // Anomaly Detection Results [ADMIN]
+  Future<String> uploadId(String anomalyResultId, File selectedImage) async {
+    String filename = '$anomalyResultId-${DateTime.now()}';
+    final anomalyResultsStorage =
+        _storage.ref().child('id-anomaly-results').child('$filename.jpg');
+    await anomalyResultsStorage.putFile(selectedImage);
+    final imageUrl = await anomalyResultsStorage.getDownloadURL();
+
+    return imageUrl;
+  }
+
+  // ADMIN
+
+  addFaceResult(FaceResults faceResults) async {
+    await _db
+        .collection('faceResults')
+        .doc(faceResults.faceResultId)
+        .set(faceResults.toFirestore());
+  }
+
+  addAnomalyResult(AnomalyResults anomalyResults) async {
+    await _db
+        .collection('anomalyResults')
+        .doc(anomalyResults.anomalyResultId)
+        .set(anomalyResults.toFirestore());
+  }
+
+  Future<List<FaceResults>> getAllFaceResults() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _db.collection('faceResults').get();
+
+    List<FaceResults> faceResultsList = querySnapshot.docs.map((doc) {
+      return FaceResults.fromFireStore(doc);
+    }).toList();
+
+    return faceResultsList;
+  }
+
+  Future<List<AnomalyResults>> getAllAnomalyResults() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _db.collection('anomalyResults').get();
+
+    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
+      return AnomalyResults.fromFireStore(doc);
+    }).toList();
+
+    return anomalyResultsList;
   }
 
   // USERS
