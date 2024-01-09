@@ -58,7 +58,7 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
         child: GestureDetector(
           onTap: onBack,
           child: Image.asset("assets/icons/back-btn-2.png",
-              height: 23, width:12.86 ),
+              height: 23, width: 12.86),
         ),
       );
 
@@ -251,8 +251,8 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.only(
-                  left: 15, right: 14, top: 14, bottom: 14),
+              padding:
+                  EdgeInsets.only(left: 15, right: 14, top: 14, bottom: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

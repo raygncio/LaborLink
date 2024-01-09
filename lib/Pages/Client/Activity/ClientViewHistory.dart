@@ -80,11 +80,11 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       ),
                       if (showCompletionProof)
                         HandymanInfoCard(handymanInfo: completedRequest),
-                      const Align(
+                      Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 26),
-                            child: ReportIssueButton(),
+                            child: ReportIssueButton(userId: widget.userId),
                           )),
                     ],
                   ),
@@ -125,7 +125,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      completedRequest['requestId'] ?? '',
+                      widget.userId,
                       style: getTextStyle(
                           textColor: AppColors.secondaryYellow,
                           fontFamily: AppFonts.montserrat,

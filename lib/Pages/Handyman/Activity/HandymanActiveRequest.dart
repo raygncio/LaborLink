@@ -226,9 +226,10 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                                 ),
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(top: 15, bottom: 15),
-                              child: ReportIssueButton(),
+                              child: ReportIssueButton(
+                                  userId: widget.clientDetail['handymanId']),
                             ),
                           ],
                         )

@@ -17,6 +17,12 @@ class HandymanSelectedCard extends StatefulWidget {
 class HandymanSelectedCardState extends State<HandymanSelectedCard> {
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.handymanInfo['firstName'] ?? '';
+    String middleName = widget.handymanInfo['middleName'] ?? '';
+    String lastName = widget.handymanInfo['lastName'] ?? '';
+    String suffix = widget.handymanInfo['suffix'] ?? '';
+
+    String fullname = '$firstName $middleName $lastName $suffix';
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.white,
@@ -33,7 +39,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.network(widget.handymanInfo["img_url"]),
+                    child: Image.asset("assets/icons/person-circle-blue.png"),
                   ),
                 ),
                 Padding(
@@ -42,7 +48,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.handymanInfo['name'],
+                      Text(fullname,
                           style: getTextStyle(
                               textColor: AppColors.primaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -55,11 +61,11 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["service"],
+                                  label: widget.handymanInfo["specialization"],
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["area"],
+                                label: widget.handymanInfo["city"],
                                 type: BadgeType.normal)
                           ],
                         ),

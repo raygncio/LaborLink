@@ -4,7 +4,8 @@ import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/styles.dart';
 
 class ReportIssueButton extends StatefulWidget {
-  const ReportIssueButton({Key? key}) : super(key: key);
+  final String userId;
+  const ReportIssueButton({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ReportIssueButton> createState() => _ReportIssueButtonState();
@@ -41,6 +42,6 @@ class _ReportIssueButtonState extends State<ReportIssueButton> {
   }
 
   void onReportIssue() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ReportIssuePage(),
+        builder: (context) => ReportIssuePage(userId: widget.userId),
       ));
 }

@@ -141,6 +141,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                         padding: const EdgeInsets.only(right: 8),
                         child: Text(
                           title,
+                          softWrap: false,
                           style: getTextStyle(
                               textColor: AppColors.tertiaryBlue,
                               fontFamily: AppFonts.montserrat,

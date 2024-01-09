@@ -30,12 +30,14 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   bool _havePendingOpenRequest = false;
   bool _havePendingDirectRequest = false;
   bool _forApproval = false;
+  String checkRequest = '';
   Request? requestInfo;
   DatabaseService service = DatabaseService();
   List<Map<String, dynamic>> interestedLaborer = [];
   List<Map<String, dynamic>> interestedLaborerWithOffer = [];
   List<Map<String, dynamic>> combinedInterestedLaborers = [];
   Map<String, dynamic> getActiveRequest = {};
+  Map<String, dynamic> getHandymanInfo = {};
   Future<Map<String, dynamic>>? activeRequestFuture;
 
   @override
@@ -48,17 +50,23 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   }
 
   void checkForRequests() async {
+    bool direct = false;
     try {
       requestInfo = await service.getRequestsData(widget.userId);
 
       String progress = requestInfo!.progress;
+      String? handymanId = requestInfo?.handymanId;
       print('progress: $progress');
 
       setState(() {
-        if (progress == "pending") {
-          _havePendingOpenRequest = true;
+        if (progress == "pending" && handymanId != null) {
           _havePendingDirectRequest = true;
           // _forApproval = true;
+          checkRequest = "direct";
+          direct = true;
+        } else if (progress == "pending") {
+          _havePendingOpenRequest = true;
+          checkRequest = "open";
         } else if (progress == "hired" ||
             progress == "omw" ||
             progress == "arrived" ||
@@ -67,6 +75,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
           _haveActiveRequest = true;
         }
       });
+
+      if (direct) {}
     } catch (error) {
       print('Error fetching get user data: $error');
     }
@@ -82,7 +92,6 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
     if (interestedLaborerWithOffer.isNotEmpty) {
       // Combine the lists
-      // print("NANANANNANANANA");
       combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
     }
   }

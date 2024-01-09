@@ -2,25 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/styles.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
 
-// class ReportSubmittedPage extends StatefulWidget {
-//   final String userId;
-//   const ReportSubmittedPage({Key? key, required this.userId}) : super(key: key);
+class ReportSubmittedPage extends StatefulWidget {
+  final String userId;
+  const ReportSubmittedPage({Key? key, required this.userId}) : super(key: key);
 
-//   @override
-//   State<ReportSubmittedPage> createState() => _ReportSubmittedPageState();
-// }
-
-class ReportSubmittedPage extends ConsumerWidget {
-  //late String userId;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
+  State<ReportSubmittedPage> createState() => _ReportSubmittedPageState();
+}
 
-    //Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-    //userId = userInfo['userId'] ?? '';
+class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
+  @override
+  Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -73,7 +66,7 @@ class ReportSubmittedPage extends ConsumerWidget {
                           fontSize: 15,
                           fontFamily: AppFonts.montserrat,
                           color: AppColors.secondaryBlue,
-                          command: () => onCheckReports(context),
+                          command: onCheckReports,
                           borderRadius: 8),
                     ],
                   ),
@@ -81,7 +74,7 @@ class ReportSubmittedPage extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 22),
                   child: GestureDetector(
-                    onTap: () => onContinue(context),
+                    onTap: onContinue,
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.accentOrange,
@@ -114,10 +107,10 @@ class ReportSubmittedPage extends ConsumerWidget {
     );
   }
 
-  void onCheckReports(BuildContext context) =>
+  void onCheckReports() =>
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => IssuesReportedPage(),
+        builder: (context) => IssuesReportedPage(userId: widget.userId),
       ));
 
-  void onContinue(BuildContext context) => Navigator.of(context).pop();
+  void onContinue() => Navigator.of(context).pop();
 }

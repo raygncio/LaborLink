@@ -22,7 +22,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       getReviews();
       setState(() {
         isReviewsVisible = true;

@@ -237,11 +237,12 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                     ),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 15),
-                    child: ReportIssueButton(),
+                    child: ReportIssueButton(
+                        userId: widget.requestDetail["clientId"]),
                   ),
                 ),
                 HandymanInfoCard(handymanInfo: widget.requestDetail),
