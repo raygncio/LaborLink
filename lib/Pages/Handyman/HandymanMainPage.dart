@@ -89,7 +89,7 @@ class _HandymanMainPageState extends State<HandymanMainPage> {
       return HandymanActivityPage(
           navigateToNewPage: updateSelectedIndex, userId: widget.userId);
     } else if (_selectedIndex == 2) {
-      return IssuesReportedPage(userId: widget.userId);
+      return IssuesReportedPage(userId: widget.userId, hide: true);
     }
 
     return ProfilePage(userId: widget.userId);

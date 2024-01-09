@@ -11,6 +11,7 @@ import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/request.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
@@ -28,6 +29,8 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
   late int _currentProgress;
   late bool _requestCompleted;
   late String _progress = ' ';
+  Request? requestInfo;
+  Timer? timer;
   DatabaseService service = DatabaseService();
   List<String> progressDescriptions = [
     "Waiting for the handyman",
@@ -57,6 +60,57 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       _currentProgress = 0;
     }
     _requestCompleted = _currentProgress == 4;
+
+    if (widget.requestDetail["progress"] != 'completion') {
+      //check email verification status every 3 sec
+      timer = Timer.periodic(
+        const Duration(seconds: 3),
+        (timer) => reloadPage(),
+      );
+    } else if (widget.requestDetail["progress"] == 'completion') {
+      timer?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void reloadPage() async {
+    int currentProgress = 0;
+    String status = ' ';
+    // Use setState to trigger a rebuild of the widget
+    try {
+      requestInfo =
+          await service.getRequestsData(widget.requestDetail["clientId"]);
+
+      print('progress: ${requestInfo!.progress}');
+
+      if (requestInfo!.progress == 'completion') {
+        currentProgress = 4;
+        status = 'Completion';
+      } else if (requestInfo!.progress == 'omw') {
+        currentProgress = 1;
+        status = 'On the way';
+      } else if (requestInfo!.progress == 'arrived') {
+        currentProgress = 2;
+        status = 'Arrived';
+      } else if (requestInfo!.progress == 'inprogress') {
+        currentProgress = 3;
+        status = 'In Progress';
+      }
+
+      setState(() {
+        _currentProgress = currentProgress;
+        _progress = status;
+        _requestCompleted = currentProgress == 4;
+      });
+    } catch (error) {
+      print('Error fetching get user data: $error');
+    }
   }
 
   @override

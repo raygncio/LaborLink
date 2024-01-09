@@ -15,7 +15,9 @@ import 'dart:io';
 
 class IssuesReportedPage extends StatefulWidget {
   final String userId;
-  const IssuesReportedPage({Key? key, required this.userId}) : super(key: key);
+  final bool hide;
+  const IssuesReportedPage({Key? key, required this.userId, required this.hide})
+      : super(key: key);
 
   @override
   State<IssuesReportedPage> createState() => _IssuesReportedPageState();
@@ -249,12 +251,17 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16),
-                      child: GestureDetector(
-                        onTap: () => onBack(context),
-                        child: Image.asset("assets/icons/back-btn-2.png",
+                      child: Visibility(
+                        visible: !widget.hide,
+                        child: GestureDetector(
+                          onTap: () => onBack(context),
+                          child: Image.asset(
+                            "assets/icons/back-btn-2.png",
                             height: 23,
                             width: 13,
-                            alignment: Alignment.centerLeft),
+                            alignment: Alignment.centerLeft,
+                          ),
+                        ),
                       ),
                     ),
                   ),

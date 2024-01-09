@@ -89,8 +89,10 @@ class _RatingsPageState extends State<RatingsPage> {
                                     fontSize: 10),
                               ),
                             ),
-                            const AppBadge(
-                              label: "Handyman",
+                            AppBadge(
+                              label: widget.ratings['userRole'] == 'client'
+                                  ? 'Client'
+                                  : "Handyman",
                               type: BadgeType.normal,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 4, vertical: 1),
@@ -191,18 +193,18 @@ class _RatingsPageState extends State<RatingsPage> {
                     ]),
                 child: Stack(
                   children: [
-                    Positioned(
-                      top: 17,
-                      left: 14,
-                      child: GestureDetector(
-                        onTap: onBack,
-                        child: Image.asset(
-                          "assets/icons/back-btn-2.png",
-                          width: 12,
-                          height: 23,
-                        ),
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: 17,
+                    //   left: 14,
+                    //   child: GestureDetector(
+                    //     onTap: onBack,
+                    //     child: Image.asset(
+                    //       "assets/icons/back-btn-2.png",
+                    //       width: 12,
+                    //       height: 23,
+                    //     ),
+                    //   ),
+                    // ),
                     Align(
                       alignment: const FractionalOffset(0.5, 5),
                       child: Container(
@@ -339,7 +341,7 @@ class _RatingsPageState extends State<RatingsPage> {
         Future.delayed(Duration(seconds: 1), () {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) =>
-                ClientMainPage(userId: widget.ratings["userId"]),
+                ClientMainPage(userId: widget.ratings["clientId"]),
           ));
         });
       } catch (e) {

@@ -109,7 +109,8 @@ class _ReportSubmittedPageState extends State<ReportSubmittedPage> {
 
   void onCheckReports() =>
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => IssuesReportedPage(userId: widget.userId),
+        builder: (context) =>
+            IssuesReportedPage(userId: widget.userId, hide: false),
       ));
 
   void onContinue() => Navigator.of(context).pop();

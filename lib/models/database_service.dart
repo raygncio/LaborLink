@@ -115,28 +115,8 @@ class DatabaseService {
   }
 
   // Face Verification Results [ADMIN]
-  Future<String> uploadFace1(String faceResultId, File selectedImage) async {
-    String filename = '$faceResultId-${DateTime.now()}';
-    final faceResultsStorage =
-        _storage.ref().child('face-results').child('$filename.jpg');
-    await faceResultsStorage.putFile(selectedImage);
-    final imageUrl = await faceResultsStorage.getDownloadURL();
-
-    return imageUrl;
-  }
-
-  Future<String> uploadFace2(String faceResultId, File selectedImage) async {
-    String filename = '$faceResultId-2-${DateTime.now()}';
-    final faceResultsStorage =
-        _storage.ref().child('face-results').child('$filename.jpg');
-    await faceResultsStorage.putFile(selectedImage);
-    final imageUrl = await faceResultsStorage.getDownloadURL();
-
-    return imageUrl;
-  }
-
-  Future<String> uploadFace3(String faceResultId, File selectedImage) async {
-    String filename = '$faceResultId-3-${DateTime.now()}';
+  Future<String> uploadFace(String count, File selectedImage) async {
+    String filename = 'faceResult-$count-${DateTime.now()}';
     final faceResultsStorage =
         _storage.ref().child('face-results').child('$filename.jpg');
     await faceResultsStorage.putFile(selectedImage);
@@ -146,8 +126,8 @@ class DatabaseService {
   }
 
   // Anomaly Detection Results [ADMIN]
-  Future<String> uploadId(String anomalyResultId, File selectedImage) async {
-    String filename = '$anomalyResultId-${DateTime.now()}';
+  Future<String> uploadId(String count, File selectedImage) async {
+    String filename = 'anomalyResult-$count-${DateTime.now()}';
     final anomalyResultsStorage =
         _storage.ref().child('id-anomaly-results').child('$filename.jpg');
     await anomalyResultsStorage.putFile(selectedImage);
@@ -771,7 +751,6 @@ class DatabaseService {
           'arrived',
           'inprogress',
           'completion',
-          'rating'
         ])
         .where('userId', isEqualTo: userId)
         .get();
@@ -929,7 +908,7 @@ class DatabaseService {
 
     for (var doc in requestQuery.docs) {
       await doc.reference.update({
-        'progress': 'completed',
+        'progress': 'rating',
       });
     }
   }
@@ -1280,17 +1259,18 @@ class DatabaseService {
       'arrived',
       'inprogress',
       'completion',
-      'rating'
+      'rating',
     ]).get();
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
       final userId = requestData['userId'];
-
+      final handymanId = requestData['handymanId'];
       Map<String, dynamic> groupData = {
         ...requestData,
         'requestId': requestId,
+        'clientId': userId
       };
 
       resultMap.addAll(groupData);
@@ -1303,15 +1283,26 @@ class DatabaseService {
         final userData = userDoc.data();
         resultMap.addAll(userData);
 
-        final reviewQuery = await _db
-            .collection('review')
-            .where('userId', isEqualTo: userId)
+        final handymanQuery = await _db
+            .collection('handyman')
+            .where('userId', isEqualTo: handymanId)
             .get();
 
-        // Process 'review' query results
-        for (var reviewDoc in reviewQuery.docs) {
-          final reviewData = reviewDoc.data();
-          resultMap.addAll(reviewData);
+        // Process 'user' query results
+        for (var handymanDoc in handymanQuery.docs) {
+          final handymanData = handymanDoc.data();
+          print(handymanData);
+          resultMap.addAll(handymanData);
+          final reviewQuery = await _db
+              .collection('review')
+              .where('userId', isEqualTo: userId)
+              .get();
+
+          // Process 'review' query results
+          for (var reviewDoc in reviewQuery.docs) {
+            final reviewData = reviewDoc.data();
+            resultMap.addAll(reviewData);
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/LoginPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
@@ -42,6 +43,15 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
       if (value == "yes") {
         ref.invalidate(currentUserProvider);
         FirebaseAuth.instance.signOut();
+
+        Navigator.of(context).pop();
+
+        // Navigator.of(context).pushAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (ctx) => const LoginPage(),
+        //   ),
+        //   (route) => false,
+        // );
       }
     });
   }

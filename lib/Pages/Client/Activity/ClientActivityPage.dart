@@ -94,11 +94,6 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     } catch (error) {
       print('Error fetching interested laborers: 1 $error');
     }
-
-    if (interestedLaborerWithOffer.isNotEmpty) {
-      // Combine the lists
-      combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
-    }
   }
 
   void fetchInterestedLaborers() async {
