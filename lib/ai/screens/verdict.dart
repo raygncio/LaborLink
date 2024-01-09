@@ -7,6 +7,7 @@ import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/handyman.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/services/analytics_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,33 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
   bool isRegistered = false;
 
   bool hasFaceResults = false;
+
+  Future<File> imageToFile({String imageName, String ext}) async {
+    var bytes = await rootBundle.load('assets/$imageName.$ext');
+    String tempPath = (await getTemporaryDirectory()).path;
+    File file = File('$tempPath/profile.png');
+    await file.writeAsBytes(
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
+    return file;
+  }
+
+  _recordResults() async {
+    DatabaseService service = DatabaseService();
+    FaceResults faceResults;
+    List<Image>? resultImages = widget.images;
+    List<double>? regulaResults = widget.regulaOutputs;
+
+    if (resultImages == null || regulaResults == null) return;
+
+    for (var i = 0; i < resultImages.length; i++) {
+      // Upload files to Firebase Storage
+      String imageUrl = await service.uploadFace(i.toString(), resultImages[i]);
+
+      anomalyResults = AnomalyResults(
+          idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
+      await service.addAnomalyResult(anomalyResults);
+    }
+  }
 
   checkFaceResults() {
     if (widget.images != null && widget.regulaOutputs != null) {
