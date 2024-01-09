@@ -32,7 +32,7 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
   Future<String>? phoneNumber;
   String? userId;
   String? linkedPhoneNumber;
-  bool successfulOtp = false;
+  // bool successfulOtp = false;
 
   @override
   void dispose() {
@@ -107,7 +107,7 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
     print('>>>>>>>>>>>>userRole: $userRole');
     print('>>>>>>>>>>>>>phoneNumber: $phoneNumber');
 
-    if (linkedPhoneNumber != null && successfulOtp) {
+    if (linkedPhoneNumber != null) {
       return FutureBuilder(
         future: userRole,
         builder: (context, snapshot) {
@@ -255,8 +255,10 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
                                               .then((value) {
                                             if (value == 'Success') {
                                               Navigator.pop(context);
+
+                                              // run build again
                                               setState(() {
-                                                successfulOtp = true;
+                                                //successfulOtp = true;
                                               });
                                             } else {
                                               ScaffoldMessenger.of(context)
