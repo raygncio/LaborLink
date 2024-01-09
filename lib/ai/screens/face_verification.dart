@@ -179,18 +179,17 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
     bool isGoodOnRegula = await regulaFaceMatch();
     print(
         '<<<<<<<<<<<<<<<<<<<<<<<<<prompting regula face match -> $isGoodOnRegula');
-    if (results.contains('nomatch')) {
-      if (isGoodOnRegula) {
-        print('<<<<<<<<<<<<<<<<<<<<<<<<<$isGoodOnRegula');
-        print('<<<<<<<<<<<<<<<<<<<<<<<<<$regulaResults');
-        setState(() {
-          isMatch = true;
-        });
-      } else {
-        setState(() {
-          isMatch = false;
-        });
-      }
+
+    if (isGoodOnRegula) {
+      print('<<<<<<<<<<<<<<<<<<<<<<<<<$isGoodOnRegula');
+      print('<<<<<<<<<<<<<<<<<<<<<<<<<$regulaResults');
+      setState(() {
+        isMatch = true;
+      });
+    } else {
+      setState(() {
+        isMatch = false;
+      });
     }
 
     setState(() {

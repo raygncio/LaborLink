@@ -1104,6 +1104,128 @@ class DatabaseService {
     return resultMap;
   }
 
+  Future<Map<String, dynamic>> getDirectRequest(String userId) async {
+    Map<String, dynamic> resultMap = {};
+
+    final requestQuery = await _db
+        .collection('request')
+        .where('userId', isEqualTo: userId)
+        .where('progress', isEqualTo: 'pending')
+        .get();
+
+    for (var requestDoc in requestQuery.docs) {
+      final requestData = requestDoc.data();
+      final requestId = requestDoc.id;
+      final desc = requestData['description'];
+
+      Map<String, dynamic> groupData = {
+        ...requestData,
+        'requestId': requestId,
+        'requestDesc': desc,
+      };
+
+      resultMap.addAll(groupData);
+
+      final handymanQuery = await _db
+          .collection('handymanApproval')
+          .where('requestId', isEqualTo: requestId)
+          .where('status', isEqualTo: 'hired')
+          .get();
+
+      if (handymanQuery.docs.isNotEmpty) {
+        // Process 'handyman approval' query results
+        for (var handymanDoc in handymanQuery.docs) {
+          final handymanData = handymanDoc.data();
+          resultMap.addAll(handymanData);
+          // print(">>>>>>>>>>>>>$groupData");
+          final userID = handymanData['handymanId'];
+
+          final userQuery = await _db
+              .collection('user')
+              .where('userId', isEqualTo: userID)
+              .get();
+
+          // Process 'user' query results
+          for (var userDoc in userQuery.docs) {
+            final userData = userDoc.data();
+            resultMap.addAll(userData);
+
+            final handymanQuery1 = await _db
+                .collection('handyman')
+                .where('userId', isEqualTo: userID)
+                .get();
+
+            for (var handyDoc in handymanQuery1.docs) {
+              final handyData = handyDoc.data();
+              resultMap.addAll(handyData);
+
+              // Query 'review' using key from userData
+              final reviewsQuery = await _db
+                  .collection('reviews')
+                  .where('userId', isEqualTo: userID)
+                  .get();
+
+              // Process 'review' query results
+              for (var reviewDoc in reviewsQuery.docs) {
+                final reviewData = reviewDoc.data();
+                resultMap.addAll(reviewData);
+              }
+            }
+          }
+        }
+      } else {
+        final offerQuery = await _db
+            .collection('offer')
+            .where('requestId', isEqualTo: requestId)
+            .where('status', isEqualTo: 'pending')
+            .get();
+
+        // Process 'handyman approval' query results
+        for (var offerDoc in offerQuery.docs) {
+          final offerData = offerDoc.data();
+          resultMap.addAll(offerData);
+          // print(">>>>>>>>>>>>>$groupData");
+          final userID = offerData['userId'];
+
+          final userQuery = await _db
+              .collection('user')
+              .where('userId', isEqualTo: userID)
+              .get();
+
+          // Process 'user' query results
+          for (var userDoc in userQuery.docs) {
+            final userData = userDoc.data();
+            resultMap.addAll(userData);
+
+            final handymanQuery1 = await _db
+                .collection('handyman')
+                .where('userId', isEqualTo: userID)
+                .get();
+
+            for (var handyDoc in handymanQuery1.docs) {
+              final handyData = handyDoc.data();
+              resultMap.addAll(handyData);
+
+              // Query 'review' using key from userData
+              final reviewsQuery = await _db
+                  .collection('reviews')
+                  .where('userId', isEqualTo: userID)
+                  .get();
+
+              // Process 'review' query results
+              for (var reviewDoc in reviewsQuery.docs) {
+                final reviewData = reviewDoc.data();
+                resultMap.addAll(reviewData);
+              }
+            }
+          }
+        }
+      }
+    }
+    // print(">>>>>>>>>>>>>$resultMap");
+    return resultMap;
+  }
+
   Future<Map<String, dynamic>> getActiveRequestClient(String handymanId) async {
     Map<String, dynamic> resultMap = {};
 

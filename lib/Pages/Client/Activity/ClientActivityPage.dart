@@ -37,7 +37,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   List<Map<String, dynamic>> interestedLaborerWithOffer = [];
   List<Map<String, dynamic>> combinedInterestedLaborers = [];
   Map<String, dynamic> getActiveRequest = {};
-  Map<String, dynamic> getHandymanInfo = {};
+  Map<String, dynamic> getDirectInfo = {};
   Future<Map<String, dynamic>>? activeRequestFuture;
 
   @override
@@ -76,9 +76,25 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         }
       });
 
-      if (direct) {}
+      if (direct) {
+        getDirectRequest();
+      }
     } catch (error) {
       print('Error fetching get user data: $error');
+    }
+  }
+
+  void getDirectRequest() async {
+    try {
+      getDirectInfo = await service.getDirectRequest(widget.userId);
+      print(">>>>>>>>>>>>>>>>>>>>>>>>>$getDirectInfo");
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
+    }
+
+    if (interestedLaborerWithOffer.isNotEmpty) {
+      // Combine the lists
+      combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
     }
   }
 
@@ -391,7 +407,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 9, top: 8),
                 child: HandymanSelectedCard(
-                  handymanInfo: dummyFilteredHandyman[4],
+                  handymanInfo: getDirectInfo,
                 ),
               ),
             ],
