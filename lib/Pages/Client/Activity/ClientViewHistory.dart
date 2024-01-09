@@ -54,7 +54,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
-
+    print(widget.userId);
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
       body: SafeArea(

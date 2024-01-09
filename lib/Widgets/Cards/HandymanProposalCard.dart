@@ -55,6 +55,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
 
     // Concatenate non-null values
     fullname = '$firstName $middleName $lastName $suffix';
+
     return Container(
       height: 81,
       decoration: const BoxDecoration(

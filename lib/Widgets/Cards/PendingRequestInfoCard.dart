@@ -89,6 +89,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
 
     if (confirmCancel == true) {
       DatabaseService service = DatabaseService();
+      print(userId);
       try {
         await service.cancelRequest(userId);
         print('Document updated successfully');

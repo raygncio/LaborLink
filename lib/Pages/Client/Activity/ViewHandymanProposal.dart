@@ -395,7 +395,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
         );
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) =>
-              ClientMainPage(userId: widget.handymanInfo['userId']),
+              ClientMainPage(userId: widget.handymanInfo['clientId']),
         ));
       } catch (e) {
         print('Error updating document: $e');

@@ -86,10 +86,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
   void getDirectRequest() async {
     try {
-      getDirectInfo = await service.getDirectRequest(widget.userId);
-      print(">>>>>>>>>>>>>>>>>>>>>>>>>$getDirectInfo");
+      getDirectInfo = await service.getDirectRequest(
+          widget.userId); // print("GET THE DIRECT INFO: $getDirectInfo");
+      setState(() {
+        getDirectInfo = getDirectInfo;
+      });
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 1 $error');
     }
 
     if (interestedLaborerWithOffer.isNotEmpty) {
@@ -103,7 +106,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       interestedLaborerWithOffer =
           await service.getInterestedHandymanAndOffer(widget.userId);
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 2 $error');
     }
 
     if (interestedLaborerWithOffer.isNotEmpty) {
@@ -124,10 +127,10 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void fetchOffersOfLaborers() async {
     try {
       interestedLaborer = await service.getInterestedHandyman(widget.userId);
-      print(
-          "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
+      // print(
+      //     "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 3 $error');
     }
 
     if (interestedLaborer.isNotEmpty) {
@@ -375,7 +378,16 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         } else {
           Map<String, dynamic> requestDetail = snapshot.data!;
 
-          return _buildPendingDirectRequest(requestDetail);
+          return FutureBuilder(
+            future: Future.delayed(Duration(milliseconds: 400)),
+            builder: (context, delaySnapshot) {
+              if (delaySnapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Return a loading indicator or placeholder during the delay
+              } else {
+                return _buildPendingDirectRequest(requestDetail);
+              }
+            },
+          );
         }
       },
     );
@@ -513,6 +525,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     bool openCancelledRequest = false;
     List<Map<String, dynamic>> cancelledRequest = [];
     List<Map<String, dynamic>> completedRequest = [];
+    print(widget.userId);
 
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
@@ -520,7 +533,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 4 $error');
     }
 
     if (completedRequest.isNotEmpty) {
@@ -592,7 +605,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
-                                      userId: currentRequest['requestId'],
+                                      userId: currentRequest['validRequestId'],
                                     ),
                                   )),
                                   child: Container(

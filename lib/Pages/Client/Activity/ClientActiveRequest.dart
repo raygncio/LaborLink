@@ -13,6 +13,7 @@ import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
 class ClientActiveRequest extends StatefulWidget {
   final Map<String, dynamic> requestDetail;
@@ -26,7 +27,7 @@ class ClientActiveRequest extends StatefulWidget {
 class _ClientActiveRequestState extends State<ClientActiveRequest> {
   late int _currentProgress;
   late bool _requestCompleted;
-  late String _progress;
+  late String _progress = ' ';
   DatabaseService service = DatabaseService();
   List<String> progressDescriptions = [
     "Waiting for the handyman",
@@ -36,9 +37,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     "Service complete!",
     "Service complete on both parties!"
   ];
-
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+
     if (widget.requestDetail["progress"] == 'completion') {
       _currentProgress = 4;
       _progress = 'Completion';
@@ -55,8 +57,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       _currentProgress = 0;
     }
     _requestCompleted = _currentProgress == 4;
-    print('Request Detail: ${widget.requestDetail}');
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
