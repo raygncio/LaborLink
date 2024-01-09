@@ -130,11 +130,12 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     setState(() {
       button = delayed;
-      isRegistered = true;
+      // isRegistered = true;
     });
   }
 
   createClientAccount() async {
+    print('>>>>>>>>>>>>>>>>>>>>create client account');
     print(savedUserData);
 
     // Create a user in Firebase Authentication
@@ -177,9 +178,14 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     } on FirebaseAuthException catch (error) {
       print('Error fetching user data: $error');
     }
+
+    setState(() {
+      isRegistered = true;
+    });
   }
 
   createHandymanAccount() async {
+    print('>>>>>>>>>>>>>>>>>>>>create handyman account');
     print(savedUserData);
 
     // Create a user in Firebase Authentication
@@ -247,6 +253,10 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     } on FirebaseAuthException catch (error) {
       print('>>>>>>>>>>>>>>>>>>>>Error fetching user data: $error');
     }
+
+    setState(() {
+      isRegistered = true;
+    });
   }
 
   showResultsButton() {
@@ -350,12 +360,15 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('>>>>>>>>>>>isSuccessful: ${widget.isSuccessful}');
     if (widget.isSuccessful) {
       savedUserData = ref.watch(registrationDataProvider);
     }
 
     if (!isRegistered && savedUserData.isNotEmpty) {
+      print('>>>>>>>>>>>savedUserData.isNotEmpty: ${savedUserData.isNotEmpty}');
       if (savedUserData['userRole'] == 'client') {
+        //print('>>>>>>create client account');
         createClientAccount();
       }
       if (savedUserData['userRole'] == 'handyman') {
