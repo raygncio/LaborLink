@@ -67,19 +67,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 borderRadius: 5),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14),
-                          child: Flex(
-                            direction: Axis.horizontal,
-                            children: [
-                              AppOutlinedButton(
-                                  text: "BACK",
-                                  color: AppColors.accentOrange,
-                                  command: onBack,
-                                  borderRadius: 5),
-                            ],
-                          ),
-                        )
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 14),
+                        //   child: Flex(
+                        //     direction: Axis.horizontal,
+                        //     children: [
+                        //       AppOutlinedButton(
+                        //           text: "BACK",
+                        //           color: AppColors.accentOrange,
+                        //           command: onBack,
+                        //           borderRadius: 5),
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   )
@@ -124,6 +124,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           }
         }
 
+        // pop out of login page
         Navigator.of(context).pop();
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.

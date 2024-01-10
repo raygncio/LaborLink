@@ -44,13 +44,19 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
         ref.invalidate(currentUserProvider);
         FirebaseAuth.instance.signOut();
 
-        Navigator.of(context).pop();
+        // Navigator.of(context).pop();
 
         // Navigator.of(context).pushAndRemoveUntil(
         //   MaterialPageRoute(
-        //     builder: (ctx) => const LoginPage(),
+        //     builder: (ctx) => const LandingPage(),
         //   ),
         //   (route) => false,
+        // );
+
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(
+        //     builder: (ctx) => const LandingPage(),
+        //   ),
         // );
       }
     });
