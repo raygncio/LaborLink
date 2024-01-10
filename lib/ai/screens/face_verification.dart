@@ -322,7 +322,8 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
     for (var i = 0; i < faceResultImages.length; i++) {
       // Create a File object with the desired file path
       String tempPath = (await getTemporaryDirectory()).path;
-      convertedImage = await File(tempPath).writeAsBytes(faceResultImages[i]);
+      convertedImage = await File('$tempPath/face-results')
+          .writeAsBytes(faceResultImages[i]);
 
       // Upload files to Firebase Storage
       String imageUrl = await service.uploadFace(i.toString(), convertedImage);

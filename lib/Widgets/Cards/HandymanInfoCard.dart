@@ -136,18 +136,19 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
               ),
             ),
             const Spacer(),
-            Container(
-              height: 45,
-              width: 45,
-              decoration: BoxDecoration(
-                color: AppColors.dirtyWhite,
-                borderRadius: BorderRadius.circular(50),
+            if (widget.handymanInfo['userRole'] == 'handyman')
+              Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                  color: AppColors.dirtyWhite,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Image.asset(
+                    "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
+                    width: 50,
+                    height: 48),
               ),
-              child: Image.asset(
-                  "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
-                  width: 50,
-                  height: 48),
-            ),
           ],
         ),
       ),

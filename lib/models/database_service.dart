@@ -749,6 +749,58 @@ class DatabaseService {
     return resultList;
   }
 
+  // Get all the client history with handyman and reviews
+  Future<Map<String, dynamic>> getUserInfo(String userId) async {
+    Map<String, dynamic> resultMap = {};
+    double rating = 0;
+    double count = 0;
+    double rates = 0;
+    final userQuery =
+        await _db.collection('user').where('userId', isEqualTo: userId).get();
+    for (var userDoc in userQuery.docs) {
+      final userData = userDoc.data();
+      final userRole = userData['userRole'];
+
+      resultMap.addAll(userData);
+      final reviewQuery = await _db
+          .collection('review')
+          .where('userId', isEqualTo: userId)
+          .get();
+      for (var reviewDoc in reviewQuery.docs) {
+        final reviewData = reviewDoc.data();
+        rating += reviewData['rating'];
+        count++;
+        resultMap.addAll(reviewData);
+      }
+
+      if (userRole == 'handyman') {
+        final handymanQuery = await _db
+            .collection('handyman')
+            .where('userId', isEqualTo: userId)
+            .get();
+        for (var handymanDoc in handymanQuery.docs) {
+          final handymanData = handymanDoc.data();
+          resultMap.addAll(handymanData);
+
+          final reviewQuery = await _db
+              .collection('review')
+              .where('userId', isEqualTo: userId)
+              .get();
+          for (var reviewDoc in reviewQuery.docs) {
+            final reviewData = reviewDoc.data();
+            rating += reviewData['rating'];
+            count++;
+            resultMap.addAll(reviewData);
+          }
+        }
+      }
+      rates = rating / count;
+
+      resultMap.addAll({'rates': rates});
+    }
+    return resultMap;
+  }
+
   Future<Request?> getRequestsData(String userId) async {
     final querySnap = await _db
         .collection('request')

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
-import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
@@ -31,6 +30,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
+  Map<String, dynamic> getUserInfo = {};
+
   File? defaultAvatar;
   final _labelTextStyle = getTextStyle(
       textColor: AppColors.black,
@@ -86,14 +87,9 @@ class _ProfilePageState extends State<ProfilePage> {
     DatabaseService service = DatabaseService();
     try {
       Client clientInfo = await service.getUserData(widget.userId);
-
-      String fullName = clientInfo.firstName +
-          ' ' +
-          (clientInfo.middleName ?? "") +
-          ' ' +
-          clientInfo.lastName +
-          ' ' +
-          (clientInfo.suffix ?? "");
+      getUserInfo = await service.getUserInfo(widget.userId);
+      String fullName =
+          '${clientInfo.firstName} ${clientInfo.middleName ?? " "} ${clientInfo.lastName} ${clientInfo.suffix ?? ""}';
 
       String formattedDate =
           DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
@@ -563,7 +559,11 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void onViewReviewsAndRatings() {}
+  void onViewReviewsAndRatings() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => ViewHandymanProfile(handymanInfo: getUserInfo),
+    ));
+  }
 
   void onChangePassword() {}
 

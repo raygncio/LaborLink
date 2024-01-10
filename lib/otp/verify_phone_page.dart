@@ -151,7 +151,7 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
                         children: [
                           Flexible(
                             child: Text(
-                              'An OTP has been sent to your phone number',
+                              'Verify your phone number',
                               maxLines: 2,
                               textAlign: TextAlign.center,
                               style: getTextStyle(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanDirectRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
@@ -15,7 +14,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
-import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -83,13 +81,13 @@ class _ClientHomePageState extends State<ClientHomePage> {
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
     // DatabaseService service = DatabaseService();
-    print('>>>>>>>>>>>>>$searchText');
+
     if (searchText == null) return;
 
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndHandymanDataByFirstName(searchText);
-
+      // print('>>>>>>>>>>>>>$results');
       // searchResultSection();
       // print(searchText);
       //print(results);
@@ -309,7 +307,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                           scrollDirection: Axis.vertical,
                           child: Column(children: [
                             LaborMenu(
-                              padding: EdgeInsets.only(bottom: 28),
+                              padding: const EdgeInsets.only(bottom: 28),
                               onLaborSelected: onLaborSelectedCallback,
                             ),
                             Row(
@@ -405,15 +403,19 @@ class _ClientHomePageState extends State<ClientHomePage> {
   }
 
   void onLaborSelectedCallback(String selectedLaborName) {
+    String text = '';
     // Handle the selected labor category name as needed
-    print('Labor selected in main code: $selectedLaborName');
+    if (selectedLaborName == 'Installation') {
+      text = '${selectedLaborName}s';
+    } else {
+      text = selectedLaborName;
+    }
+    print('Labor selected in main code: $text');
 
-    updateDirectRequestTabContent(selectedLaborName);
+    updateDirectRequestTabContent(text.toLowerCase());
   }
 
   Future<Widget> getOngoingRequestContent() async {
-    // TODO: Add logic for ongoing Request
-    //DatabaseService service = DatabaseService();
     Request? requestInfo = await service.getRequestsData(widget.userId);
 
     if (requestInfo != null) {
@@ -423,7 +425,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
         // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
       );
     } else {
-      return NoOngoingRequestCard();
+      return const NoOngoingRequestCard();
     }
   }
 }

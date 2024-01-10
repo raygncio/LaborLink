@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
+import 'package:laborlink/Pages/Admin/AnomalyList.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/styles.dart';
 
 enum ReportType { faceVerification, anomalyDetection }
 
 class ReportGenerationPage extends StatefulWidget {
-  final reportType;
+  final dynamic reportType;
+
   const ReportGenerationPage({Key? key, required this.reportType})
       : super(key: key);
 
@@ -14,10 +19,39 @@ class ReportGenerationPage extends StatefulWidget {
 }
 
 class _ReportGenerationPageState extends State<ReportGenerationPage> {
+  FaceResults? faceResult;
+  AnomalyResults? anomalyResult;
+  DatabaseService service = DatabaseService();
+
+  List<AnomalyResults> anomalyResults = [];
+  List<FaceResults> faceResults = [];
+
+  _loadData() async {
+    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
+    anomalyResults = await service.getAllAnomalyResults();
+    faceResults = await service.getAllFaceResults();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // final deviceWidth = MediaQuery.of(context).size.width;
     // final deviceHeight = MediaQuery.of(context).size.height;
+
+    Widget mainContent = const Center(
+      child: Text('No data found!'),
+    );
+
+    if (widget.reportType == ReportType.anomalyDetection &&
+        anomalyResults.isNotEmpty) {
+      mainContent = AnomalyList(results: anomalyResults);
+    }
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -31,27 +65,13 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 15, top: 22),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: AppColors.secondaryBlue,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 14),
-                        child: Text(
-                          "${widget.reportType == ReportType.faceVerification ? "Face Verification" : "Anomaly Detection"} Report",
-                          style: getTextStyle(
-                              textColor: AppColors.white,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 20),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.description,
-                        color: AppColors.white,
-                        size: 25,
+                      Expanded(
+                        child: mainContent,
                       )
                     ],
                   ),
@@ -98,7 +118,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                 ),
               ),
               Text(
-                "Reports Generation",
+                "${widget.reportType == ReportType.faceVerification ? "Face Verification" : "Anomaly Detection"} Report",
                 style: getTextStyle(
                     textColor: AppColors.secondaryYellow,
                     fontFamily: AppFonts.montserrat,

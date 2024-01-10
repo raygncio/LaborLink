@@ -78,7 +78,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: SizedBox(
-                height: 29,
+                height: 50,
+                width: 300,
                 child: Row(
                   children: [
                     AppFilledButton(
@@ -99,7 +100,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Padding(
               padding: const EdgeInsets.only(top: 7),
               child: SizedBox(
-                height: 29,
+                height: 50,
+                width: 300,
                 child: Row(
                   children: [
                     AppFilledButton(

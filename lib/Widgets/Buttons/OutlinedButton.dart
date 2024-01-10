@@ -33,7 +33,7 @@ class AppOutlinedButton extends StatefulWidget {
 class _AppOutlinedButtonState extends State<AppOutlinedButton> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Expanded(
       child: Padding(

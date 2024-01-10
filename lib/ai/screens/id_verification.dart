@@ -145,7 +145,7 @@ class _IdVerificationState extends State<IdVerification> {
       await service.addAnomalyResult(anomalyResults);
     }
 
-    print('############################## RECODING RESULTS!');
+    print('############################## RECORDING RESULTS!!!');
   }
 
   @override

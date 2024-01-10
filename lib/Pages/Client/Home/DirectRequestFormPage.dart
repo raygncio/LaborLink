@@ -4,11 +4,8 @@ import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/Forms/RequestForm.dart';
-import 'package:laborlink/ai/screens/splash_success.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/handyman_approval.dart';
@@ -66,13 +63,13 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
   _getTotalFee(double fee) {
     setState(() {
       _totalFee = fee;
-      print('>>>>>>>>>>>$_totalFee');
+      // print('>>>>>>>>>>>$_totalFee');
     });
   }
 
   void onProceed() {
     if (directRequestFormKey.currentState!.validateForm()) {
-      print('>>>> IN direct request proceed');
+      // print('>>>> IN direct request proceed');
 
       // Retrieve form data
       Map<String, dynamic> formData =
