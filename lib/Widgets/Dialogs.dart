@@ -488,6 +488,7 @@ Future<String?> attachServiceProofDialog(
                               .pushReplacement(MaterialPageRoute(
                             builder: (context) => RatingsPage(
                               ratings: clientDetails,
+                              user: 'handyman',
                             ),
                           ));
                         },

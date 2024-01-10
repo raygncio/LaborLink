@@ -341,7 +341,7 @@ class DatabaseService {
     List<Map<String, dynamic>> resultList = [];
     List<String> categoriesToCheck = [
       'plumbing',
-      'installation',
+      'installations',
       'carpentry',
       'electrical',
       'painting',
@@ -369,6 +369,7 @@ class DatabaseService {
             .where('userId', isEqualTo: userId)
             .where('category', isEqualTo: searchText)
             .where('progress', isEqualTo: 'pending')
+            .where('handymanId', isNull: true)
             .get();
 
         // Process 'request' query results
@@ -1270,7 +1271,8 @@ class DatabaseService {
       Map<String, dynamic> groupData = {
         ...requestData,
         'requestId': requestId,
-        'clientId': userId
+        'clientId': userId,
+        'handymanId': handymanId
       };
 
       resultMap.addAll(groupData);
@@ -1360,6 +1362,7 @@ class DatabaseService {
             for (var handyDoc in handymanQuery.docs) {
               final handyData = handyDoc.data();
               resultMap.addAll(handyData);
+              print(">>>>>>>>>>>>>>>>>>>$userData");
               // Query 'review' using key from userData
               final reviewQuery = await _db
                   .collection('review')

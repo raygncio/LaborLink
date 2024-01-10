@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
@@ -10,7 +11,9 @@ import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 
 class RatingsPage extends StatefulWidget {
   final Map<String, dynamic> ratings;
-  const RatingsPage({Key? key, required this.ratings}) : super(key: key);
+  final String user;
+  const RatingsPage({Key? key, required this.ratings, required this.user})
+      : super(key: key);
 
   @override
   State<RatingsPage> createState() => _RatingsPageState();
@@ -338,12 +341,21 @@ class _RatingsPageState extends State<RatingsPage> {
           ),
         );
 
-        Future.delayed(Duration(seconds: 1), () {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) =>
-                ClientMainPage(userId: widget.ratings["clientId"]),
-          ));
-        });
+        if (widget.user == 'client') {
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) =>
+                  ClientMainPage(userId: widget.ratings["clientId"]),
+            ));
+          });
+        } else {
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) =>
+                  HandymanMainPage(userId: widget.ratings["handymanId"]),
+            ));
+          });
+        }
       } catch (e) {
         // Handle errors during user creation
         ScaffoldMessenger.of(context).showSnackBar(

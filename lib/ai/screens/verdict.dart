@@ -7,6 +7,7 @@ import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/handyman.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
 import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/services/analytics_service.dart';
 import 'package:lottie/lottie.dart';
@@ -15,6 +16,9 @@ import 'package:laborlink/providers/registration_data_provider.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final AnalyticsService _analytics = AnalyticsService();
@@ -44,14 +48,14 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   bool hasFaceResults = false;
 
-  Future<File> imageToFile({String imageName, String ext}) async {
-    var bytes = await rootBundle.load('assets/$imageName.$ext');
-    String tempPath = (await getTemporaryDirectory()).path;
-    File file = File('$tempPath/profile.png');
-    await file.writeAsBytes(
-        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
-    return file;
-  }
+  // Future<File> imageToFile({String imageName, String ext}) async {
+  //   var bytes = await rootBundle.load('assets/$imageName.$ext');
+  //   String tempPath = (await getTemporaryDirectory()).path;
+  //   File file = File('$tempPath/profile.png');
+  //   await file.writeAsBytes(
+  //       bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
+  //   return file;
+  // }
 
   _recordResults() async {
     DatabaseService service = DatabaseService();
@@ -63,11 +67,11 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     for (var i = 0; i < resultImages.length; i++) {
       // Upload files to Firebase Storage
-      String imageUrl = await service.uploadFace(i.toString(), resultImages[i]);
+      // String imageUrl = await service.uploadFace(i.toString(), resultImages[i]);
 
-      anomalyResults = AnomalyResults(
-          idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
-      await service.addAnomalyResult(anomalyResults);
+      // anomalyResults = AnomalyResults(
+      //     idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
+      // await service.addAnomalyResult(anomalyResults);
     }
   }
 

@@ -109,7 +109,8 @@ class _RequestCompleteSuccessPageState
       });
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => RatingsPage(ratings: widget.details),
+        builder: (context) =>
+            RatingsPage(ratings: widget.details, user: 'client'),
       ));
     }
   }

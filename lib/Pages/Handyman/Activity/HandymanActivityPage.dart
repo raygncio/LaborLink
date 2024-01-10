@@ -392,7 +392,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 54),
-            child: ClientInfoCard(clientInfo: dummyClients[0]),
+            child: ClientInfoCard(clientInfo: getActiveRequest),
           ),
         ],
       );

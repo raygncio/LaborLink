@@ -15,6 +15,7 @@ import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
@@ -35,13 +36,35 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   final _searchController = TextEditingController();
   DatabaseService service = DatabaseService();
   late GlobalKey<RequestFormState> requestFormKey;
+  late String specialization;
   List<Map<String, dynamic>> _searchResults = [];
   List<Map<String, dynamic>> offers = [];
   List<Map<String, dynamic>> interested = [];
+  Handyman? handyman;
 
   int _selectedTabIndex = 0;
 
   bool _showSearchResult = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    displayRequest();
+    super.initState();
+  }
+
+  void displayRequest() async {
+    try {
+      handyman = await service.getHandymanData(widget.userId);
+
+      if (handyman!.specialization.isNotEmpty) {
+        specialization = handyman!.specialization;
+        updateFindLaborTabContent(specialization);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,22 +104,37 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     });
   }
 
+  _loadData() async {
+    try {
+      List<Map<String, dynamic>> results = await service
+          .getUserAndRequestBaseOnSearch(_searchController.text.toLowerCase());
+
+      // Check if the widget is still mounted before updating the state
+      if (mounted) {
+        setState(() {
+          _showSearchResult = results.isNotEmpty;
+          _searchResults = results;
+        });
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+  }
+
   void updateFindLaborTabContent(String? searchText) async {
-    DatabaseService service = DatabaseService();
     if (searchText == null) return;
 
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndRequestBaseOnSearch(searchText.toLowerCase());
 
-      // searchResultSection();
-      // print(searchText);
-      print(results);
-
-      setState(() {
-        _showSearchResult = results.isNotEmpty;
-        _searchResults = results;
-      });
+      // Check if the widget is still mounted before updating the state
+      if (mounted) {
+        setState(() {
+          _showSearchResult = results.isNotEmpty;
+          _searchResults = results;
+        });
+      }
     } catch (error) {
       print('Error fetching user data: $error');
     }
