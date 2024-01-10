@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:laborlink/Pages/Admin/FaceList.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
 import 'package:laborlink/Pages/Admin/AnomalyList.dart';
+import 'package:laborlink/Pages/Admin/pdf_service.dart';
 import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/styles.dart';
 
@@ -22,6 +25,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
   FaceResults? faceResult;
   AnomalyResults? anomalyResult;
   DatabaseService service = DatabaseService();
+  PdfInvoiceService pdfService = PdfInvoiceService();
 
   List<AnomalyResults> anomalyResults = [];
   List<FaceResults> faceResults = [];
@@ -30,6 +34,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
     anomalyResults = await service.getAllAnomalyResults();
     faceResults = await service.getAllFaceResults();
+    print(faceResults);
     setState(() {});
   }
 
@@ -51,6 +56,11 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
     if (widget.reportType == ReportType.anomalyDetection &&
         anomalyResults.isNotEmpty) {
       mainContent = AnomalyList(results: anomalyResults);
+    }
+
+    if (widget.reportType == ReportType.faceVerification &&
+        faceResults.isNotEmpty) {
+      mainContent = FaceList(results: faceResults);
     }
 
     return Scaffold(
@@ -88,7 +98,33 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                     fontSize: 18,
                     fontFamily: AppFonts.poppins,
                     color: AppColors.accentOrange,
-                    command: () {},
+                    command: () async {
+                      if (widget.reportType == ReportType.anomalyDetection) {
+                        final data = await pdfService
+                            .createAnomalyReport(anomalyResults);
+                        String download = await pdfService.savePdfFile(
+                            'anomaly_detection_${DateTime.now()}', data);
+                        if (download == 'Success') {
+                          Fluttertoast.showToast(
+                              msg: "Saved to downloads",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              textColor: Colors.white,
+                              fontSize: 12.0);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                download,
+                                style: const TextStyle(color: AppColors.white),
+                              ),
+                              backgroundColor: AppColors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
                     borderRadius: 5),
               ],
             )

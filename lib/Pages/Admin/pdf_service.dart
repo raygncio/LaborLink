@@ -12,7 +12,7 @@ import 'package:laborlink/models/results/face_results.dart';
 class AnomalyCustomRow {
   final String resultId;
   final String idType;
-  final dynamic attachment;
+  final Uint8List attachment;
   final String result;
   final String createdAt;
 
@@ -39,13 +39,12 @@ class PdfInvoiceService {
 
     // INITIALIZE ELEMENTS
     final List<AnomalyCustomRow> elements = [
-      AnomalyCustomRow(
-          "Result Id", "Id Type", "Attachment", "Result", "Created At"),
       for (var result in anomalyResults)
         AnomalyCustomRow(
           result.anomalyResultId!,
           result.idType,
           await convertedImage(result.attachment),
+          //result.attachment,
           result.result,
           result.createdAt.toString(),
         ),
@@ -68,8 +67,8 @@ class PdfInvoiceService {
           return pw.Column(
             children: [
               // HEADER
-              pw.Image(pw.MemoryImage(logo),
-                  width: 200, height: 200, fit: pw.BoxFit.cover),
+              pw.Image(pw.MemoryImage(logo)),
+              // pw.Image(pw.MemoryImage(imageResults[0])),
               pw.SizedBox(height: 20),
               pw.Text("LaborLink Anomaly Detection Report",
                   textAlign: pw.TextAlign.center),
@@ -102,29 +101,47 @@ class PdfInvoiceService {
     return pw.Expanded(
       child: pw.Column(
         children: [
+          // COLUMN TITLES
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child: pw.Text('Result Id', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text('Id Type', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text('Attachment', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text('Result', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text('Created At', textAlign: pw.TextAlign.center)),
+            ],
+          ),
+          pw.SizedBox(height: 20),
+
+          // CONTENTS
           for (var element in elements)
             pw.Row(
               children: [
                 pw.Expanded(
                     child: pw.Text(element.resultId,
-                        textAlign: pw.TextAlign.left)),
+                        textAlign: pw.TextAlign.center)),
                 pw.Expanded(
-                    child:
-                        pw.Text(element.idType, textAlign: pw.TextAlign.right)),
+                    child: pw.Text(element.idType,
+                        textAlign: pw.TextAlign.center)),
                 pw.Expanded(
                   child: pw.Image(
                     pw.MemoryImage(element.attachment),
-                    width: 50,
-                    height: 50,
-                    fit: pw.BoxFit.cover,
                   ),
                 ),
                 pw.Expanded(
-                    child:
-                        pw.Text(element.result, textAlign: pw.TextAlign.right)),
+                    child: pw.Text(
+                        element.result == 'noanomaly'
+                            ? 'No Anomaly'
+                            : 'Has Anomaly',
+                        textAlign: pw.TextAlign.center)),
                 pw.Expanded(
                     child: pw.Text(element.createdAt,
-                        textAlign: pw.TextAlign.right)),
+                        textAlign: pw.TextAlign.center)),
               ],
             )
         ],
@@ -132,12 +149,27 @@ class PdfInvoiceService {
     );
   }
 
-  Future<void> savePdfFile(String fileName, Uint8List byteList) async {
-    final output = await getTemporaryDirectory();
-    var filePath = "${output.path}/$fileName.pdf";
-    final file = File(filePath);
-    await file.writeAsBytes(byteList);
-    await OpenDocument.openDocument(filePath: filePath);
+  Future<String> savePdfFile(String fileName, Uint8List byteList) async {
+    bool dirDownloadExists = true;
+    var directory = "/storage/emulated/0/Download/";
+
+    dirDownloadExists = await Directory(directory).exists();
+    if (dirDownloadExists) {
+      directory = "/storage/emulated/0/Download/";
+    } else {
+      directory = "/storage/emulated/0/Downloads/";
+    }
+
+    try {
+      var filePath = "$directory$fileName.pdf".replaceAll(':', '-');
+      final file = File(filePath);
+      await file.writeAsBytes(byteList);
+      // await OpenDocument.openDocument(filePath: filePath);
+
+      return 'Success';
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   // String getSubTotal(List<Product> products) {

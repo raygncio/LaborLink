@@ -16,7 +16,7 @@ class AnomalyItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              result.anomalyResultId!,
+              'Result ID:     ${result.anomalyResultId!}',
               style: getTextStyle(
                   textColor: AppColors.secondaryBlue,
                   fontFamily: AppFonts.poppins,
@@ -38,7 +38,7 @@ class AnomalyItem extends StatelessWidget {
                 ),
                 const Spacer(), // space
                 Container(
-                  width: 40,
+                  width: 100,
                   child: Image.network(result.attachment),
                 ),
                 const Spacer(), // space
