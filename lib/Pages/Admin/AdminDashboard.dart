@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Admin/ApprovedIssuesPage.dart';
-import 'package:laborlink/Pages/Admin/IssuesForApprovalPage.dart';
-import 'package:laborlink/Pages/Admin/ManageClientsAccounts.dart';
-import 'package:laborlink/Pages/Admin/ManageHandymanAccounts.dart';
 import 'package:laborlink/Pages/Admin/ReportGenerationPage.dart';
-import 'package:laborlink/Pages/Admin/ReviewedIssuePage.dart';
-import 'package:laborlink/Pages/Admin/RequestsForApprovalPage.dart';
-import 'package:laborlink/Pages/Admin/ReviewedRequestsPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/styles.dart';
@@ -41,9 +34,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: [
-                    manageAccountsSection(deviceWidth),
-                    manageRequestsSection(deviceWidth),
-                    manageReportedIssuesSection(deviceWidth),
                     generateReportsSection(deviceWidth),
                     const Padding(
                       padding: EdgeInsets.only(top: 15),
@@ -73,332 +63,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ),
       );
 
-  Widget manageAccountsSection(deviceWidth) => Container(
-        padding: const EdgeInsets.only(left: 9, right: 13, top: 5, bottom: 10),
-        width: deviceWidth,
-        decoration: BoxDecoration(
-          color: AppColors.secondaryBlue,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Manage Accounts",
-              style: getTextStyle(
-                  textColor: AppColors.white,
-                  fontFamily: AppFonts.montserrat,
-                  fontWeight: AppFontWeights.bold,
-                  fontSize: 15),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ManageClientsAccounts(),
-                )),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  height: 29,
-                  decoration: BoxDecoration(
-                      color: AppColors.blueBadge,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Clients",
-                        style: getTextStyle(
-                            textColor: AppColors.secondaryBlue,
-                            fontFamily: AppFonts.montserrat,
-                            fontWeight: AppFontWeights.bold,
-                            fontSize: 15),
-                      ),
-                      Text(
-                        "100",
-                        style: getTextStyle(
-                            textColor: AppColors.secondaryBlue,
-                            fontFamily: AppFonts.montserrat,
-                            fontWeight: AppFontWeights.bold,
-                            fontSize: 15),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ManageHandymanAccounts(),
-                )),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  height: 29,
-                  decoration: BoxDecoration(
-                      color: AppColors.blueBadge,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Handymen",
-                        style: getTextStyle(
-                            textColor: AppColors.secondaryBlue,
-                            fontFamily: AppFonts.montserrat,
-                            fontWeight: AppFontWeights.bold,
-                            fontSize: 15),
-                      ),
-                      Text(
-                        "100",
-                        style: getTextStyle(
-                            textColor: AppColors.secondaryBlue,
-                            fontFamily: AppFonts.montserrat,
-                            fontWeight: AppFontWeights.bold,
-                            fontSize: 15),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-      );
-
-  Widget manageRequestsSection(deviceWidth) => Padding(
-        padding: const EdgeInsets.only(top: 18),
-        child: Container(
-          padding:
-              const EdgeInsets.only(left: 9, right: 13, top: 7, bottom: 10),
-          width: deviceWidth,
-          decoration: BoxDecoration(
-            color: AppColors.secondaryBlue,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Manage Requests",
-                style: getTextStyle(
-                    textColor: AppColors.white,
-                    fontFamily: AppFonts.montserrat,
-                    fontWeight: AppFontWeights.bold,
-                    fontSize: 15),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 7),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const RequestsForApprovalPage(),
-                  )),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 11),
-                    height: 29,
-                    decoration: BoxDecoration(
-                        color: AppColors.blueBadge,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Requests for Approval",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          "5",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 7),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ReviewedRequestsPage(),
-                  )),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 11),
-                    height: 29,
-                    decoration: BoxDecoration(
-                        color: AppColors.blueBadge,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Reviewed Requests",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          "78",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      );
-
-  Widget manageReportedIssuesSection(deviceWidth) => Padding(
-        padding: const EdgeInsets.only(top: 18),
-        child: Container(
-          padding:
-              const EdgeInsets.only(left: 9, right: 13, top: 7, bottom: 10),
-          width: deviceWidth,
-          decoration: BoxDecoration(
-            color: AppColors.secondaryBlue,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Manage Reported Issues",
-                style: getTextStyle(
-                    textColor: AppColors.white,
-                    fontFamily: AppFonts.montserrat,
-                    fontWeight: AppFontWeights.bold,
-                    fontSize: 15),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 7),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const IssuesForApprovalPage(),
-                  )),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 11),
-                    height: 29,
-                    decoration: BoxDecoration(
-                        color: AppColors.blueBadge,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Issues for Approval",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          "2",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 7),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ApprovedIssuesPage(),
-                  )),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 11),
-                    height: 29,
-                    decoration: BoxDecoration(
-                        color: AppColors.blueBadge,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Approved Issues",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          "7",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 7),
-                child: GestureDetector(
-                  onTap:  () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ReviewedIssuePage(),
-                  )),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 11),
-                    height: 29,
-                    decoration: BoxDecoration(
-                        color: AppColors.blueBadge,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Reviewed Issues",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        ),
-                        Text(
-                          "7",
-                          style: getTextStyle(
-                              textColor: AppColors.secondaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 15),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      );
-
   Widget generateReportsSection(deviceWidth) => Padding(
         padding: const EdgeInsets.only(top: 31),
         child: Column(
@@ -418,14 +82,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Row(
                   children: [
                     AppFilledButton(
-                        text: "Fake Detection Report",
+                        text: "Face Verification Report",
                         fontSize: 15,
                         fontFamily: AppFonts.montserrat,
                         color: AppColors.secondaryBlue,
                         command: () =>
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const ReportGenerationPage(
-                                  reportType: ReportType.fakeDetection),
+                                  reportType: ReportType.faceVerification),
                             )),
                         borderRadius: 8),
                   ],
@@ -439,14 +103,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Row(
                   children: [
                     AppFilledButton(
-                        text: "Income Report",
+                        text: "Anomaly Detection Report",
                         fontSize: 15,
                         fontFamily: AppFonts.montserrat,
                         color: AppColors.secondaryBlue,
                         command: () =>
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const ReportGenerationPage(
-                                  reportType: ReportType.income),
+                                  reportType: ReportType.anomalyDetection),
                             )),
                         borderRadius: 8),
                   ],

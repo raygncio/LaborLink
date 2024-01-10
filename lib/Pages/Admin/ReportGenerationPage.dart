@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/styles.dart';
 
-enum ReportType { fakeDetection, income }
+enum ReportType { faceVerification, anomalyDetection }
 
 class ReportGenerationPage extends StatefulWidget {
   final reportType;
@@ -16,8 +16,8 @@ class ReportGenerationPage extends StatefulWidget {
 class _ReportGenerationPageState extends State<ReportGenerationPage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
+    // final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -40,7 +40,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                       Padding(
                         padding: const EdgeInsets.only(right: 14),
                         child: Text(
-                          "${widget.reportType == ReportType.fakeDetection ? "Fake Detection" : "Income"} Report",
+                          "${widget.reportType == ReportType.faceVerification ? "Face Verification" : "Anomaly Detection"} Report",
                           style: getTextStyle(
                               textColor: AppColors.white,
                               fontFamily: AppFonts.montserrat,
