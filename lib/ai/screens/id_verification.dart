@@ -55,6 +55,9 @@ class _IdVerificationState extends State<IdVerification> {
 
       if (_currentFileIndex.value >= files.length) {
         _interpretOutputs();
+        // upload results to Firebase
+        _recordResults();
+
         setState(() {
           _isExiting = true;
         });
@@ -129,7 +132,7 @@ class _IdVerificationState extends State<IdVerification> {
     });
   }
 
-  void _recordResults() async {
+  _recordResults() async {
     DatabaseService service = DatabaseService();
     AnomalyResults anomalyResults;
 
@@ -141,6 +144,8 @@ class _IdVerificationState extends State<IdVerification> {
           idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
       await service.addAnomalyResult(anomalyResults);
     }
+
+    print('############################## RECODING RESULTS!');
   }
 
   @override
@@ -163,8 +168,6 @@ class _IdVerificationState extends State<IdVerification> {
   Widget build(BuildContext context) {
     // if finish verifying IDs
     if (_isExiting) {
-      // upload results to Firebase
-      _recordResults();
       // if there's at least 1 anomaly
       if (_hasAProblem) {
         Timer(const Duration(seconds: 2), () {

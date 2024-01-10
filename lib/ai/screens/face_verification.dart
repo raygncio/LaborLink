@@ -12,7 +12,10 @@ import 'package:laborlink/ai/helpers/ml_service.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:lottie/lottie.dart';
+import 'package:path_provider/path_provider.dart';
 
 List<CameraDescription>? cameras;
 
@@ -29,6 +32,7 @@ class FaceVerificationPage extends StatefulWidget {
 
 class _FaceVerificationPageState extends State<FaceVerificationPage> {
   List<Image> showImage = []; //for debugging
+  List<List<int>> faceResultImages = []; //for admin reports
   var debugIndex = 0;
 
   List<Uint8List> regulaImages = []; // for regula face match
@@ -141,6 +145,9 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
       List<int> intImage = await _mlService
           .getIntImage(toMap(type: 'id', image: file, face: facesDetected[0]));
       showImage.add(Image.memory(Uint8List.fromList(intImage)));
+
+      // for admin reports
+      faceResultImages.add(intImage);
       // ************************************************************************
 
       // for regula facematch
@@ -192,6 +199,9 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
       });
     }
 
+    // record results for Admin Reporting
+    await recordResults();
+
     setState(() {
       isDoneMatching = true;
     });
@@ -216,6 +226,9 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
           toMap(type: 'camera', image: image, face: facesDetected[0]));
 
       showImage.add(Image.memory(Uint8List.fromList(intImage)));
+
+      // for admin reports
+      faceResultImages.add(intImage);
       // ****************************************************************
 
       // for regula facematch
@@ -293,6 +306,53 @@ class _FaceVerificationPageState extends State<FaceVerificationPage> {
 
     print('%%%%%%%%%%%% in regula face match function -> $isGoodOnRegula');
     return isGoodOnRegula;
+  }
+
+  recordResults() async {
+    DatabaseService service = DatabaseService();
+    FaceResults? faceResults;
+    File convertedImage;
+    List<String> attachmentUrls = [];
+
+    // exit if empty
+    if (faceResultImages.isEmpty || regulaResults.isEmpty) return;
+
+    print('############################### RECORDING RESULTS!');
+
+    for (var i = 0; i < faceResultImages.length; i++) {
+      // Create a File object with the desired file path
+      String tempPath = (await getTemporaryDirectory()).path;
+      convertedImage = await File(tempPath).writeAsBytes(faceResultImages[i]);
+
+      // Upload files to Firebase Storage
+      String imageUrl = await service.uploadFace(i.toString(), convertedImage);
+
+      // Collect image URLs
+      attachmentUrls.add(imageUrl);
+    }
+
+    if (attachmentUrls.length == 2) {
+      faceResults = FaceResults(
+        attachment: attachmentUrls[0],
+        attachment2: attachmentUrls[1],
+        result: regulaResults[0].toStringAsFixed(2),
+      );
+    }
+
+    if (attachmentUrls.length > 2) {
+      faceResults = FaceResults(
+        attachment: attachmentUrls[0],
+        attachment2: attachmentUrls[1],
+        attachment3: attachmentUrls[2],
+        result: regulaResults[0].toStringAsFixed(2),
+        result2: regulaResults[1].toStringAsFixed(2),
+      );
+    }
+
+    // upload to results data to Firestore
+    if (faceResults != null) {
+      await service.addFaceResult(faceResults);
+    }
   }
 
   @override

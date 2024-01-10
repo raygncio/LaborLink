@@ -535,8 +535,8 @@ class DatabaseService {
 
       final userQuery = await _db
           .collection('user')
-          .where('userId', isEqualTo: handymanId)
-          .where('userRole', isEqualTo: 'handyman')
+          .where('userId', isEqualTo: clientId)
+          .where('userRole', isEqualTo: 'client')
           .get();
 
       // Process 'user' query results
@@ -598,7 +598,7 @@ class DatabaseService {
       final offerData = offerDoc.data();
       final price = offerData["bidPrice"];
       final requestId = offerData["requestId"];
-      print('*************************USER ID $requestId');
+
       final requestDoc = await _db.collection('request').doc(requestId).get();
 
       // Process 'request' query results
@@ -643,8 +643,10 @@ class DatabaseService {
   }
 
   // Get all the client history with handyman and reviews
-  Future<Map<String, dynamic>> getClientHistory(String requestId) async {
+  Future<Map<String, dynamic>> getClientHistory(
+      String requestId, String userRole) async {
     Map<String, dynamic> resultMap = {};
+    String checkId;
     final requestDoc = await _db.collection('request').doc(requestId).get();
 
     // Process 'request' query results
@@ -657,6 +659,13 @@ class DatabaseService {
         'clientId': clientId,
         ...requestData,
       };
+
+      if (userRole == 'client') {
+        checkId = clientId;
+      } else {
+        checkId = handymanId;
+      }
+
       // resultList.add(combinedData);
       final handymanQuery = await _db
           .collection('handyman')
@@ -668,16 +677,14 @@ class DatabaseService {
         combinedData.addAll(handyData);
         final userQuery = await _db
             .collection('user')
-            .where('userId', isEqualTo: handymanId)
-            .where('userRole', isEqualTo: 'handyman')
+            .where('userId', isEqualTo: checkId)
             .get();
 
         // Process 'user' query results
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
           combinedData.addAll(userData);
-          // print(">>>>>>>>>>>>>>>>>>>>$combinedData");
-
+          print(">>>>>>>>>>>>>>>>>>>>$userData");
           // Query 'review' using key from userData
           final reviewsQuery = await _db
               .collection('review')
@@ -1332,9 +1339,17 @@ class DatabaseService {
       for (var offerDoc in offerQuery.docs) {
         final offerData = offerDoc.data();
         final offerStatus = offerData['status'];
-        resultMap.addAll({'approvalStatus': offerStatus, 'hasOffer': true});
+        final offerDesc = offerData['description'];
+        final offerPic = offerData['attachment'];
+        resultMap.addAll({
+          'approvalStatus': offerStatus,
+          'hasOffer': true,
+          'offerDesc': offerDesc,
+          'offerPic': offerPic
+        });
         final requestId = offerData["requestId"];
         resultMap.addAll(offerData);
+        // print(">>>>>>>>>>>>>>>>>>>$offerDesc");
 
         // Query 'request' using key from userData
         final requestQuery =
@@ -1343,10 +1358,11 @@ class DatabaseService {
         // Process 'request' query results
         final requestData = requestQuery.data();
         if (requestData != null) {
+          final clientId = requestData['userId'];
           resultMap.addAll(requestData);
           final userQuery = await _db
               .collection('user')
-              .where('userId', isEqualTo: userId)
+              .where('userId', isEqualTo: clientId)
               .get();
 
           for (var userDoc in userQuery.docs) {
@@ -1362,7 +1378,7 @@ class DatabaseService {
             for (var handyDoc in handymanQuery.docs) {
               final handyData = handyDoc.data();
               resultMap.addAll(handyData);
-              print(">>>>>>>>>>>>>>>>>>>$userData");
+
               // Query 'review' using key from userData
               final reviewQuery = await _db
                   .collection('review')
@@ -1473,7 +1489,7 @@ class DatabaseService {
         'requestId': requestId,
         'clientId': clientId
       };
-      resultList.add(groupData);
+      // resultList.add(groupData);
       //print("*************************CHECK THE USER DATA123 $requestData");
 
       // Query 'offer' collection

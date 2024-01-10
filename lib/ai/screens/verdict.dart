@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/LoginPage.dart';
@@ -17,6 +18,7 @@ import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
@@ -47,33 +49,6 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
   bool isRegistered = false;
 
   bool hasFaceResults = false;
-
-  // Future<File> imageToFile({String imageName, String ext}) async {
-  //   var bytes = await rootBundle.load('assets/$imageName.$ext');
-  //   String tempPath = (await getTemporaryDirectory()).path;
-  //   File file = File('$tempPath/profile.png');
-  //   await file.writeAsBytes(
-  //       bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
-  //   return file;
-  // }
-
-  _recordResults() async {
-    DatabaseService service = DatabaseService();
-    FaceResults faceResults;
-    List<Image>? resultImages = widget.images;
-    List<double>? regulaResults = widget.regulaOutputs;
-
-    if (resultImages == null || regulaResults == null) return;
-
-    for (var i = 0; i < resultImages.length; i++) {
-      // Upload files to Firebase Storage
-      // String imageUrl = await service.uploadFace(i.toString(), resultImages[i]);
-
-      // anomalyResults = AnomalyResults(
-      //     idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
-      // await service.addAnomalyResult(anomalyResults);
-    }
-  }
 
   checkFaceResults() {
     if (widget.images != null && widget.regulaOutputs != null) {
@@ -353,7 +328,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
                 height: 40,
               ),
               for (var result in regulaResults)
-                Text('Match Percentage: $result'),
+                Text('Match Percentage: ${result.toStringAsFixed(2)}'),
             ],
           ),
         ),
