@@ -1538,7 +1538,7 @@ class DatabaseService {
 
       Map<String, dynamic> groupData = {
         ...requestData,
-        'requestId': requestId,
+        'NewRequestId': requestId,
         'clientId': clientId
       };
       // resultList.add(groupData);

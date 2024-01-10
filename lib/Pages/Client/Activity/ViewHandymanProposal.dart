@@ -381,7 +381,7 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
       try {
         await service.updateOffer(widget.handymanInfo['handymanId']);
         await service.updateRequestProgressWithOffer(
-            widget.handymanInfo['requestId'],
+            widget.handymanInfo['NewRequestId'],
             widget.handymanInfo['handymanId'],
             widget.handymanInfo['bidPrice']);
 

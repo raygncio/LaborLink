@@ -1,15 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/RequestCompleteSuccessPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/MessageButton.dart';
-import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Buttons/ReportIssueButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/styles.dart';
@@ -101,6 +98,9 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       } else if (requestInfo!.progress == 'inprogress') {
         currentProgress = 3;
         status = 'In Progress';
+      } else if (requestInfo!.progress == 'hired') {
+        currentProgress = 0;
+        status = 'Hired';
       }
 
       setState(() {
@@ -180,9 +180,9 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                             Column(
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.only(top: 27),
+                                  padding: const EdgeInsets.only(top: 27),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.place,
+                                    icon: const Icon(Icons.place,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["address"] ?? '',
@@ -191,9 +191,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 12),
+                                  padding: const EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.calendar_month_rounded,
+                                    icon: const Icon(
+                                        Icons.calendar_month_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["date"] ?? '',
@@ -202,9 +203,9 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 12),
+                                  padding: const EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.watch_later,
+                                    icon: const Icon(Icons.watch_later,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["time"] ?? '',
@@ -214,9 +215,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                 ),
                                 InkWell(
                                   child: Padding(
-                                    padding: EdgeInsets.only(top: 12),
+                                    padding: const EdgeInsets.only(top: 12),
                                     child: TextWithIcon(
-                                      icon: Icon(Icons.local_offer_rounded,
+                                      icon: const Icon(
+                                          Icons.local_offer_rounded,
                                           size: 17,
                                           color: AppColors.accentOrange),
                                       text: widget
@@ -229,7 +231,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                 ),
                                 // Update the padding for the description text
                                 Padding(
-                                  padding: EdgeInsets.only(
+                                  padding: const EdgeInsets.only(
                                       top: 15,
                                       left: 10,
                                       right:
