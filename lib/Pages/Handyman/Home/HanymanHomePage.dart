@@ -390,13 +390,16 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   Future<Widget> getOngoingServiceContent() async {
     DatabaseService service = DatabaseService();
-    Request? requestInfo = await service.getHandymanService(widget.userId);
-    print(">>>>>>>>>>>>$requestInfo");
-    print('$requestInfo.title');
-    if (requestInfo != null) {
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    print(">>>>>>>>>>>>${getActiveRequest['address']}");
+
+    if (getActiveRequest["approvalStatus"] != "completed" ||
+        getActiveRequest["approvalStatus"] != "cancelled") {
       return OngoingRequestCard(
-        title: requestInfo.title,
-        address: requestInfo.address,
+        title: getActiveRequest['title'],
+        address: getActiveRequest['address'],
         // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
       );
     } else {

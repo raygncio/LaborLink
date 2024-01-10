@@ -4,7 +4,7 @@ import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
+
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 
@@ -98,10 +98,11 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                     ),
                   ),
                   AppBadge(
-                    label: "Offered ₱ " +
-                        widget.handymanInfo["bidPrice"].toString(),
+                    label:
+                        "Offered ₱${widget.handymanInfo['bidPrice'].toString()}",
                     type: BadgeType.offer,
-                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                   )
                 ],
               ),
@@ -284,16 +285,16 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextWithIcon(
-                        icon: Icon(Icons.place,
+                        icon: const Icon(Icons.place,
                             size: 17, color: AppColors.accentOrange),
                         text: widget.handymanInfo["address"],
                         fontSize: 12,
                         contentPadding: 19,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(top: 12),
                         child: TextWithIcon(
-                          icon: Icon(Icons.calendar_month_rounded,
+                          icon: const Icon(Icons.calendar_month_rounded,
                               size: 17, color: AppColors.accentOrange),
                           text: widget.handymanInfo["date"],
                           fontSize: 12,
@@ -301,9 +302,9 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(top: 12),
                         child: TextWithIcon(
-                          icon: Icon(Icons.watch_later,
+                          icon: const Icon(Icons.watch_later,
                               size: 17, color: AppColors.accentOrange),
                           text: widget.handymanInfo["time"],
                           fontSize: 12,
@@ -311,12 +312,12 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(top: 12),
                         child: TextWithIcon(
-                          icon: Icon(Icons.local_offer_rounded,
+                          icon: const Icon(Icons.local_offer_rounded,
                               size: 17, color: AppColors.accentOrange),
                           text:
-                              widget.handymanInfo["bidPrice"].toString() + "*",
+                              "${widget.handymanInfo['bidPrice'].toString()}*",
                           fontSize: 12,
                           contentPadding: 19,
                         ),
@@ -354,22 +355,22 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Hire Handyman'),
-          content: Text('Are you sure you want to hire this handyman?'),
+          title: const Text('Hire Handyman'),
+          content: const Text('Are you sure you want to hire this handyman?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context)
                     .pop(false); // Return false when cancel is pressed
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); // Return true when confirm is pressed
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
           ],
         );
@@ -384,15 +385,15 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
             widget.handymanInfo['handymanId'],
             widget.handymanInfo['bidPrice']);
 
-        print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Handyman hired successfully'),
             duration: Duration(seconds: 2),
             backgroundColor: AppColors.tertiaryBlue,
           ),
         );
+
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) =>
               ClientMainPage(userId: widget.handymanInfo['clientId']),

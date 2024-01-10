@@ -7,7 +7,10 @@ import 'package:laborlink/models/database_service.dart';
 
 class ClientViewHistory extends StatefulWidget {
   final String userId;
-  const ClientViewHistory({Key? key, required this.userId}) : super(key: key);
+  final String userRole;
+  const ClientViewHistory(
+      {Key? key, required this.userId, required this.userRole})
+      : super(key: key);
 
   @override
   State<ClientViewHistory> createState() => _ClientViewHistoryState();
@@ -42,8 +45,9 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
     DatabaseService service = DatabaseService();
 
     try {
-      completedRequest = await service.getClientHistory(widget.userId);
-      print(completedRequest);
+      completedRequest =
+          await service.getClientHistory(widget.userId, widget.userRole);
+      // print(completedRequest);
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }
@@ -54,7 +58,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
-    print(widget.userId);
+    // print(widget.userId);
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
       body: SafeArea(

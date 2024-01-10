@@ -257,7 +257,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                     ],
                   ),
                   Text(
-                    getActiveRequest['requestId'],
+                    "Request ID:${getActiveRequest['requestId']}",
                     style: getTextStyle(
                         textColor: AppColors.tertiaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -285,16 +285,16 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextWithIcon(
-                              icon: Icon(Icons.place,
+                              icon: const Icon(Icons.place,
                                   size: 17, color: AppColors.accentOrange),
                               text: getActiveRequest['address'],
                               fontSize: 12,
                               contentPadding: 19,
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.calendar_month_rounded,
+                                icon: const Icon(Icons.calendar_month_rounded,
                                     size: 17, color: AppColors.accentOrange),
                                 text: getActiveRequest['date'],
                                 fontSize: 12,
@@ -302,9 +302,9 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.watch_later,
+                                icon: const Icon(Icons.watch_later,
                                     size: 17, color: AppColors.accentOrange),
                                 text: getActiveRequest['time'],
                                 fontSize: 12,
@@ -312,9 +312,9 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.local_offer_rounded,
+                                icon: const Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
                                 text: getActiveRequest['suggestedPrice']
                                     .toString(),
@@ -345,12 +345,12 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 7.76),
+                                padding: const EdgeInsets.only(top: 7.76),
                                 child: AppBadge(
                                   label: "Offered ₱" +
                                       getActiveRequest['bidPrice'].toString(),
                                   type: BadgeType.offer,
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                       horizontal: 7, vertical: 1),
                                 ),
                               ),
@@ -502,6 +502,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
                                       userId: currentRequest['requestId'],
+                                      userRole: currentRequest['userRole'],
                                     ),
                                   )),
                                   child: Container(

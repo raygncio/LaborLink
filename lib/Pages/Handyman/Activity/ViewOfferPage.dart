@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Badge.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/ReviewCard.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 
 class ViewClientProposal extends StatefulWidget {
@@ -17,9 +14,19 @@ class ViewClientProposal extends StatefulWidget {
 }
 
 class _ViewClientProposalState extends State<ViewClientProposal> {
+  late double bidPrice;
+  late double suggestedPrice;
+  late double addCharge;
+  late double serviceFee;
+  late double convenienceFee;
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+    bidPrice = (widget.handymanInfo["bidPrice"] as num).toDouble();
+    suggestedPrice = (widget.handymanInfo["suggestedPrice"] as num).toDouble();
+    addCharge = bidPrice - suggestedPrice;
+    serviceFee = suggestedPrice / 1.10;
+    convenienceFee = suggestedPrice - serviceFee;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -83,17 +90,18 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                           fontSize: 15),
                     ),
                   ),
-                  const AppBadge(
-                    label: "Offered ₱650",
+                  AppBadge(
+                    label: widget.handymanInfo["bidPrice"].toString(),
                     type: BadgeType.offer,
-                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                   )
                 ],
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  loremIpsumLong,
+                  widget.handymanInfo["offerDesc"] ?? '',
                   overflow: TextOverflow.visible,
                   style: getTextStyle(
                       textColor: AppColors.black,
@@ -104,23 +112,30 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 11,
-                    mainAxisSpacing: 11,
+                child: Center(
+                  child: Image.network(
+                    widget.handymanInfo["offerPic"],
+                    width: 300,
+                    height: 300,
                   ),
-                  itemCount: proposalImg.length,
-                  itemBuilder: (context, index) {
-                    return Image.asset(
-                      proposalImg[index],
-                      width: 140,
-                      height: 140,
-                    );
-                  },
                 ),
+                // child: GridView.builder(
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   shrinkWrap: true,
+                //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 2,
+                //     crossAxisSpacing: 11,
+                //     mainAxisSpacing: 11,
+                //   ),
+                //   itemCount: proposalImg.length,
+                //   itemBuilder: (context, index) {
+                //     return Image.asset(
+                //       proposalImg[index],
+                //       width: 140,
+                //       height: 140,
+                //     );
+                //   },
+                // ),
               ),
             ],
           ),
@@ -158,7 +173,7 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                       ),
                       const Spacer(),
                       Text(
-                        "₱650.00",
+                        widget.handymanInfo["bidPrice"].toString(),
                         style: getTextStyle(
                             textColor: AppColors.secondaryBlue,
                             fontFamily: AppFonts.montserrat,
@@ -181,7 +196,7 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱500.00",
+                          serviceFee.toDouble().toStringAsFixed(2),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -205,7 +220,7 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱50.00",
+                          convenienceFee.toDouble().toStringAsFixed(2),
                           style: getTextStyle(
                               textColor: AppColors.black,
                               fontFamily: AppFonts.montserrat,
@@ -229,7 +244,7 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                         ),
                         const Spacer(),
                         Text(
-                          "₱100.00",
+                          addCharge.toString(),
                           style: getTextStyle(
                               textColor: AppColors.pink,
                               fontFamily: AppFonts.montserrat,
@@ -250,45 +265,45 @@ class _ViewClientProposalState extends State<ViewClientProposal> {
                 thickness: 0.7,
               ),
             ),
-            const Padding(
-              padding:
-                  EdgeInsets.only(left: 15, right: 14, top: 14, bottom: 14),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 15, right: 14, top: 14, bottom: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextWithIcon(
-                    icon: Icon(Icons.place,
+                    icon: const Icon(Icons.place,
                         size: 17, color: AppColors.accentOrange),
-                    text: "556 Juan Luna Ave.",
+                    text: widget.handymanInfo["address"],
                     fontSize: 12,
                     contentPadding: 19,
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.only(top: 12),
                     child: TextWithIcon(
-                      icon: Icon(Icons.calendar_month_rounded,
+                      icon: const Icon(Icons.calendar_month_rounded,
                           size: 17, color: AppColors.accentOrange),
-                      text: "07 Aug 2023",
+                      text: widget.handymanInfo["date"],
                       fontSize: 12,
                       contentPadding: 19,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.only(top: 12),
                     child: TextWithIcon(
-                      icon: Icon(Icons.watch_later,
+                      icon: const Icon(Icons.watch_later,
                           size: 17, color: AppColors.accentOrange),
-                      text: "12:00 - 1:00 PM",
+                      text: widget.handymanInfo["time"],
                       fontSize: 12,
                       contentPadding: 19,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.only(top: 12),
                     child: TextWithIcon(
-                      icon: Icon(Icons.local_offer_rounded,
+                      icon: const Icon(Icons.local_offer_rounded,
                           size: 17, color: AppColors.accentOrange),
-                      text: "₱650*",
+                      text: "${widget.handymanInfo['bidPrice'].toString()}*",
                       fontSize: 12,
                       contentPadding: 19,
                     ),

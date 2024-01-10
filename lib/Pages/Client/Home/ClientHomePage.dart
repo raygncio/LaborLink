@@ -83,6 +83,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
     // DatabaseService service = DatabaseService();
+    print('>>>>>>>>>>>>>$searchText');
     if (searchText == null) return;
 
     try {
@@ -102,10 +103,10 @@ class _ClientHomePageState extends State<ClientHomePage> {
     }
   }
 
-  void onHistoryButtonClick() =>
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => ClientViewHistory(userId: widget.userId),
-      ));
+  // void onHistoryButtonClick() =>
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+  //       builder: (context) => ClientViewHistory(userId: widget.userId),
+  //     ));
 
   Future<void> submitRequest(requestType) async {
     setState(() {
@@ -307,8 +308,10 @@ class _ClientHomePageState extends State<ClientHomePage> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Column(children: [
-                            const LaborMenu(
-                                padding: EdgeInsets.only(bottom: 28)),
+                            LaborMenu(
+                              padding: EdgeInsets.only(bottom: 28),
+                              onLaborSelected: onLaborSelectedCallback,
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,6 +402,13 @@ class _ClientHomePageState extends State<ClientHomePage> {
         }
       },
     );
+  }
+
+  void onLaborSelectedCallback(String selectedLaborName) {
+    // Handle the selected labor category name as needed
+    print('Labor selected in main code: $selectedLaborName');
+
+    updateDirectRequestTabContent(selectedLaborName);
   }
 
   Future<Widget> getOngoingRequestContent() async {

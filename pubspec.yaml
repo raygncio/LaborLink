@@ -60,6 +60,7 @@ dependencies:
   fluttertoast: ^8.2.4
   firebase_analytics: ^10.7.1
   flutter_rating_bar: ^4.0.1
+  fl_chart: ^0.65.0
 
 dev_dependencies:
   flutter_test:

@@ -108,7 +108,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: RateWidget(
-                            rate: widget.handymanInfo["rating"] ?? 0,
+                            rate: (widget.handymanInfo["rating"] ?? 0).toInt(),
                             iconSize: 12),
                       ),
                     ],

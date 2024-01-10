@@ -106,7 +106,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
     if (interestedLaborerWithOffer.isNotEmpty) {
       // Combine the lists
-      combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+      setState(() {
+        combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+      });
     }
   }
 
@@ -129,7 +131,9 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     }
 
     if (interestedLaborer.isNotEmpty) {
-      combinedInterestedLaborers.addAll(interestedLaborer);
+      setState(() {
+        combinedInterestedLaborers.addAll(interestedLaborer);
+      });
     }
 
     // print(
@@ -520,12 +524,12 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     bool openCancelledRequest = false;
     List<Map<String, dynamic>> cancelledRequest = [];
     List<Map<String, dynamic>> completedRequest = [];
-    print(widget.userId);
+    // print(widget.userId);
 
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      print('*************************COMPLETED REQUEST $completedRequest');
+      //print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
       print('Error fetching interested laborers: 4 $error');
@@ -592,7 +596,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                             itemBuilder: (context, index) {
                               Map<String, dynamic> currentRequest =
                                   completedRequest[index];
-                              // print(">>>>>>>>>>>>$currentRequest");
+                              print(
+                                  ">>>>>>>>>>>>${currentRequest['validRequestId']}");
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -601,6 +606,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
                                       userId: currentRequest['validRequestId'],
+                                      userRole: currentRequest['userRole'],
                                     ),
                                   )),
                                   child: Container(

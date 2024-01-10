@@ -4,8 +4,9 @@ import 'package:laborlink/styles.dart';
 
 class LaborMenu extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
-
-  const LaborMenu({Key? key, this.padding}) : super(key: key);
+  final Function(String) onLaborSelected;
+  const LaborMenu({Key? key, this.padding, required this.onLaborSelected})
+      : super(key: key);
 
   @override
   State<LaborMenu> createState() => _LaborMenuState();
@@ -64,6 +65,8 @@ class _LaborMenuState extends State<LaborMenu> {
 
   void onLaborSelect(int index) {
     String selectedLaborName = labors[index]["name"];
-    print('Selected labor: $selectedLaborName');
+    // print('Selected labor: $selectedLaborName');
+    // Call the callback function with the selected labor name
+    widget.onLaborSelected(selectedLaborName);
   }
 }

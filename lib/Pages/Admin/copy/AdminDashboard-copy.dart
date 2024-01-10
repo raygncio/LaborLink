@@ -425,7 +425,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         command: () =>
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const ReportGenerationPage(
-                                  reportType: ReportType.fakeDetection),
+                                  reportType: ReportType.anomalyDetection),
                             )),
                         borderRadius: 8),
                   ],
@@ -446,7 +446,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         command: () =>
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const ReportGenerationPage(
-                                  reportType: ReportType.income),
+                                  reportType: ReportType.faceVerification),
                             )),
                         borderRadius: 8),
                   ],

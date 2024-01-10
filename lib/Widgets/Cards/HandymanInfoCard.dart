@@ -103,13 +103,14 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                     padding: const EdgeInsets.only(top: 3),
                     child: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: AppBadge(
-                              label:
-                                  widget.handymanInfo["specialization"] ?? '',
-                              type: BadgeType.normal),
-                        ),
+                        if (widget.handymanInfo['userRole'] == 'handyman')
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: AppBadge(
+                                label:
+                                    widget.handymanInfo["specialization"] ?? '',
+                                type: BadgeType.normal),
+                          ),
                         AppBadge(
                             label: widget.handymanInfo["city"] ?? '',
                             type: BadgeType.normal)
