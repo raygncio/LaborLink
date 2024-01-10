@@ -100,11 +100,16 @@ class _AccountCreatedPageState extends State<AccountCreatedPage> {
       isLoading = true;
     });
     Timer(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (ctx) => const LandingPage(),
-        ),
-      );
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (ctx) => const LandingPage(),
+      //   ),
+      // );
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (ctx) => const LandingPage(),
+          ),
+          (route) => false);
     });
   }
 }
