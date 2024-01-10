@@ -137,7 +137,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     setState(() {
       button = delayed;
-      // isRegistered = true;
+      isRegistered = true; // to stop reloading create account functions
     });
   }
 
@@ -353,7 +353,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   @override
   void initState() {
-    Timer(const Duration(seconds: 4), () {
+    Timer(const Duration(seconds: 6), () {
       showButton();
     });
     hasFaceResults = checkFaceResults();
