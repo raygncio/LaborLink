@@ -300,7 +300,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.only(bottom: 15),
                     child: ReportIssueButton(
                         userId: widget.requestDetail["clientId"]),
                   ),

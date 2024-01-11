@@ -298,11 +298,13 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
 
       // Update the progress in the database
       await service.updateRequestProgressHandyman(
-        widget.requestDetail["requestId"],
+        widget.requestDetail["activeRequestId"],
         _currentProgress,
       );
     } else {
-      attachServiceProofDialog(context, widget.clientDetail);
+      print(widget.requestDetail["activeRequestId"]);
+      attachServiceProofDialog(context, widget.clientDetail,
+          widget.requestDetail["activeRequestId"]);
     }
   }
 }

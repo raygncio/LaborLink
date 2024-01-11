@@ -49,7 +49,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
     try {
       getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
       getClientRequest = await service.getActiveRequestClient(widget.userId);
-      print("testingggggggg ${getActiveRequest['approvalStatus']}");
+      print("testingggggggg ${getActiveRequest['activeRequestId']}");
       setState(() {
         if (getActiveRequest["approvalStatus"] == "pending") {
           _forApproval = true;

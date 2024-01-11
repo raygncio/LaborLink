@@ -988,7 +988,7 @@ class DatabaseService {
     if (handymanQuery.docs.isNotEmpty) {
       for (var doc in handymanQuery.docs) {
         await doc.reference.update({
-          'status': 'completed',
+          'status': 'rating',
         });
       }
     }
@@ -1002,7 +1002,7 @@ class DatabaseService {
     if (offerQuery.docs.isNotEmpty) {
       for (var doc in offerQuery.docs) {
         await doc.reference.update({
-          'status': 'completed',
+          'status': 'rating',
         });
       }
     }
@@ -1050,6 +1050,35 @@ class DatabaseService {
     if (requestDoc.exists) {
       await requestDoc.reference
           .update({'completionProof': url, 'progress': 'completed'});
+    }
+
+    //check for handyman approval and offer if meron tapos completed ilagay
+    final handymanQuery = await _db
+        .collection('handymanApproval')
+        .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'rating')
+        .get();
+
+    if (handymanQuery.docs.isNotEmpty) {
+      for (var doc in handymanQuery.docs) {
+        await doc.reference.update({
+          'status': 'completed',
+        });
+      }
+    }
+
+    final offerQuery = await _db
+        .collection('offer')
+        .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'rating')
+        .get();
+
+    if (offerQuery.docs.isNotEmpty) {
+      for (var doc in offerQuery.docs) {
+        await doc.reference.update({
+          'status': 'completed',
+        });
+      }
     }
   }
 

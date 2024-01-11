@@ -5,20 +5,14 @@ import 'package:laborlink/Pages/Handyman/Activity/HandymanActivityPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/DirectRequestCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanDirectRequestCard.dart';
-import 'package:laborlink/Widgets/Cards/NoOngoingServiceCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
-import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/Forms/RequestForm.dart';
-import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/models/request.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 class HandymanHomePage extends StatefulWidget {
@@ -46,6 +40,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   bool _showSearchResult = false;
 
+  late double currentDeviceHeight; // get current device height
+
   @override
   void initState() {
     // TODO: implement initState
@@ -69,6 +65,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+    currentDeviceHeight = deviceHeight;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -247,7 +245,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
             Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
-                padding: const EdgeInsets.only(top: 505),
+                padding: EdgeInsets.only(top: currentDeviceHeight - 380),
                 child: Container(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15, right: 23),

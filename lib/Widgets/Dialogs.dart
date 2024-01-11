@@ -403,8 +403,8 @@ Future<String?> yesCancelDialog(BuildContext context, String prompt) =>
       },
     ).then((value) => value);
 
-Future<String?> attachServiceProofDialog(
-    BuildContext context, Map<String, dynamic> clientDetails) {
+Future<String?> attachServiceProofDialog(BuildContext context,
+    Map<String, dynamic> clientDetails, String requestId) {
   final _filePickerKey = GlobalKey<UploadFilePickerState>();
   //file
   File? _selectedImage;
@@ -474,7 +474,7 @@ Future<String?> attachServiceProofDialog(
                                 await service.uploadReportAttachment(
                                     clientDetails['userId'], _selectedImage!);
                             await service.updateRequestCompletion(
-                                clientDetails['requestId'], completionUrl);
+                                requestId, completionUrl);
                           } catch (e) {
                             // Handle errors during user creation
                             ScaffoldMessenger.of(context).showSnackBar(
