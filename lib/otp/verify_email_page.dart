@@ -116,31 +116,121 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isEmailVerified) {
-      print('>>>>>>>>>>>isEmailVerified: $isEmailVerified');
-      return const VerifyPhonePage();
+    // COMMENT OUT THIS SECTION ----------------
+    // REMOVED VERIFY EMAIL FOR CLIENTS ONLY
+    // print('>>>>>>>>>>>>userRole: $userRole');
+    return FutureBuilder(
+      future: userRole,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == 'client') {
+            return ClientMainPage(userId: userId!);
+          } else if (snapshot.data == 'handyman') {
+            if (isEmailVerified) {
+              return const VerifyPhonePage();
+            }
+          }
+        }
+        return Scaffold(
+          body: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset('assets/animations/handyman.json'),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10, left: 10),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'A verification email has been sent to your email.',
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: getTextStyle(
+                                textColor: AppColors.secondaryBlue,
+                                fontFamily: AppFonts.poppins,
+                                fontWeight: AppFontWeights.bold,
+                                fontSize: 24),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryBlue),
+                    icon: const Icon(
+                      Icons.email,
+                      size: 32,
+                    ),
+                    label: Text(
+                      'Resend Email',
+                      style: getTextStyle(
+                          textColor: AppColors.white,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.medium,
+                          fontSize: 15),
+                    ),
+                    onPressed: canResendEmail ? sendVerificationEmail : null,
+                  ),
+                  TextButton(
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50)),
+                    child: Text(
+                      'Cancel',
+                      style: getTextStyle(
+                          textColor: AppColors.primaryBlue,
+                          fontFamily: AppFonts.poppins,
+                          fontWeight: AppFontWeights.bold,
+                          fontSize: 15),
+                    ),
+                    onPressed: () => FirebaseAuth.instance.signOut(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
 
-      // print('>>>>>>>>>>>>userRole: $userRole');
+    // // ORIGINAL CODE ---------------------------
+    // if (isEmailVerified) {
+    //   print('>>>>>>>>>>>isEmailVerified: $isEmailVerified');
 
-      // return FutureBuilder(
-      //   future: userRole,
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasData) {
-      //       if (snapshot.data == 'client') {
-      //         return ClientMainPage(userId: userId ?? '');
-      //       } else if (snapshot.data == 'handyman') {
-      //         return HandymanMainPage(userId: userId!);
-      //       }
-      //     }
-      //     return const Scaffold(
-      //       backgroundColor: AppColors.white,
-      //       body: Center(
-      //         child: CircularProgressIndicator(),
-      //       ),
-      //     );
-      //   },
-      // );
-    }
+    //   // ORIGINAL CODE ---------------------------
+    //   // return const VerifyPhonePage();
+
+    //   // COMMENT OUT THIS SECTION ----------------
+    //   // REMOVED VERIFY EMAIL FOR CLIENTS ONLY
+    //   // print('>>>>>>>>>>>>userRole: $userRole');
+
+    //   // return FutureBuilder(
+    //   //   future: userRole,
+    //   //   builder: (context, snapshot) {
+    //   //     if (snapshot.hasData) {
+    //   //       if (snapshot.data == 'client') {
+    //   //         return ClientMainPage(userId: userId!);
+    //   //       } else if (snapshot.data == 'handyman') {
+    //   //         return const VerifyPhonePage();
+    //   //       }
+    //   //     }
+    //   //     return const Scaffold(
+    //   //       backgroundColor: AppColors.white,
+    //   //       body: Center(
+    //   //         child: CircularProgressIndicator(),
+    //   //       ),
+    //   //     );
+    //   //   },
+    //   // );
+    // }
+
+    // ORIG CODE --------------------------------
 
     return Scaffold(
       body: SingleChildScrollView(

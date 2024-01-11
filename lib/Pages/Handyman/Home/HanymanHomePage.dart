@@ -393,7 +393,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
-    print(">>>>>>>>>>>>${getActiveRequest['address']}");
+    print(">>>>>>>>>>>>${getActiveRequest['approvalStatus']}");
 
     if (getActiveRequest["approvalStatus"] != "completed" ||
         getActiveRequest["approvalStatus"] != "cancelled") {

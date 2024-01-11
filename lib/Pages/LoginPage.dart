@@ -127,11 +127,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
         // await Future.delayed(const Duration(seconds: 1));
 
-        if (!FirebaseAuth.instance.currentUser!.emailVerified) {
-          await Future.delayed(
-            const Duration(seconds: 3),
-          );
-        }
+        // if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+        //   await Future.delayed(
+        //     const Duration(seconds: 3),
+        //   );
+        // }
 
         // pop out of login page
         // Navigator.of(context).pop();

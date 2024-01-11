@@ -960,6 +960,7 @@ class DatabaseService {
 
   // Update the progress to cancelled request
   Future<void> updateRequest(String userId) async {
+    String requestId = '';
     final requestQuery = await _db
         .collection('request')
         .where('userId', isEqualTo: userId)
@@ -967,9 +968,39 @@ class DatabaseService {
         .get();
 
     for (var doc in requestQuery.docs) {
+      requestId = doc.id;
       await doc.reference.update({
         'progress': 'rating',
       });
+    }
+
+    //check for handyman approval and offer if meron tapos completed ilagay
+    final handymanQuery = await _db
+        .collection('handymanApproval')
+        .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'hired')
+        .get();
+
+    if (handymanQuery.docs.isNotEmpty) {
+      for (var doc in handymanQuery.docs) {
+        await doc.reference.update({
+          'status': 'completed',
+        });
+      }
+    }
+
+    final offerQuery = await _db
+        .collection('offer')
+        .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'hired')
+        .get();
+
+    if (offerQuery.docs.isNotEmpty) {
+      for (var doc in offerQuery.docs) {
+        await doc.reference.update({
+          'status': 'completed',
+        });
+      }
     }
   }
 
@@ -985,7 +1016,7 @@ class DatabaseService {
     } else if (progress == 3) {
       update = "inprogress";
     } else if (progress == 4) {
-      update = "competion";
+      update = "completion";
     } else if (progress == 5) {
       update = "completed";
     }

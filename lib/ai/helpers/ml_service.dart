@@ -124,8 +124,9 @@ class MLService {
     );
 
     // turn 90 if web cam
+    // -90 if real device
     if (data['type'] == 'camera') {
-      croppedImage = img_lib.copyRotate(croppedImage, 90);
+      croppedImage = img_lib.copyRotate(croppedImage, -90);
     }
 
     return croppedImage;
@@ -135,7 +136,7 @@ class MLService {
   Future<img_lib.Image?> _convertCameraImage(CameraImage image) async {
     //var img = convertToImage(image);
     var img = await convertYUV420toImageColor(image);
-    //img = img_lib.copyRotate(img!, -90);    // comment this if web cam
+    img = img_lib.copyRotate(img!, -90); // comment this if web cam
     return img;
   }
 

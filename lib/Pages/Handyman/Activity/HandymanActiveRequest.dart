@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Client/Activity/RequestCompleteSuccessPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/MessageButton.dart';
-import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Buttons/ReportIssueButton.dart';
 import 'package:laborlink/Widgets/Cards/ClientInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,8 +47,8 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
 
   @override
   void initState() {
-    print("new test");
-    print(widget.requestDetail['progress']);
+    // print("new test");
+    // print(widget.requestDetail['progress']);
     if (widget.requestDetail["progress"] == 'rating') {
       _currentProgress = 5;
     } else if (widget.requestDetail["progress"] == 'omw') {
@@ -130,7 +126,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                                     horizontal: 7, vertical: 2)),
                           ],
                         ),
-                        Container(
+                        SizedBox(
                           width: 150,
                           child: Text(
                             widget.requestDetail["requestId"] ?? '',
@@ -156,9 +152,9 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                         Column(
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(top: 16),
+                              padding: const EdgeInsets.only(top: 16),
                               child: TextWithIcon(
-                                icon: Icon(Icons.place,
+                                icon: const Icon(Icons.place,
                                     size: 17, color: AppColors.accentOrange),
                                 text: widget.requestDetail["address"] ?? '',
                                 fontSize: 12,
@@ -166,9 +162,9 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.calendar_month_rounded,
+                                icon: const Icon(Icons.calendar_month_rounded,
                                     size: 17, color: AppColors.accentOrange),
                                 text: widget.requestDetail["date"] ?? '',
                                 fontSize: 12,
@@ -176,9 +172,9 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.watch_later,
+                                icon: const Icon(Icons.watch_later,
                                     size: 17, color: AppColors.accentOrange),
                                 text: widget.requestDetail["time"] ?? '',
                                 fontSize: 12,
@@ -186,9 +182,9 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.local_offer_rounded,
+                                icon: const Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
                                 text: widget.requestDetail["suggestedPrice"]
                                         .toString() ??
@@ -227,7 +223,8 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 15, bottom: 15),
+                              padding:
+                                  const EdgeInsets.only(top: 15, bottom: 15),
                               child: ReportIssueButton(
                                   userId: widget.clientDetail['handymanId']),
                             ),
@@ -241,13 +238,13 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                   Visibility(
                     visible: _currentProgress >= 0,
                     child: FutureBuilder(
-                      future: Future.delayed(Duration(seconds: -1)),
+                      future: Future.delayed(const Duration(seconds: -1)),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
                           return ClientInfoCard(
                               clientInfo: widget.clientDetail);
                         } else {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator();
                         }
                       },
                     ),
