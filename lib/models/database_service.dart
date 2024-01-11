@@ -153,8 +153,10 @@ class DatabaseService {
   }
 
   Future<List<FaceResults>> getAllFaceResults() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await _db.collection('faceResults').get();
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('faceResults')
+        .orderBy("createdAt", descending: true)
+        .get();
 
     List<FaceResults> faceResultsList = querySnapshot.docs.map((doc) {
       return FaceResults.fromFireStore(doc);
@@ -164,8 +166,10 @@ class DatabaseService {
   }
 
   Future<List<AnomalyResults>> getAllAnomalyResults() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await _db.collection('anomalyResults').get();
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('anomalyResults')
+        .orderBy("createdAt", descending: true)
+        .get();
 
     List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
       return AnomalyResults.fromFireStore(doc);
@@ -1408,15 +1412,7 @@ class DatabaseService {
     final offerQuery = await _db
         .collection('offer')
         .where('userId', isEqualTo: userId)
-        .where('status', whereIn: [
-      'pending',
-      'hired',
-      // 'omw',
-      // 'arrived',
-      // 'inprogress',
-      // 'completion',
-      // 'rating'
-    ]).get();
+        .where('status', whereIn: ['pending', 'hired', 'rating']).get();
 
     if (offerQuery.docs.isNotEmpty) {
       for (var offerDoc in offerQuery.docs) {
@@ -1424,13 +1420,16 @@ class DatabaseService {
         final offerStatus = offerData['status'];
         final offerDesc = offerData['description'];
         final offerPic = offerData['attachment'];
+        final requestId = offerData["requestId"];
+        print('>>>>>>>>>>>>$offerData');
         resultMap.addAll({
           'approvalStatus': offerStatus,
           'hasOffer': true,
           'offerDesc': offerDesc,
-          'offerPic': offerPic
+          'offerPic': offerPic,
+          'activeRequestId': requestId,
         });
-        final requestId = offerData["requestId"];
+
         resultMap.addAll(offerData);
         // print(">>>>>>>>>>>>>>>>>>>$offerDesc");
 
@@ -1533,7 +1532,7 @@ class DatabaseService {
         }
       }
     }
-    // print(">>>>>>>>>>>>>$resultMap");
+
     return resultMap;
   }
 
