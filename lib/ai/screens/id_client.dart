@@ -47,22 +47,22 @@ class _IdClientState extends State<IdClient> {
     return imageFiles;
   }
 
-  _showSplashId() {
+  _showSplashId() async {
+    await Future.delayed(const Duration(seconds: 5));
     setState(() {
       content = const SplashId();
     });
   }
 
-  _toFaceVerif() {
-    Timer(const Duration(seconds: 4), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (ctx) => FaceVerificationPage(
-            idImages: _getImages(),
-          ),
+  _toFaceVerif() async {
+    await Future.delayed(const Duration(seconds: 10));
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => FaceVerificationPage(
+          idImages: _getImages(),
         ),
-      );
-    });
+      ),
+    );
   }
 
   @override
@@ -79,12 +79,10 @@ class _IdClientState extends State<IdClient> {
 
   @override
   Widget build(BuildContext context) {
-    Timer(const Duration(seconds: 4), () {
-      _showSplashId();
-      _toFaceVerif();
-    });
+    _showSplashId();
+    _toFaceVerif();
 
-    content = Center(
+    content ??= Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
