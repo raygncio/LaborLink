@@ -328,7 +328,12 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
                 height: 40,
               ),
               for (var result in regulaResults)
-                Text('Match Percentage: ${result.toStringAsFixed(2)}'),
+                Text('Match Percentage: ${result.toStringAsFixed(2)}',
+                    style: getTextStyle(
+                        textColor: AppColors.secondaryBlue,
+                        fontFamily: AppFonts.poppins,
+                        fontWeight: AppFontWeights.regular,
+                        fontSize: 15)),
             ],
           ),
         ),
