@@ -89,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Client clientInfo = await service.getUserData(widget.userId);
       getUserInfo = await service.getUserInfo(widget.userId);
       String fullName =
-          '${clientInfo.firstName} ${clientInfo.middleName ?? " "} ${clientInfo.lastName} ${clientInfo.suffix ?? ""}';
+          '${clientInfo.firstName[0].toUpperCase()}${clientInfo.firstName.substring(1).toLowerCase()} ${clientInfo.middleName ?? " "} ${clientInfo.lastName[0].toUpperCase()}${clientInfo.lastName.substring(1).toLowerCase()} ${clientInfo.suffix ?? ""}';
 
       String formattedDate =
           DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date

@@ -50,17 +50,10 @@ class AuthService {
     try {
       cred =
           PhoneAuthProvider.credential(verificationId: verifyId, smsCode: otp);
-      // proceeds to next try catch if successful
-    } on FirebaseAuthException catch (e) {
-      return e.message.toString();
-    } catch (e) {
-      return e.toString();
-    }
 
-    try {
-      // if sucessful linking
       User currentUser = FirebaseAuth.instance.currentUser!;
-      currentUser.linkWithCredential(cred);
+      await currentUser.linkWithCredential(cred);
+
       return 'Success';
     } on FirebaseAuthException catch (e) {
       return e.message.toString();

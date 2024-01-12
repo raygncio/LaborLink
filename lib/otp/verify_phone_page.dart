@@ -32,6 +32,7 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
   Future<String>? phoneNumber;
   String? userId;
   String? linkedPhoneNumber;
+  bool canResendOtp = true;
   // bool successfulOtp = false;
 
   @override
@@ -63,6 +64,18 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
         (timer) => checkLinkedPhone(),
       );
     }
+  }
+
+  refreshButton() async {
+    setState(() {
+      canResendOtp = false;
+    });
+
+    await Future.delayed(const Duration(seconds: 10));
+
+    setState(() {
+      canResendOtp = true;
+    });
   }
 
   Future checkLinkedPhone() async {
@@ -183,115 +196,145 @@ class _VerifyPhonePageState extends ConsumerState<VerifyPhonePage> {
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          print('>>>>>>>>>>>>$phoneNumber');
-                          AuthService.sendOtp(
-                            phoneNumber: phoneNumber, // registered phone number
+                        onPressed: !canResendOtp
+                            ? null
+                            : () {
+                                print('>>>>>>>>>>>>$phoneNumber');
+                                refreshButton();
+                                AuthService.sendOtp(
+                                  phoneNumber:
+                                      phoneNumber, // registered phone number
 
-                            // exception handling for sendOtp function
-                            errorStep: () =>
-                                ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Error in sending OTP',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: AppColors.red,
-                              ),
-                            ),
-
-                            // if code sent successfully
-                            nextStep: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('OTP Verification'),
-                                  content: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text('Enter 6 digit OTP'),
-                                      const SizedBox(
-                                        height: 12,
+                                  // exception handling for sendOtp function
+                                  errorStep: () => ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Error in sending OTP',
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                      Form(
-                                        key: _otpFormKey,
-                                        child: TextFormField(
-                                          keyboardType: TextInputType.number,
-                                          controller: _otpController,
-                                          decoration: InputDecoration(
-                                            focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(32),
-                                                borderSide: const BorderSide(
-                                                    color:
-                                                        AppColors.primaryBlue)),
-                                            labelText: 'Enter OTP',
-                                            floatingLabelStyle: const TextStyle(
-                                                color: AppColors.primaryBlue),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(32),
+                                      backgroundColor: AppColors.red,
+                                    ),
+                                  ),
+
+                                  // if code sent successfully
+                                  nextStep: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text(
+                                          'OTP Verification',
+                                          textAlign: TextAlign.center,
+                                          style: getTextStyle(
+                                              textColor:
+                                                  AppColors.secondaryBlue,
+                                              fontFamily: AppFonts.poppins,
+                                              fontWeight: AppFontWeights.bold,
+                                              fontSize: 24),
+                                        ),
+                                        content: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text('Enter 6 digit OTP'),
+                                            const SizedBox(
+                                              height: 12,
+                                            ),
+                                            Form(
+                                              key: _otpFormKey,
+                                              child: TextFormField(
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                controller: _otpController,
+                                                decoration: InputDecoration(
+                                                  focusedBorder: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              32),
+                                                      borderSide:
+                                                          const BorderSide(
+                                                              color: AppColors
+                                                                  .primaryBlue)),
+                                                  labelText: 'Enter OTP',
+                                                  floatingLabelStyle:
+                                                      const TextStyle(
+                                                          color: AppColors
+                                                              .primaryBlue),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            32),
+                                                  ),
+                                                ),
+                                                validator: (value) {
+                                                  if (value!.length != 6) {
+                                                    return "Invalid OTP";
+                                                  }
+
+                                                  return null;
+                                                },
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              if (_otpFormKey.currentState!
+                                                  .validate()) {
+                                                AuthService.proceed(
+                                                        otp:
+                                                            _otpController.text)
+                                                    .then(
+                                                  (value) {
+                                                    if (value == 'Success') {
+                                                      Navigator.pop(context);
+
+                                                      // run build again
+                                                      setState(() {});
+                                                    } else {
+                                                      print(
+                                                          '>>>>>>>>>>>> OTP ERROR');
+                                                      Navigator.pop(context);
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            value,
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                          backgroundColor:
+                                                              AppColors.red,
+                                                        ),
+                                                      );
+                                                      setState(() {});
+                                                    }
+                                                  },
+                                                );
+                                              }
+                                            },
+                                            child: Text(
+                                              'Submit',
+                                              style: getTextStyle(
+                                                  textColor:
+                                                      AppColors.secondaryBlue,
+                                                  fontFamily: AppFonts.poppins,
+                                                  fontWeight:
+                                                      AppFontWeights.bold,
+                                                  fontSize: 15),
                                             ),
                                           ),
-                                          validator: (value) {
-                                            if (value!.length != 6) {
-                                              return "Invalid OTP";
-                                            }
-
-                                            return null;
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        if (_otpFormKey.currentState!
-                                            .validate()) {
-                                          AuthService.proceed(
-                                                  otp: _otpController.text)
-                                              .then((value) {
-                                            if (value == 'Success') {
-                                              Navigator.pop(context);
-
-                                              // run build again
-                                              setState(() {
-                                                //successfulOtp = true;
-                                              });
-                                            } else {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    value,
-                                                    style: const TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  backgroundColor:
-                                                      AppColors.red,
-                                                ),
-                                              );
-                                            }
-                                          });
-                                        }
-                                      },
-                                      child: Text(
-                                        'Submit',
-                                        style: getTextStyle(
-                                            textColor: AppColors.secondaryBlue,
-                                            fontFamily: AppFonts.poppins,
-                                            fontWeight: AppFontWeights.bold,
-                                            fontSize: 15),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
+                                    );
+                                  },
+                                );
+                              },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryBlue),
                         child: Text(
