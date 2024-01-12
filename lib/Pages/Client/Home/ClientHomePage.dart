@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanDirectRequestCard.dart';
@@ -81,16 +82,37 @@ class _ClientHomePageState extends State<ClientHomePage> {
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
     // DatabaseService service = DatabaseService();
-
+    print(searchText);
+    bool fromButton = false;
+    print("dddddddddddd");
     if (searchText == null) return;
+
+    if (searchText.length > 4 && searchText.substring(0, 4) == 'btn-') {
+      fromButton = true;
+      searchText = searchText.substring(4);
+    }
+
+    print('>>>>>>>>>>>>>>>>>$searchText');
 
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndHandymanDataByFirstName(searchText);
+
       // print('>>>>>>>>>>>>>$results');
       // searchResultSection();
       // print(searchText);
-      //print(results);
+      print(results);
+
+      // prints if and only if search text is from button
+      if (fromButton && results.isEmpty) {
+        Fluttertoast.showToast(
+            msg: "No Handyman Found",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
 
       setState(() {
         _showSearchResult = results.isNotEmpty;
@@ -412,7 +434,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     }
     print('Labor selected in main code: $text');
 
-    updateDirectRequestTabContent(text.toLowerCase());
+    updateDirectRequestTabContent('btn-${text.toLowerCase()}');
   }
 
   Future<Widget> getOngoingRequestContent() async {
