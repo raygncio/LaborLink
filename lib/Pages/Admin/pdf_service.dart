@@ -22,7 +22,7 @@ class AnomalyCustomRow {
 
 class FaceCustomRow {
   final String faceResultId;
-  final String attachments;
+  final List<Uint8List> attachments;
   final String results;
   final String average;
   final String verdict;
@@ -33,6 +33,7 @@ class FaceCustomRow {
 }
 
 class PdfInvoiceService {
+  // CREATE ANOMALY REPORT PDF
   Future<Uint8List> createAnomalyReport(
       List<AnomalyResults> anomalyResults) async {
     final pdf = pw.Document();
@@ -59,29 +60,34 @@ class PdfInvoiceService {
       imageResults.add(await convertedImage(result.attachment));
     }
 
-    // CONTENT
+    // ANOMALY DETECTION REPORT PAGE
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              // HEADER
-              pw.Image(pw.MemoryImage(logo)),
-              // pw.Image(pw.MemoryImage(imageResults[0])),
-              pw.SizedBox(height: 20),
-              pw.Text("LaborLink Anomaly Detection Report",
-                  textAlign: pw.TextAlign.center),
-              pw.SizedBox(height: 25),
+          return [
+            pw.SizedBox(
+              height: 200,
+              child: pw.Column(
+                children: [
+                  // HEADER
+                  pw.Image(pw.MemoryImage(logo)),
+                  // pw.Image(pw.MemoryImage(imageResults[0])),
+                  pw.SizedBox(height: 20),
+                  pw.Text("LaborLink Anomaly Detection Report",
+                      textAlign: pw.TextAlign.center),
+                  pw.SizedBox(height: 25),
 
-              // BODY
-              itemColumn(elements),
+                  // BODY
+                  itemColumn(elements, anomalyResults),
 
-              // FOOTER
-              pw.SizedBox(height: 25),
-              pw.Text("END"),
-            ],
-          );
+                  // FOOTER
+                  pw.SizedBox(height: 25),
+                  pw.Text("END"),
+                ],
+              ),
+            )
+          ];
         },
       ),
     );
@@ -97,7 +103,8 @@ class PdfInvoiceService {
     return imageBytes;
   }
 
-  pw.Expanded itemColumn(List<AnomalyCustomRow> elements) {
+  pw.Expanded itemColumn(
+      List<AnomalyCustomRow> elements, List<AnomalyResults> anomalyResults) {
     return pw.Expanded(
       child: pw.Column(
         children: [
@@ -143,7 +150,75 @@ class PdfInvoiceService {
                     child: pw.Text(element.createdAt,
                         textAlign: pw.TextAlign.center)),
               ],
-            )
+            ),
+          pw.SizedBox(height: 20),
+
+          // FOOTER
+
+          // Total Count
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child: pw.Text('Total Count', textAlign: pw.TextAlign.left)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text(getTotalCount(anomalyResults),
+                      textAlign: pw.TextAlign.right)),
+            ],
+          ),
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child: pw.Text('Total NBI', textAlign: pw.TextAlign.left)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text(getNBICount(anomalyResults),
+                      textAlign: pw.TextAlign.right)),
+            ],
+          ),
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child: pw.Text('Total Tesda', textAlign: pw.TextAlign.left)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text(getTesdaCount(anomalyResults),
+                      textAlign: pw.TextAlign.right)),
+            ],
+          ),
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child:
+                      pw.Text('Anomaly Count', textAlign: pw.TextAlign.left)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text(getAnomalyCount(anomalyResults),
+                      textAlign: pw.TextAlign.right)),
+            ],
+          ),
+          pw.Row(
+            children: [
+              pw.Expanded(
+                  child: pw.Text('No Anomaly Count',
+                      textAlign: pw.TextAlign.left)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+              pw.Expanded(
+                  child: pw.Text(getNoAnomalyCount(anomalyResults),
+                      textAlign: pw.TextAlign.right)),
+            ],
+          ),
+          pw.SizedBox(height: 20),
         ],
       ),
     );
@@ -172,12 +247,25 @@ class PdfInvoiceService {
     }
   }
 
-  // String getSubTotal(List<Product> products) {
-  //   return products
-  //       .fold(0.0,
-  //           (double prev, element) => prev + (element.amount * element.price))
-  //       .toStringAsFixed(2);
-  // }
+  String getTotalCount(List<AnomalyResults> anomalyResults) {
+    return anomalyResults.length.toString();
+  }
+
+  String getNBICount(List<AnomalyResults> anomalyResults) {
+    return anomalyResults.length.toString();
+  }
+
+  String getTesdaCount(List<AnomalyResults> anomalyResults) {
+    return anomalyResults.length.toString();
+  }
+
+  String getAnomalyCount(List<AnomalyResults> anomalyResults) {
+    return anomalyResults.length.toString();
+  }
+
+  String getNoAnomalyCount(List<AnomalyResults> anomalyResults) {
+    return anomalyResults.length.toString();
+  }
 
   // String getVatTotal(List<Product> products) {
   //   return products
