@@ -36,7 +36,8 @@ class _RatingsPageState extends State<RatingsPage> {
     String lastName = widget.ratings['lastName'] ?? '';
     String suffix = widget.ratings['suffix'] ?? '';
 
-    String fullname = '$firstName $middleName $lastName $suffix';
+    String fullname =
+        '${firstName[0].toUpperCase()}${firstName.substring(1).toLowerCase()} $middleName ${lastName[0].toUpperCase()}${lastName.substring(1).toLowerCase()} $suffix';
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
