@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:laborlink/Pages/Admin/FaceList.dart';
+import 'package:laborlink/Pages/Admin/face/FaceList.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
-import 'package:laborlink/Pages/Admin/AnomalyList.dart';
+import 'package:laborlink/Pages/Admin/anomaly/AnomalyList.dart';
 import 'package:laborlink/Pages/Admin/pdf_service.dart';
 import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/styles.dart';

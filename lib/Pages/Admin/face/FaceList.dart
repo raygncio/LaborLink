@@ -1,5 +1,5 @@
 import 'package:laborlink/models/results/face_results.dart';
-import 'package:laborlink/Pages/Admin/FaceItem.dart';
+import 'package:laborlink/Pages/Admin/face/FaceItem.dart';
 import 'package:flutter/material.dart';
 
 class FaceList extends StatelessWidget {

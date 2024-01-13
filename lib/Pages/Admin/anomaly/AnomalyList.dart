@@ -1,5 +1,5 @@
 import 'package:laborlink/models/results/anomaly_results.dart';
-import 'package:laborlink/Pages/Admin/AnomalyItem.dart';
+import 'package:laborlink/Pages/Admin/anomaly/AnomalyItem.dart';
 import 'package:flutter/material.dart';
 
 class AnomalyList extends StatelessWidget {
