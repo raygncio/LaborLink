@@ -31,10 +31,13 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
   }
 
   void initializeFullname() {
-    String firstName = widget.handymanInfo['firstName'] ?? '';
-    String middleName = widget.handymanInfo['middleName'] ?? '';
-    String lastName = widget.handymanInfo['lastName'] ?? '';
-    String suffix = widget.handymanInfo['suffix'] ?? '';
+    String firstName =
+        capitalizeFirstLetter(widget.handymanInfo["firstName"] ?? '');
+    String middleName =
+        capitalizeFirstLetter(widget.handymanInfo["middleName"] ?? '');
+    String lastName =
+        capitalizeFirstLetter(widget.handymanInfo["lastName"] ?? '');
+    String suffix = capitalizeFirstLetter(widget.handymanInfo["suffix"] ?? '');
 
     fullname = '$firstName $middleName $lastName $suffix';
   }
@@ -122,7 +125,8 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: RatingBar.builder(
-                        initialRating: 3, // input
+                        initialRating: (widget.handymanInfo["rates"] ?? 0)
+                            .toDouble(), // input
                         itemCount: 5,
                         itemSize: 15,
                         ignoreGestures: true,
@@ -153,5 +157,12 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
         ),
       ),
     );
+  }
+
+  String capitalizeFirstLetter(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    return input[0].toUpperCase() + input.substring(1);
   }
 }
