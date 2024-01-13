@@ -198,6 +198,9 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getUserAndHandymanDataByFirstName(
       String searchText) async {
     List<Map<String, dynamic>> resultList = [];
+    double rating = 0;
+    double count = 0;
+    double rates = 0;
     List<String> categoriesToCheck = [
       'plumbing',
       'installations',
@@ -232,11 +235,22 @@ class DatabaseService {
           final handymanData = handymanDoc.data();
           final handymanId = handymanDoc.id;
 
+          final reviewQuery = await _db
+              .collection('review')
+              .where('userId', isEqualTo: userId)
+              .get();
+          for (var reviewDoc in reviewQuery.docs) {
+            final reviewData = reviewDoc.data();
+            rating += reviewData['rating'];
+            count++;
+          }
+          rates = rating / count;
           // Combine user and handyman data into a single map
           Map<String, dynamic> combinedData = {
             ...userData,
             ...handymanData,
             'handymanId': handymanId,
+            'rates': rates,
           };
           resultList.add(combinedData);
         }

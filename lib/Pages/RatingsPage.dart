@@ -98,7 +98,7 @@ class _RatingsPageState extends State<RatingsPage> {
                                   ? 'Client'
                                   : "Handyman",
                               type: BadgeType.normal,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 4, vertical: 1),
                             )
                           ],

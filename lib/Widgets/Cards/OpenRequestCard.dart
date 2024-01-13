@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -189,13 +190,23 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextWithIcon(
-                            icon: const Icon(Icons.place,
-                                size: 13, color: AppColors.accentOrange),
-                            text: address,
-                            fontSize: 12,
-                            contentPadding: 8,
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: TextWithIcon(
+                              icon: const Icon(Icons.place,
+                                  size: 13, color: AppColors.accentOrange),
+                              text: address,
+                              fontSize: 12,
+                              contentPadding: 8,
+                            ),
                           ),
+                          // TextWithIcon(
+                          //   icon: const Icon(Icons.place,
+                          //       size: 13, color: AppColors.accentOrange),
+                          //   text: address,
+                          //   fontSize: 12,
+                          //   contentPadding: 8,
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 6.75),
                             child: TextWithIcon(
@@ -301,6 +312,17 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
 
       await service.addHandymanApproval(handymanApproval);
       // Show a success message or perform further actions upon accepting the request
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Request accepted succesfully."),
+          backgroundColor: Color.fromARGB(255, 54, 114, 244),
+        ),
+      );
+
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId),
+      ));
     } catch (e) {
       print('Error: $e');
       // Handle error scenario if required

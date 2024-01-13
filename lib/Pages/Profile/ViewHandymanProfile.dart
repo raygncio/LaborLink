@@ -22,7 +22,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () {
       getReviews();
       setState(() {
         isReviewsVisible = true;
@@ -107,7 +107,6 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                   shrinkWrap: true,
                   itemCount: results.length,
                   itemBuilder: (context, index) {
-                    print('>>>>>>>>>>>>>>>>>>>>>$results.length');
                     Map<String, dynamic> currentReview = results[index];
                     String fullName = '';
 

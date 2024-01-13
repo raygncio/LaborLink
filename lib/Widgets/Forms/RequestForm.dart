@@ -56,7 +56,7 @@ class RequestFormState extends State<RequestForm> {
   String homeAddress = '';
   var formattedDate = DateFormat('d-MM-yyyy');
 
-  final List<String> _categories = dummyDropdownData;
+  final List<String> _categories = specializations;
   final List<String> _dateOptions = dummyDropdownData;
   final List<String> _timeOptions = <String>[
     '8:00 - 9:00 am',
@@ -137,7 +137,9 @@ class RequestFormState extends State<RequestForm> {
     try {
       Client clientInfo = await service.getUserData(widget.userId);
 
-      homeAddress = clientInfo.streetAddress;
+      homeAddress =
+          '${clientInfo.streetAddress} ${clientInfo.city ?? " "} ${clientInfo.state} ${clientInfo.zipCode ?? ""}';
+      ;
     } catch (error) {
       print('Error fetching user data: $error');
     }

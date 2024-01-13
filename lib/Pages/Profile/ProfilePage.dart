@@ -94,12 +94,15 @@ class _ProfilePageState extends State<ProfilePage> {
       String formattedDate =
           DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
 
+      String address =
+          '${clientInfo.streetAddress} ${clientInfo.city ?? " "} ${clientInfo.state} ${clientInfo.zipCode ?? ""}';
+
       setState(() {
         _fullNameController.text = fullName;
         _birthdateController.text = formattedDate;
         _emailController.text = clientInfo.emailAdd;
-        _phoneNumberController.text = clientInfo.phoneNumber;
-        _addressController.text = clientInfo.streetAddress;
+        _phoneNumberController.text = '0${clientInfo.phoneNumber}';
+        _addressController.text = address;
       });
     } catch (error) {
       print('Error fetching user data: $error');
