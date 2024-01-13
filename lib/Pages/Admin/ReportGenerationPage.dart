@@ -91,41 +91,69 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
             Row(
               children: [
                 AppFilledButton(
-                    padding: const EdgeInsets.only(
-                        left: 25, right: 23, bottom: 21, top: 28),
-                    height: 42,
-                    text: "Download PDF",
-                    fontSize: 18,
-                    fontFamily: AppFonts.poppins,
-                    color: AppColors.accentOrange,
-                    command: () async {
-                      if (widget.reportType == ReportType.anomalyDetection) {
-                        final data = await pdfService
-                            .createAnomalyReport(anomalyResults);
-                        String download = await pdfService.savePdfFile(
-                            'anomaly_detection_${DateTime.now()}', data);
-                        if (download == 'Success') {
-                          Fluttertoast.showToast(
-                              msg: "Saved to downloads",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 12.0);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                download,
-                                style: const TextStyle(color: AppColors.white),
-                              ),
-                              backgroundColor: AppColors.red,
+                  padding: const EdgeInsets.only(
+                      left: 25, right: 23, bottom: 21, top: 28),
+                  height: 42,
+                  text: "Download PDF",
+                  fontSize: 18,
+                  fontFamily: AppFonts.poppins,
+                  color: AppColors.accentOrange,
+                  borderRadius: 5,
+                  command: () async {
+                    // DOWNLOAD ANOMALY REPORT
+                    if (widget.reportType == ReportType.anomalyDetection) {
+                      final data =
+                          await pdfService.createAnomalyReport(anomalyResults);
+                      String download = await pdfService.savePdfFile(
+                          'anomaly_detection_${DateTime.now()}', data);
+                      if (download == 'Success') {
+                        Fluttertoast.showToast(
+                            msg: "Saved to downloads",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            fontSize: 12.0);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              download,
+                              style: const TextStyle(color: AppColors.white),
                             ),
-                          );
-                        }
+                            backgroundColor: AppColors.red,
+                          ),
+                        );
                       }
-                    },
-                    borderRadius: 5),
+                    }
+                    // DOWNLOAD ANOMALY REPORT
+                    if (widget.reportType == ReportType.faceVerification) {
+                      final data =
+                          await pdfService.createFaceReport(faceResults);
+                      String download = await pdfService.savePdfFile(
+                          'face_verification_${DateTime.now()}', data);
+                      if (download == 'Success') {
+                        Fluttertoast.showToast(
+                            msg: "Saved to downloads",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            fontSize: 12.0);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              download,
+                              style: const TextStyle(color: AppColors.white),
+                            ),
+                            backgroundColor: AppColors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
               ],
             )
           ],

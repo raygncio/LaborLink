@@ -23,8 +23,8 @@ class AnomalyCustomRow {
 class FaceCustomRow {
   final String faceResultId;
   final List<Uint8List> attachments;
-  final String results;
-  final String average;
+  final List<String> results;
+  final double average;
   final String verdict;
   final String createdAt;
 
@@ -61,32 +61,371 @@ class PdfInvoiceService {
     }
 
     // ANOMALY DETECTION REPORT PAGE
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           return [
-            pw.SizedBox(
-              height: 200,
-              child: pw.Column(
+            // HEADER
+            pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Image(pw.MemoryImage(logo)),
+                // pw.Image(pw.MemoryImage(imageResults[0])),
+                pw.SizedBox(height: 20),
+                pw.Text("LaborLink Anomaly Detection Report",
+                    textAlign: pw.TextAlign.center),
+                pw.SizedBox(height: 25),
+              ],
+            ),
+
+            // BODY
+            // COLUMN TITLES
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Result Id', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Id Type', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child:
+                        pw.Text('Attachment', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Result', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child:
+                        pw.Text('Created At', textAlign: pw.TextAlign.center)),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // CONTENTS
+            for (var element in elements)
+              pw.Row(
                 children: [
-                  // HEADER
-                  pw.Image(pw.MemoryImage(logo)),
-                  // pw.Image(pw.MemoryImage(imageResults[0])),
-                  pw.SizedBox(height: 20),
-                  pw.Text("LaborLink Anomaly Detection Report",
-                      textAlign: pw.TextAlign.center),
-                  pw.SizedBox(height: 25),
-
-                  // BODY
-                  itemColumn(elements, anomalyResults),
-
-                  // FOOTER
-                  pw.SizedBox(height: 25),
-                  pw.Text("END"),
+                  pw.Expanded(
+                      child: pw.Text(element.resultId,
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                      child: pw.Text(element.idType,
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                    child: pw.Image(
+                      pw.MemoryImage(element.attachment),
+                    ),
+                  ),
+                  pw.Expanded(
+                      child: pw.Text(
+                          element.result == 'noanomaly'
+                              ? 'No Anomaly'
+                              : 'Has Anomaly',
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                      child: pw.Text(element.createdAt,
+                          textAlign: pw.TextAlign.center)),
                 ],
               ),
-            )
+            pw.SizedBox(height: 20),
+
+            // FOOTER
+
+            // Total Count
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Count', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getAnomalyTotalCount(anomalyResults),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child: pw.Text('Total NBI', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getNBICount(anomalyResults),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Tesda', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getTesdaCount(anomalyResults),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Anomaly Count', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(
+                        '${getAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
+                        textAlign: pw.TextAlign.right)),
+                pw.Expanded(
+                    child: pw.Text('${getAnomalyPercentage(anomalyResults)}%',
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child: pw.Text('No Anomaly Count',
+                        textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(
+                        '${getNoAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
+                        textAlign: pw.TextAlign.right)),
+                pw.Expanded(
+                    child: pw.Text('${getNoAnomalyPercentage(anomalyResults)}%',
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // FOOTER
+            pw.SizedBox(height: 25),
+            pw.Text("END"),
+          ];
+        },
+      ),
+    );
+    return pdf.save();
+  }
+
+  Future<Uint8List> createFaceReport(List<FaceResults> faceResults) async {
+    final pdf = pw.Document();
+
+    // INITIALIZE ELEMENTS
+    final List<FaceCustomRow> elements = [];
+
+    for (int i = 0; i < faceResults.length; i++) {
+      List<Uint8List> faces = [];
+      List<String> results = [];
+      double average = 0.0;
+      String verdict = 'PASSED'; //by default
+
+      faces.add(await convertedImage(faceResults[i].attachment!));
+      faces.add(await convertedImage(faceResults[i].attachment2!));
+      results.add(faceResults[i].result!);
+      average = double.parse(faceResults[i].result!);
+
+      // if there are 3 attachments and 2 results
+      if (faceResults[i].attachment3 != null) {
+        faces.add(await convertedImage(faceResults[i].attachment3!));
+        results.add(faceResults[i].result2!);
+
+        // get average
+        average = (double.parse(faceResults[i].result!) +
+                double.parse(faceResults[i].result2!)) /
+            2;
+
+        // get verdict
+        if (int.parse(faceResults[i].result2!) == 0) {
+          verdict = 'FAILED';
+        }
+      }
+
+      // get verdict
+      if (int.parse(faceResults[i].result!) == 0) {
+        verdict = 'FAILED';
+      }
+
+      elements.add(FaceCustomRow(
+        faceResults[i].faceResultId!,
+        faces,
+        results,
+        average,
+        verdict,
+        faceResults[i].createdAt!.toString(),
+      ));
+    }
+
+    // LOAD IMAGES
+    final logo =
+        (await rootBundle.load("assets/icons/LOGO 1.png")).buffer.asUint8List();
+
+    // FACE VERIFICATION REPORT PAGE
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            // HEADER
+            pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Image(pw.MemoryImage(logo)),
+                // pw.Image(pw.MemoryImage(imageResults[0])),
+                pw.SizedBox(height: 20),
+                pw.Text("LaborLink Face Verification Report",
+                    textAlign: pw.TextAlign.center),
+                pw.SizedBox(height: 25),
+              ],
+            ),
+
+            // BODY
+            // COLUMN TITLES
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Result Id', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Faces', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Results', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Average', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Verdict', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child:
+                        pw.Text('Created At', textAlign: pw.TextAlign.center)),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // CONTENTS
+            for (var element in elements)
+              pw.Row(
+                children: [
+                  pw.Expanded(
+                      child: pw.Text(element.faceResultId,
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                    child: pw.Row(
+                      children: [
+                        for (var attachment in element.attachments)
+                          pw.Image(
+                            pw.MemoryImage(attachment),
+                          ),
+                      ],
+                    ),
+                  ),
+                  pw.Expanded(
+                    child: pw.Row(
+                      children: [
+                        for (var result in element.results)
+                          pw.Text(result, textAlign: pw.TextAlign.center),
+                      ],
+                    ),
+                  ),
+                  pw.Expanded(
+                      child: pw.Text(element.average.toString(),
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                      child: pw.Text(element.verdict,
+                          textAlign: pw.TextAlign.center)),
+                  pw.Expanded(
+                      child: pw.Text(element.createdAt,
+                          textAlign: pw.TextAlign.center)),
+                ],
+              ),
+            pw.SizedBox(height: 20),
+
+            // FOOTER
+
+            // Total Count
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //         child:
+            //             pw.Text('Total Count', textAlign: pw.TextAlign.left)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(
+            //         child: pw.Text(getAnomalyTotalCount(anomalyResults),
+            //             textAlign: pw.TextAlign.right)),
+            //   ],
+            // ),
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //         child: pw.Text('Total NBI', textAlign: pw.TextAlign.left)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(
+            //         child: pw.Text(getNBICount(anomalyResults),
+            //             textAlign: pw.TextAlign.right)),
+            //   ],
+            // ),
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //         child:
+            //             pw.Text('Total Tesda', textAlign: pw.TextAlign.left)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(
+            //         child: pw.Text(getTesdaCount(anomalyResults),
+            //             textAlign: pw.TextAlign.right)),
+            //   ],
+            // ),
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //         child:
+            //             pw.Text('Anomaly Count', textAlign: pw.TextAlign.left)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(
+            //         child: pw.Text(
+            //             '${getAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
+            //             textAlign: pw.TextAlign.right)),
+            //     pw.Expanded(
+            //         child: pw.Text('${getAnomalyPercentage(anomalyResults)}%',
+            //             textAlign: pw.TextAlign.right)),
+            //   ],
+            // ),
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //         child: pw.Text('No Anomaly Count',
+            //             textAlign: pw.TextAlign.left)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+            //     pw.Expanded(
+            //         child: pw.Text(
+            //             '${getNoAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
+            //             textAlign: pw.TextAlign.right)),
+            //     pw.Expanded(
+            //         child: pw.Text('${getNoAnomalyPercentage(anomalyResults)}%',
+            //             textAlign: pw.TextAlign.right)),
+            //   ],
+            // ),
+            pw.SizedBox(height: 20),
+
+            // FOOTER
+            pw.SizedBox(height: 25),
+            pw.Text("END"),
           ];
         },
       ),
@@ -101,127 +440,6 @@ class PdfInvoiceService {
             .asUint8List();
 
     return imageBytes;
-  }
-
-  pw.Expanded itemColumn(
-      List<AnomalyCustomRow> elements, List<AnomalyResults> anomalyResults) {
-    return pw.Expanded(
-      child: pw.Column(
-        children: [
-          // COLUMN TITLES
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child: pw.Text('Result Id', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text('Id Type', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text('Attachment', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text('Result', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text('Created At', textAlign: pw.TextAlign.center)),
-            ],
-          ),
-          pw.SizedBox(height: 20),
-
-          // CONTENTS
-          for (var element in elements)
-            pw.Row(
-              children: [
-                pw.Expanded(
-                    child: pw.Text(element.resultId,
-                        textAlign: pw.TextAlign.center)),
-                pw.Expanded(
-                    child: pw.Text(element.idType,
-                        textAlign: pw.TextAlign.center)),
-                pw.Expanded(
-                  child: pw.Image(
-                    pw.MemoryImage(element.attachment),
-                  ),
-                ),
-                pw.Expanded(
-                    child: pw.Text(
-                        element.result == 'noanomaly'
-                            ? 'No Anomaly'
-                            : 'Has Anomaly',
-                        textAlign: pw.TextAlign.center)),
-                pw.Expanded(
-                    child: pw.Text(element.createdAt,
-                        textAlign: pw.TextAlign.center)),
-              ],
-            ),
-          pw.SizedBox(height: 20),
-
-          // FOOTER
-
-          // Total Count
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child: pw.Text('Total Count', textAlign: pw.TextAlign.left)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text(getTotalCount(anomalyResults),
-                      textAlign: pw.TextAlign.right)),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child: pw.Text('Total NBI', textAlign: pw.TextAlign.left)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text(getNBICount(anomalyResults),
-                      textAlign: pw.TextAlign.right)),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child: pw.Text('Total Tesda', textAlign: pw.TextAlign.left)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text(getTesdaCount(anomalyResults),
-                      textAlign: pw.TextAlign.right)),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child:
-                      pw.Text('Anomaly Count', textAlign: pw.TextAlign.left)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text(getAnomalyCount(anomalyResults),
-                      textAlign: pw.TextAlign.right)),
-            ],
-          ),
-          pw.Row(
-            children: [
-              pw.Expanded(
-                  child: pw.Text('No Anomaly Count',
-                      textAlign: pw.TextAlign.left)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-              pw.Expanded(
-                  child: pw.Text(getNoAnomalyCount(anomalyResults),
-                      textAlign: pw.TextAlign.right)),
-            ],
-          ),
-          pw.SizedBox(height: 20),
-        ],
-      ),
-    );
   }
 
   Future<String> savePdfFile(String fileName, Uint8List byteList) async {
@@ -247,27 +465,65 @@ class PdfInvoiceService {
     }
   }
 
-  String getTotalCount(List<AnomalyResults> anomalyResults) {
+  // STATS ---------------------------------------------------------------------
+
+  String getAnomalyTotalCount(List<AnomalyResults> anomalyResults) {
     return anomalyResults.length.toString();
   }
 
   String getNBICount(List<AnomalyResults> anomalyResults) {
-    return anomalyResults.length.toString();
+    int count = 0;
+    for (var result in anomalyResults) {
+      if (result.idType.toLowerCase() == 'nbi') {
+        count++;
+      }
+    }
+    return count.toString();
   }
 
   String getTesdaCount(List<AnomalyResults> anomalyResults) {
-    return anomalyResults.length.toString();
+    int count = 0;
+    for (var result in anomalyResults) {
+      if (result.idType.toLowerCase() == 'tesda') {
+        count++;
+      }
+    }
+    return count.toString();
   }
 
   String getAnomalyCount(List<AnomalyResults> anomalyResults) {
-    return anomalyResults.length.toString();
+    int count = 0;
+    for (var result in anomalyResults) {
+      if (result.result.toLowerCase() == 'hasanomaly') {
+        count++;
+      }
+    }
+    return count.toString();
   }
 
   String getNoAnomalyCount(List<AnomalyResults> anomalyResults) {
-    return anomalyResults.length.toString();
+    int count = 0;
+    for (var result in anomalyResults) {
+      if (result.result.toLowerCase() == 'noanomaly') {
+        count++;
+      }
+    }
+    return count.toString();
   }
 
-  // String getVatTotal(List<Product> products) {
+  String getAnomalyPercentage(List<AnomalyResults> anomalyResults) {
+    int count = int.parse(getAnomalyCount(anomalyResults));
+    return ((count / int.parse(getAnomalyTotalCount(anomalyResults))) * 100)
+        .toString();
+  }
+
+  String getNoAnomalyPercentage(List<AnomalyResults> anomalyResults) {
+    int count = int.parse(getNoAnomalyCount(anomalyResults));
+    return ((count / int.parse(getAnomalyTotalCount(anomalyResults))) * 100)
+        .toString();
+  }
+
+  // String getVatTotal(List<Product> products) {s
   //   return products
   //       .fold(
   //         0.0,
