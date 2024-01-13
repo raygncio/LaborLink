@@ -33,7 +33,7 @@ class FaceCustomRow {
 }
 
 class PdfInvoiceService {
-  // CREATE ANOMALY REPORT PDF
+  // CREATE ANOMALY REPORT PDF--------------------------------------------------
   Future<Uint8List> createAnomalyReport(
       List<AnomalyResults> anomalyResults) async {
     final pdf = pw.Document();
@@ -60,7 +60,7 @@ class PdfInvoiceService {
       imageResults.add(await convertedImage(result.attachment));
     }
 
-    // ANOMALY DETECTION REPORT PAGE
+    // ANOMALY DETECTION REPORT ADD PAGE
 
     pdf.addPage(
       pw.MultiPage(
@@ -68,17 +68,19 @@ class PdfInvoiceService {
         build: (pw.Context context) {
           return [
             // HEADER
-            pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.center,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Image(pw.MemoryImage(logo)),
-                // pw.Image(pw.MemoryImage(imageResults[0])),
-                pw.SizedBox(height: 20),
-                pw.Text("LaborLink Anomaly Detection Report",
-                    textAlign: pw.TextAlign.center),
-                pw.SizedBox(height: 25),
-              ],
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Image(pw.MemoryImage(logo)),
+                  // pw.Image(pw.MemoryImage(imageResults[0])),
+                  pw.SizedBox(height: 20),
+                  pw.Text("LaborLink Anomaly Detection Report",
+                      textAlign: pw.TextAlign.center),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
             ),
 
             // BODY
@@ -104,30 +106,34 @@ class PdfInvoiceService {
 
             // CONTENTS
             for (var element in elements)
-              pw.Row(
-                children: [
-                  pw.Expanded(
-                      child: pw.Text(element.resultId,
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                      child: pw.Text(element.idType,
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                    child: pw.Image(
-                      pw.MemoryImage(element.attachment),
+              pw.Container(
+                margin: const pw.EdgeInsets.only(bottom: 10),
+                child: pw.Row(
+                  children: [
+                    pw.Expanded(
+                        child: pw.Text(element.resultId,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.idType,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                      child: pw.Image(
+                        pw.MemoryImage(element.attachment),
+                      ),
                     ),
-                  ),
-                  pw.Expanded(
-                      child: pw.Text(
-                          element.result == 'noanomaly'
-                              ? 'No Anomaly'
-                              : 'Has Anomaly',
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                      child: pw.Text(element.createdAt,
-                          textAlign: pw.TextAlign.center)),
-                ],
+                    pw.Expanded(
+                        child: pw.Text(
+                            element.result == 'noanomaly'
+                                ? 'No Anomaly'
+                                : 'Has Anomaly',
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.createdAt,
+                            textAlign: pw.TextAlign.center)),
+                  ],
+                ),
               ),
+
             pw.SizedBox(height: 20),
 
             // FOOTER
@@ -215,6 +221,8 @@ class PdfInvoiceService {
     return pdf.save();
   }
 
+  // CREATE FACE REPORT PDF ----------------------------------------------------
+
   Future<Uint8List> createFaceReport(List<FaceResults> faceResults) async {
     final pdf = pw.Document();
 
@@ -242,14 +250,20 @@ class PdfInvoiceService {
                 double.parse(faceResults[i].result2!)) /
             2;
 
-        // get verdict
-        if (int.parse(faceResults[i].result2!) == 0) {
+        // get verdict and single out result
+        if (double.parse(faceResults[i].result2!) == 0) {
           verdict = 'FAILED';
+          average = double.parse(faceResults[i].result!);
+        }
+
+        // single out result
+        if (double.parse(faceResults[i].result!) == 0) {
+          average = double.parse(faceResults[i].result2!);
         }
       }
 
       // get verdict
-      if (int.parse(faceResults[i].result!) == 0) {
+      if (double.parse(faceResults[i].result!) == 0) {
         verdict = 'FAILED';
       }
 
@@ -267,7 +281,7 @@ class PdfInvoiceService {
     final logo =
         (await rootBundle.load("assets/icons/LOGO 1.png")).buffer.asUint8List();
 
-    // FACE VERIFICATION REPORT PAGE
+    // FACE VERIFICATION REPORT ADD PAGE
 
     pdf.addPage(
       pw.MultiPage(
@@ -275,17 +289,19 @@ class PdfInvoiceService {
         build: (pw.Context context) {
           return [
             // HEADER
-            pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.center,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Image(pw.MemoryImage(logo)),
-                // pw.Image(pw.MemoryImage(imageResults[0])),
-                pw.SizedBox(height: 20),
-                pw.Text("LaborLink Face Verification Report",
-                    textAlign: pw.TextAlign.center),
-                pw.SizedBox(height: 25),
-              ],
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Image(pw.MemoryImage(logo)),
+                  // pw.Image(pw.MemoryImage(imageResults[0])),
+                  pw.SizedBox(height: 20),
+                  pw.Text("LaborLink Face Verification Report",
+                      textAlign: pw.TextAlign.center),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
             ),
 
             // BODY
@@ -311,116 +327,109 @@ class PdfInvoiceService {
             pw.SizedBox(height: 20),
 
             // CONTENTS
+
             for (var element in elements)
-              pw.Row(
-                children: [
-                  pw.Expanded(
-                      child: pw.Text(element.faceResultId,
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                    child: pw.Row(
-                      children: [
-                        for (var attachment in element.attachments)
-                          pw.Image(
-                            pw.MemoryImage(attachment),
-                          ),
-                      ],
+              pw.Container(
+                margin: const pw.EdgeInsets.only(bottom: 10),
+                child: pw.Row(
+                  children: [
+                    pw.Expanded(
+                        child: pw.Text(element.faceResultId,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                      child: pw.Column(
+                        children: [
+                          for (var attachment in element.attachments)
+                            pw.Image(
+                              width: 40,
+                              pw.MemoryImage(attachment),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                  pw.Expanded(
-                    child: pw.Row(
-                      children: [
-                        for (var result in element.results)
-                          pw.Text(result, textAlign: pw.TextAlign.center),
-                      ],
+                    pw.Expanded(
+                      child: pw.Column(
+                        children: [
+                          for (var result in element.results)
+                            pw.Text(result, textAlign: pw.TextAlign.center),
+                        ],
+                      ),
                     ),
-                  ),
-                  pw.Expanded(
-                      child: pw.Text(element.average.toString(),
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                      child: pw.Text(element.verdict,
-                          textAlign: pw.TextAlign.center)),
-                  pw.Expanded(
-                      child: pw.Text(element.createdAt,
-                          textAlign: pw.TextAlign.center)),
-                ],
+                    pw.Expanded(
+                        child: pw.Text(element.average.toStringAsFixed(2),
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.verdict,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.createdAt,
+                            textAlign: pw.TextAlign.center)),
+                  ],
+                ),
               ),
+
             pw.SizedBox(height: 20),
 
             // FOOTER
 
-            // Total Count
-            // pw.Row(
-            //   children: [
-            //     pw.Expanded(
-            //         child:
-            //             pw.Text('Total Count', textAlign: pw.TextAlign.left)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(
-            //         child: pw.Text(getAnomalyTotalCount(anomalyResults),
-            //             textAlign: pw.TextAlign.right)),
-            //   ],
-            // ),
-            // pw.Row(
-            //   children: [
-            //     pw.Expanded(
-            //         child: pw.Text('Total NBI', textAlign: pw.TextAlign.left)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(
-            //         child: pw.Text(getNBICount(anomalyResults),
-            //             textAlign: pw.TextAlign.right)),
-            //   ],
-            // ),
-            // pw.Row(
-            //   children: [
-            //     pw.Expanded(
-            //         child:
-            //             pw.Text('Total Tesda', textAlign: pw.TextAlign.left)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(
-            //         child: pw.Text(getTesdaCount(anomalyResults),
-            //             textAlign: pw.TextAlign.right)),
-            //   ],
-            // ),
-            // pw.Row(
-            //   children: [
-            //     pw.Expanded(
-            //         child:
-            //             pw.Text('Anomaly Count', textAlign: pw.TextAlign.left)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(
-            //         child: pw.Text(
-            //             '${getAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
-            //             textAlign: pw.TextAlign.right)),
-            //     pw.Expanded(
-            //         child: pw.Text('${getAnomalyPercentage(anomalyResults)}%',
-            //             textAlign: pw.TextAlign.right)),
-            //   ],
-            // ),
-            // pw.Row(
-            //   children: [
-            //     pw.Expanded(
-            //         child: pw.Text('No Anomaly Count',
-            //             textAlign: pw.TextAlign.left)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
-            //     pw.Expanded(
-            //         child: pw.Text(
-            //             '${getNoAnomalyCount(anomalyResults)}/${getAnomalyTotalCount(anomalyResults)}',
-            //             textAlign: pw.TextAlign.right)),
-            //     pw.Expanded(
-            //         child: pw.Text('${getNoAnomalyPercentage(anomalyResults)}%',
-            //             textAlign: pw.TextAlign.right)),
-            //   ],
-            // ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Count', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getFaceTotalCount(elements),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Passed', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(
+                        '${getPassedCount(elements)}/${getFaceTotalCount(elements)}',
+                        textAlign: pw.TextAlign.right)),
+                pw.Expanded(
+                    child: pw.Text('${getPassedPercentage(elements)}%',
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Failed', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(
+                        '${getFailedCount(elements)}/${getFaceTotalCount(elements)}',
+                        textAlign: pw.TextAlign.right)),
+                pw.Expanded(
+                    child: pw.Text('${getFailedPercentage(elements)}%',
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child: pw.Text('Average Accuracy',
+                        textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getAverageAccuracy(elements),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
             pw.SizedBox(height: 20),
 
             // FOOTER
@@ -465,7 +474,7 @@ class PdfInvoiceService {
     }
   }
 
-  // STATS ---------------------------------------------------------------------
+  // ANOMALY STATS -------------------------------------------------------------
 
   String getAnomalyTotalCount(List<AnomalyResults> anomalyResults) {
     return anomalyResults.length.toString();
@@ -521,6 +530,64 @@ class PdfInvoiceService {
     int count = int.parse(getNoAnomalyCount(anomalyResults));
     return ((count / int.parse(getAnomalyTotalCount(anomalyResults))) * 100)
         .toString();
+  }
+
+  // FACE STATS ----------------------------------------------------------------
+  String getFaceTotalCount(List<FaceCustomRow> faceResults) {
+    return faceResults.length.toString();
+  }
+
+  String getPassedCount(List<FaceCustomRow> faceResults) {
+    int count = 0;
+    for (var result in faceResults) {
+      if (result.verdict.toLowerCase() == 'passed') {
+        count++;
+      }
+    }
+    return count.toString();
+  }
+
+  String getFailedCount(List<FaceCustomRow> faceResults) {
+    int count = 0;
+    for (var result in faceResults) {
+      if (result.verdict.toLowerCase() == 'failed') {
+        count++;
+      }
+    }
+    return count.toString();
+  }
+
+  String getPassedPercentage(List<FaceCustomRow> faceResults) {
+    int count = int.parse(getPassedCount(faceResults));
+    return ((count / int.parse(getFaceTotalCount(faceResults))) * 100)
+        .toStringAsFixed(2);
+  }
+
+  String getFailedPercentage(List<FaceCustomRow> faceResults) {
+    int count = int.parse(getFailedCount(faceResults));
+    return ((count / int.parse(getFaceTotalCount(faceResults))) * 100)
+        .toStringAsFixed(2);
+  }
+
+  String getAverageAccuracy(List<FaceCustomRow> faceResults) {
+    int count = 0;
+    double total = 0;
+    double ave = 0;
+    for (var result in faceResults) {
+      // if (result.results.length > 1) {
+      //   if (result.results[0] == '0.00' || result.results[1] == '0.00') {
+      //     continue;
+      //   }
+      // } else {
+      //   if (result.results[0] == '0.00') {
+      //     continue;
+      //   }
+      // }
+      count++;
+      total += result.average;
+    }
+    ave = total / count;
+    return (ave.toStringAsFixed(2));
   }
 
   // String getVatTotal(List<Product> products) {s
