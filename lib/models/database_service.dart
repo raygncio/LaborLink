@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/SuggestedFee.dart';
 import 'dart:io';
-
+ 
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/models/handyman_approval.dart';
@@ -278,11 +276,22 @@ class DatabaseService {
           final handymanData = handymanDoc.data();
           final handymanId = handymanDoc.id;
 
+          final reviewQuery = await _db
+              .collection('review')
+              .where('userId', isEqualTo: userId)
+              .get();
+          for (var reviewDoc in reviewQuery.docs) {
+            final reviewData = reviewDoc.data();
+            rating += reviewData['rating'];
+            count++;
+          }
+          rates = rating / count;
           // Combine user and handyman data into a single map
           Map<String, dynamic> combinedData = {
             ...userData,
             ...handymanData,
             'handymanId': handymanId,
+            'rates': rates,
           };
           resultList.add(combinedData);
         }

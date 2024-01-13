@@ -492,6 +492,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                     return HandymanProposalCard(handymanInfo: currentHandyman);
                   } else if (currentHandyman.containsKey('suggestedPrice')) {
                     print("checking");
+                    print(currentHandyman['specialization']);
                     return HandymanHireCard(
                         handymanInfo: currentHandyman,
                         requestId: widget.userId);
