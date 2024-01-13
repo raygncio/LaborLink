@@ -9,6 +9,8 @@ const List<String> validIds = <String>[
   'PhilHealth',
   'SSS',
   'Postal ID',
+  'Student ID',
+  'Others',
 ];
 
 class ClientRequirementForm extends StatefulWidget {

@@ -106,7 +106,7 @@ class AddressFormState extends State<AddressForm> {
                           child: AppNormalTextFormField(
                             controller: _stateController,
                             height: 32,
-                            label: "STATE*",
+                            label: "REGION*",
                             labelTextStyle: _labelTextStyle,
                             defaultBorder: _defaultBorder,
                             errorBorder: _errorBorder,

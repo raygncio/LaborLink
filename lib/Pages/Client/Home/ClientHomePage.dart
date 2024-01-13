@@ -10,6 +10,7 @@ import 'package:laborlink/Widgets/Forms/RequestForm.dart';
 import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
+import 'package:laborlink/models/client.dart';
 import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,9 +42,33 @@ class _ClientHomePageState extends State<ClientHomePage> {
   List<Map<String, dynamic>> _searchResults = [];
   double _totalFee = 0.0;
 
+  String currentUserFirstName = '';
+  Client? clientInfo;
+
+  getUserData() async {
+    Client userData =
+        await service.getUserData(FirebaseAuth.instance.currentUser!.uid);
+    clientInfo = userData;
+    currentUserFirstName = clientInfo!.firstName;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+
+    // check user first name
+    if (currentUserFirstName.isNotEmpty) {
+      currentUserFirstName =
+          '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
+      print('>>>>>>>>>> user name: $currentUserFirstName');
+    }
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -227,7 +252,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 44),
-                        child: Text("Hello, User!",
+                        child: Text("Hello, $currentUserFirstName",
                             style: getTextStyle(
                                 textColor: AppColors.secondaryYellow,
                                 fontFamily: AppFonts.montserrat,
