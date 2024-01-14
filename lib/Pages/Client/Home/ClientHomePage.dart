@@ -106,8 +106,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
-    // DatabaseService service = DatabaseService();
-    print(searchText);
     bool fromButton = false;
 
     if (searchText == null) return;
@@ -124,9 +122,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
           await service.getUserAndHandymanDataByFirstName(searchText);
 
       // print('>>>>>>>>>>>>>$results');
-      // searchResultSection();
-      // print(searchText);
-      print(results);
 
       // prints if and only if search text is from button
       if (fromButton && results.isEmpty) {
@@ -252,7 +247,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 44),
-                        child: Text("Hello, $currentUserFirstName",
+                        child: Text("Hello, $currentUserFirstName!",
                             style: getTextStyle(
                                 textColor: AppColors.secondaryYellow,
                                 fontFamily: AppFonts.montserrat,

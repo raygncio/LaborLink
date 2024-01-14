@@ -61,7 +61,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     if (widget.requestDetail["progress"] != 'completion') {
       //check email verification status every 3 sec
       timer = Timer.periodic(
-        const Duration(seconds: 3),
+        const Duration(seconds: 4),
         (timer) => reloadPage(),
       );
     } else if (widget.requestDetail["progress"] == 'completion') {

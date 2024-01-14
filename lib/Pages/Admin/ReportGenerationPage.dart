@@ -57,6 +57,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
   Widget build(BuildContext context) {
     // final deviceWidth = MediaQuery.of(context).size.width;
     // final deviceHeight = MediaQuery.of(context).size.height;
+    String header = '';
 
     Widget mainContent = const Center(
       child: Text('No data found!'),
@@ -65,16 +66,19 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
     if (widget.reportType == ReportType.anomalyDetection &&
         anomalyResults.isNotEmpty) {
       mainContent = AnomalyList(results: anomalyResults);
+      header = 'Anomaly Detection Report';
     }
 
     if (widget.reportType == ReportType.faceVerification &&
         faceResults.isNotEmpty) {
       mainContent = FaceList(results: faceResults);
+      header = 'Face Verification Report';
     }
 
     if (widget.reportType == ReportType.income &&
         completedRequests.isNotEmpty) {
       mainContent = IncomeList(results: completedRequests);
+      header = 'Income Report';
     }
 
     return Scaffold(
@@ -84,7 +88,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
         color: AppColors.white,
         child: Column(
           children: [
-            appBar(),
+            appBar(header),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 15, top: 22),
@@ -180,7 +184,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
 
   void onBack() => Navigator.of(context).pop();
 
-  Widget appBar() => Container(
+  Widget appBar(String header) => Container(
         color: AppColors.secondaryBlue,
         child: Padding(
           padding: const EdgeInsets.only(top: 16, bottom: 10),
@@ -198,7 +202,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                 ),
               ),
               Text(
-                "${widget.reportType == ReportType.faceVerification ? "Face Verification" : "Anomaly Detection"} Report",
+                header,
                 style: getTextStyle(
                     textColor: AppColors.secondaryYellow,
                     fontFamily: AppFonts.montserrat,

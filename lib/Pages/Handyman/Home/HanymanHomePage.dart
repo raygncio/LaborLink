@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
-import 'package:laborlink/Pages/Handyman/Activity/HandymanActivityPage.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/DirectRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
@@ -12,6 +8,9 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
@@ -29,6 +28,8 @@ class HandymanHomePage extends StatefulWidget {
 class _HandymanHomePageState extends State<HandymanHomePage> {
   final _searchController = TextEditingController();
   DatabaseService service = DatabaseService();
+  final _firebase = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   late GlobalKey<RequestFormState> requestFormKey;
   late String specialization;
   List<Map<String, dynamic>> _searchResults = [];
@@ -41,12 +42,23 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   bool _showSearchResult = false;
 
   late double currentDeviceHeight; // get current device height
+  String currentUserFirstName = '';
+  Client? clientInfo;
 
   @override
   void initState() {
     // TODO: implement initState
+    getUserData();
     displayRequest();
     super.initState();
+  }
+
+  getUserData() async {
+    Client userData =
+        await service.getUserData(FirebaseAuth.instance.currentUser!.uid);
+    clientInfo = userData;
+    currentUserFirstName = clientInfo!.firstName;
+    setState(() {});
   }
 
   void displayRequest() async {
@@ -67,6 +79,12 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
     currentDeviceHeight = deviceHeight;
+    // check user first name
+    if (currentUserFirstName.isNotEmpty) {
+      currentUserFirstName =
+          '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
+      print('>>>>>>>>>> user name: $currentUserFirstName');
+    }
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -157,7 +175,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 38),
-                        child: Text("Hello, User!",
+                        child: Text("Hello, $currentUserFirstName!",
                             style: getTextStyle(
                                 textColor: AppColors.secondaryYellow,
                                 fontFamily: AppFonts.montserrat,
@@ -401,7 +419,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
       );
     } else {
-      return NoOngoingRequestCard();
+      return const NoOngoingRequestCard();
     }
   }
 }

@@ -22,33 +22,47 @@ class IncomeItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  'Request ID: ${result.requestId!}',
-                  style: getTextStyle(
-                      textColor: AppColors.secondaryBlue,
-                      fontFamily: AppFonts.poppins,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 8),
-                ),
-                Text(
-                  'User ID: ${result.userId}',
-                  style: getTextStyle(
-                      textColor: AppColors.accentOrange,
-                      fontFamily: AppFonts.poppins,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 8),
-                ),
-                Text(
-                  'Handyman ID: ${result.handymanId!}',
-                  style: getTextStyle(
-                      textColor: AppColors.accentOrange,
-                      fontFamily: AppFonts.poppins,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 8),
-                ),
-              ],
+            SizedBox(
+              height: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Request ID: ${result.requestId!}',
+                        style: getTextStyle(
+                            textColor: AppColors.secondaryBlue,
+                            fontFamily: AppFonts.poppins,
+                            fontWeight: AppFontWeights.semiBold,
+                            fontSize: 8),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'User ID: ${result.userId}',
+                        style: getTextStyle(
+                            textColor: AppColors.accentOrange,
+                            fontFamily: AppFonts.poppins,
+                            fontWeight: AppFontWeights.semiBold,
+                            fontSize: 6),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      Text(
+                        'Handyman ID: ${result.handymanId!}',
+                        style: getTextStyle(
+                            textColor: AppColors.accentOrange,
+                            fontFamily: AppFonts.poppins,
+                            fontWeight: AppFontWeights.semiBold,
+                            fontSize: 6),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(
@@ -56,15 +70,6 @@ class IncomeItem extends StatelessWidget {
             ), // fixed spacing
             Row(
               children: [
-                Text(
-                  result.title,
-                  style: getTextStyle(
-                      textColor: AppColors.black,
-                      fontFamily: AppFonts.poppins,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 8),
-                ),
-                const Spacer(),
                 Text(
                   result.category,
                   style: getTextStyle(
@@ -93,7 +98,7 @@ class IncomeItem extends StatelessWidget {
                 ),
                 const Spacer(), // space
                 Text(
-                  income.toString(),
+                  income.toStringAsFixed(2),
                   style: getTextStyle(
                       textColor: AppColors.black,
                       fontFamily: AppFonts.poppins,

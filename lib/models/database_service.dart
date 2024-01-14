@@ -176,6 +176,20 @@ class DatabaseService {
     return anomalyResultsList;
   }
 
+  Future<List<Request>> getAllCompletedRequests() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('request')
+        .where("progress", isEqualTo: "completed")
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<Request> completedRequestsList = querySnapshot.docs.map((doc) {
+      return Request.fromFireStore(doc);
+    }).toList();
+
+    return completedRequestsList;
+  }
+
   // USERS
 
   addUser(Client userData) async {

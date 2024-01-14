@@ -300,7 +300,10 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     );
   }
 
-  void onAccept() {}
+  void onAccept() {
+    // Accept the request, update the request
+    // direct to home page
+  }
 
   _getTotalFee(double fee) {
     setState(() {
