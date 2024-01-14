@@ -75,6 +75,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                         ),
                       ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             fullname,
@@ -88,7 +89,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                             padding: EdgeInsets.only(top: 1.27),
                             child: AppBadge(
                               label: "Request ID: " +
-                                  widget.requestInfo["requestId"],
+                                  widget.requestInfo["ActiveRequestId"],
                               type: BadgeType.normal,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 1),
@@ -142,12 +143,19 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextWithIcon(
-                                  icon: const Icon(Icons.place,
-                                      size: 13, color: AppColors.accentOrange),
-                                  text: widget.requestInfo["address"] ?? '',
-                                  fontSize: 9,
-                                  contentPadding: 8,
+                                SizedBox(
+                                  width: 160,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: TextWithIcon(
+                                      icon: const Icon(Icons.place,
+                                          size: 13,
+                                          color: AppColors.accentOrange),
+                                      text: widget.requestInfo['address'],
+                                      fontSize: 12,
+                                      contentPadding: 8,
+                                    ),
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6.75),
@@ -300,9 +308,24 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     );
   }
 
-  void onAccept() {
+  void onAccept() async {
     // Accept the request, update the request
     // direct to home page
+    try {
+      await service.updateRequestProgress(
+          widget.requestInfo["ActiveRequestId"], widget.userId);
+    } catch (e) {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error creating user: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId)));
   }
 
   _getTotalFee(double fee) {
@@ -333,7 +356,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         description: _offerDesc,
         attachment: imageUrl,
         userId: widget.userId,
-        requestId: widget.requestInfo['requestId'],
+        requestId: widget.requestInfo['ActiveRequestId'],
       );
 
       await service.addOffers(offers);
@@ -365,7 +388,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
   void onDecline() async {
     DatabaseService service = DatabaseService();
     try {
-      await service.declineDirectRequest(widget.requestInfo["requestId"]);
+      await service.declineDirectRequest(widget.requestInfo["ActiveRequestId"]);
       Future.delayed(Duration(milliseconds: 400), () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

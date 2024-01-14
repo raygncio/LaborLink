@@ -405,11 +405,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   }
 
   Future<Widget> getOngoingServiceContent() async {
-    DatabaseService service = DatabaseService();
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-
-    print(">>>>>>>>>>>>${getActiveRequest['approvalStatus']}");
 
     if (getActiveRequest["approvalStatus"] != "completed" ||
         getActiveRequest["approvalStatus"] != "cancelled") {

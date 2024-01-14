@@ -190,16 +190,20 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: TextWithIcon(
-                              icon: const Icon(Icons.place,
-                                  size: 13, color: AppColors.accentOrange),
-                              text: address,
-                              fontSize: 12,
-                              contentPadding: 8,
+                          SizedBox(
+                            width: 160,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: TextWithIcon(
+                                icon: const Icon(Icons.place,
+                                    size: 13, color: AppColors.accentOrange),
+                                text: address,
+                                fontSize: 12,
+                                contentPadding: 8,
+                              ),
                             ),
                           ),
+
                           // TextWithIcon(
                           //   icon: const Icon(Icons.place,
                           //       size: 13, color: AppColors.accentOrange),
@@ -272,32 +276,46 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
   }
 
   void onAccept() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmation'),
-          content: const Text('Do you really want to accept this request?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Perform action on 'No' button press (if needed)
-              },
-              child: Text('No'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Perform action on 'Yes' button press
-                performAcceptAction();
-              },
-              child: Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    if (getActiveRequest["approvalStatus"] != "completed" ||
+        getActiveRequest["approvalStatus"] != "cancelled") {
+      // Handle errors during request accept
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only create one request at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirmation'),
+            content: const Text('Do you really want to accept this request?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Perform action on 'No' button press (if needed)
+                },
+                child: Text('No'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Perform action on 'Yes' button press
+                  performAcceptAction();
+                },
+                child: Text('Yes'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void performAcceptAction() async {

@@ -67,7 +67,7 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
     });
   }
 
-  void onProceed() {
+  void onProceed() async {
     if (directRequestFormKey.currentState!.validateForm()) {
       // print('>>>> IN direct request proceed');
 
@@ -83,7 +83,18 @@ class _DirectRequestFormPageState extends State<DirectRequestFormPage> {
       String? addressError = directRequestFormKey.currentState!
           .validateAddress(formData['address']);
 
-      if (titleError != null ||
+      Request? requestInfo = await service.getRequestsData(widget.userId);
+
+      if (requestInfo != null) {
+        // Handle errors during request creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text("Invalid. You can only create one request at a time."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (titleError != null ||
           descriptionError != null ||
           addressError != null) {
         // Handle validation errors

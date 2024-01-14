@@ -67,7 +67,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
     if (currentUserFirstName.isNotEmpty) {
       currentUserFirstName =
           '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
-      print('>>>>>>>>>> user name: $currentUserFirstName');
     }
 
     return Scaffold(
@@ -220,16 +219,29 @@ class _ClientHomePageState extends State<ClientHomePage> {
     });
   }
 
-  void onOpenRequestProceed() {
-    confirmationDialog(context).then((value) {
-      if (value == null) return;
+  void onOpenRequestProceed() async {
+    // Check if the user has an ongoing request
+    Request? requestInfo = await service.getRequestsData(widget.userId);
 
-      if (value == "proceed") {
-        suggestedFeeDialog(context, _getTotalFee).then((value) {
-          submitRequest('open');
-        });
-      }
-    });
+    if (requestInfo != null) {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only create one request at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      confirmationDialog(context).then((value) {
+        if (value == null) return;
+
+        if (value == "proceed") {
+          suggestedFeeDialog(context, _getTotalFee).then((value) {
+            submitRequest('open');
+          });
+        }
+      });
+    }
   }
 
   Widget header(deviceWidth) => KeyboardVisibilityBuilder(

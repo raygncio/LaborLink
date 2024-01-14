@@ -444,6 +444,7 @@ class DatabaseService {
             .collection('request')
             .where('userId', isEqualTo: userId)
             .where('progress', isEqualTo: 'pending')
+            .where('handymanId', isNull: true)
             .get();
 
         // Process 'request' query results
@@ -562,6 +563,7 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getCompletedRequestHandyman(
       String userId) async {
     List<Map<String, dynamic>> resultList = [];
+
     // Query 'user' collection
     final requestQuery = await _db
         .collection('request')
@@ -580,7 +582,7 @@ class DatabaseService {
       final clientId = requestData["userId"];
       Map<String, dynamic> combinedData = {
         'clientId': clientId,
-        'requestId': requestId,
+        'validRequestId': requestId,
         ...requestData,
       };
       // resultList.add(combinedData);
@@ -785,13 +787,22 @@ class DatabaseService {
       final requestId = requestDoc.id;
       final userId = requestData['userId'];
 
+      Map<String, dynamic> groupData = {
+        ...requestData,
+        'ActiveRequestId': requestId,
+        'userId': userId,
+        'handymanId': handymanId,
+      };
+
       final userQuery = await _db
           .collection('user')
           .where('userId', isEqualTo: userId)
           .where('userRole', isEqualTo: 'client')
           .get();
+
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
+        groupData.addAll(userData);
 
         final handymanQuery = await _db
             .collection('handyman')
@@ -799,15 +810,9 @@ class DatabaseService {
             .get();
         for (var handymanDoc in handymanQuery.docs) {
           final handymanData = handymanDoc.data();
+          groupData.addAll(handymanData);
 
-          // Combine handyman and request data into a single map
-          Map<String, dynamic> combinedData = {
-            'requestId': requestId,
-            ...requestData,
-            ...userData,
-            ...handymanData
-          };
-          resultList.add(combinedData);
+          resultList.add(groupData);
         }
       }
     }

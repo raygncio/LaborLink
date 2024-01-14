@@ -526,7 +526,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
-                                      userId: currentRequest['requestId'],
+                                      userId: currentRequest['validRequestId'],
                                       userRole: currentRequest['userRole'],
                                     ),
                                   )),
