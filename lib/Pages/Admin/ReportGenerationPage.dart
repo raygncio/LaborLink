@@ -144,7 +144,7 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                         );
                       }
                     }
-                    // DOWNLOAD ANOMALY REPORT
+                    // DOWNLOAD FACE REPORT
                     if (widget.reportType == ReportType.faceVerification) {
                       final data =
                           await pdfService.createFaceReport(faceResults);
@@ -171,7 +171,31 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                       }
                     }
                     // DOWNLOAD INCOME REPORT
-                    // ...
+                    if (widget.reportType == ReportType.income) {
+                      final data = await pdfService
+                          .createIncomeReport(completedRequests);
+                      String download = await pdfService.savePdfFile(
+                          'income_${DateTime.now()}', data);
+                      if (download == 'Success') {
+                        Fluttertoast.showToast(
+                            msg: "Saved to downloads",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            fontSize: 12.0);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              download,
+                              style: const TextStyle(color: AppColors.white),
+                            ),
+                            backgroundColor: AppColors.red,
+                          ),
+                        );
+                      }
+                    }
                   },
                 ),
               ],

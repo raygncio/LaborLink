@@ -35,7 +35,7 @@ class IncomeHeader extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'Income',
+                  'Gain',
                   textAlign: TextAlign.center,
                   style: getTextStyle(
                       textColor: AppColors.accentOrange,

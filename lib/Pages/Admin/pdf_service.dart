@@ -8,6 +8,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:laborlink/models/results/anomaly_results.dart';
 import 'package:laborlink/models/results/face_results.dart';
+import 'package:laborlink/models/request.dart';
 
 class AnomalyCustomRow {
   final String resultId;
@@ -32,7 +33,187 @@ class FaceCustomRow {
       this.verdict, this.createdAt);
 }
 
+class IncomeCustomRow {
+  final String requestId;
+  final String title;
+  final String userId;
+  final String handymanId;
+  final String category;
+  final double price;
+  final double income;
+  final String createdAt;
+
+  IncomeCustomRow(this.requestId, this.title, this.userId, this.handymanId,
+      this.category, this.price, this.income, this.createdAt);
+}
+
 class PdfInvoiceService {
+  // CREATE INCOME REPORT PDF--------------------------------------------------
+  Future<Uint8List> createIncomeReport(List<Request> completedRequests) async {
+    final pdf = pw.Document();
+    // double newPrice = result.suggestedPrice;
+    // double origPrice = 0.0;
+    // double income = 0.0;
+
+    // origPrice = newPrice / (1 + 0.10);
+    // income = newPrice - origPrice;
+
+    // INITIALIZE ELEMENTS
+    final List<IncomeCustomRow> elements = [
+      for (var result in completedRequests)
+        IncomeCustomRow(
+          result.requestId!,
+          result.title,
+          result.userId,
+          result.handymanId!,
+          result.category,
+          result.suggestedPrice,
+          (result.suggestedPrice - (result.suggestedPrice / 1.10)),
+          result.createdAt.toString().substring(0, 16),
+        ),
+    ];
+
+    // LOAD IMAGES
+    final logo =
+        (await rootBundle.load("assets/icons/LOGO 1.png")).buffer.asUint8List();
+
+    // INCOME REPORT ADD PAGE
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            // HEADER
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Image(pw.MemoryImage(logo)),
+                  // pw.Image(pw.MemoryImage(imageResults[0])),
+                  pw.SizedBox(height: 20),
+                  pw.Text("LaborLink Income Report",
+                      textAlign: pw.TextAlign.center),
+                  pw.Text("For the month of January",
+                      textAlign: pw.TextAlign.center),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
+            ),
+
+            // BODY
+            // COLUMN TITLES
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Request Id', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Title', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('User Id', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child:
+                        pw.Text('Handyman Id', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Category', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Suggested Price',
+                        textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text('Gain', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child:
+                        pw.Text('Created At', textAlign: pw.TextAlign.center)),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+
+            // CONTENTS
+            for (var element in elements)
+              pw.Container(
+                margin: const pw.EdgeInsets.only(bottom: 10),
+                child: pw.Row(
+                  children: [
+                    pw.Expanded(
+                        child: pw.Text(element.requestId,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.title,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.userId,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.handymanId,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.category,
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.price.toStringAsFixed(2),
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.income.toStringAsFixed(2),
+                            textAlign: pw.TextAlign.center)),
+                    pw.Expanded(
+                        child: pw.Text(element.createdAt,
+                            textAlign: pw.TextAlign.center)),
+                  ],
+                ),
+              ),
+
+            pw.SizedBox(height: 20),
+
+            // FOOTER
+
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child: pw.Text('Total Acquired Value',
+                        textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getTotalAcquiredValue(elements),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.Expanded(
+                    child:
+                        pw.Text('Total Income', textAlign: pw.TextAlign.left)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(child: pw.Text('', textAlign: pw.TextAlign.center)),
+                pw.Expanded(
+                    child: pw.Text(getTotalIncome(elements),
+                        textAlign: pw.TextAlign.right)),
+              ],
+            ),
+
+            // FOOTER
+            pw.SizedBox(height: 25),
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text("END"),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
+            ),
+          ];
+        },
+      ),
+    );
+    return pdf.save();
+  }
+
   // CREATE ANOMALY REPORT PDF--------------------------------------------------
   Future<Uint8List> createAnomalyReport(
       List<AnomalyResults> anomalyResults) async {
@@ -213,7 +394,16 @@ class PdfInvoiceService {
 
             // FOOTER
             pw.SizedBox(height: 25),
-            pw.Text("END"),
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text("END"),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
+            ),
           ];
         },
       ),
@@ -434,7 +624,16 @@ class PdfInvoiceService {
 
             // FOOTER
             pw.SizedBox(height: 25),
-            pw.Text("END"),
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text("END"),
+                  pw.SizedBox(height: 25),
+                ],
+              ),
+            ),
           ];
         },
       ),
@@ -574,15 +773,11 @@ class PdfInvoiceService {
     double total = 0;
     double ave = 0;
     for (var result in faceResults) {
-      // if (result.results.length > 1) {
-      //   if (result.results[0] == '0.00' || result.results[1] == '0.00') {
-      //     continue;
-      //   }
-      // } else {
-      //   if (result.results[0] == '0.00') {
-      //     continue;
-      //   }
-      // }
+      if (result.results.length == 1) {
+        if (result.results[0] == '0.00') {
+          continue;
+        }
+      }
       count++;
       total += result.average;
     }
@@ -590,13 +785,21 @@ class PdfInvoiceService {
     return (ave.toStringAsFixed(2));
   }
 
-  // String getVatTotal(List<Product> products) {s
-  //   return products
-  //       .fold(
-  //         0.0,
-  //         (double prev, next) =>
-  //             prev + ((next.price / 100 * next.vatInPercent) * next.amount),
-  //       )
-  //       .toStringAsFixed(2);
-  // }
+  // INCOME STATS --------------------------------------------------------------
+
+  String getTotalAcquiredValue(List<IncomeCustomRow> completedRequests) {
+    double total = 0.0;
+    for (var result in completedRequests) {
+      total += result.price;
+    }
+    return total.toStringAsFixed(2);
+  }
+
+  String getTotalIncome(List<IncomeCustomRow> completedRequests) {
+    double total = 0.0;
+    for (var result in completedRequests) {
+      total += result.income;
+    }
+    return total.toStringAsFixed(2);
+  }
 }
