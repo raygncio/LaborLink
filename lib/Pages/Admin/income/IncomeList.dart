@@ -12,7 +12,9 @@ class IncomeList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const IncomeHeader(),
+        IncomeHeader(
+          completedRequests: results,
+        ),
         Expanded(
           child: ListView.builder(
             itemCount: results.length,
