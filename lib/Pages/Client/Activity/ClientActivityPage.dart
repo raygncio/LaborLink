@@ -6,7 +6,6 @@ import 'package:laborlink/Widgets/Cards/HandymanProposalCard.dart';
 import 'package:laborlink/Widgets/Cards/HandymanSelectedCard.dart';
 import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
@@ -100,6 +99,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       interestedLaborerWithOffer =
           await service.getInterestedHandymanAndOffer(widget.userId);
+      // print(interestedLaborerWithOffer);
     } catch (error) {
       print('Error fetching interested laborers: 2 $error');
     }
@@ -236,11 +236,11 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         future: historyTab(deviceWidth),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Return a loading indicator or placeholder
+            return const CircularProgressIndicator(); // Return a loading indicator or placeholder
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}'); // Handle the error
           } else {
-            return snapshot.data ?? SizedBox.shrink();
+            return snapshot.data ?? const SizedBox.shrink();
           }
         },
       );
@@ -320,7 +320,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
@@ -340,7 +340,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
@@ -371,17 +371,17 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
           Map<String, dynamic> requestDetail = snapshot.data!;
 
           return FutureBuilder(
-            future: Future.delayed(Duration(milliseconds: 400)),
+            future: Future.delayed(const Duration(milliseconds: 400)),
             builder: (context, delaySnapshot) {
               if (delaySnapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Return a loading indicator or placeholder during the delay
+                return const CircularProgressIndicator(); // Return a loading indicator or placeholder during the delay
               } else {
                 return _buildPendingDirectRequest(requestDetail);
               }
@@ -437,7 +437,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: activeRequestFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {

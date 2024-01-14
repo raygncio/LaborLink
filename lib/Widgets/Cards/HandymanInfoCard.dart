@@ -125,8 +125,10 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: RatingBar.builder(
-                        initialRating: (widget.handymanInfo["rates"] ?? 0)
-                            .toDouble(), // input
+                        initialRating: double.parse(
+                          (widget.handymanInfo["rates"] ?? 0)
+                              .toStringAsFixed(2),
+                        ), // input
                         itemCount: 5,
                         itemSize: 15,
                         ignoreGestures: true,

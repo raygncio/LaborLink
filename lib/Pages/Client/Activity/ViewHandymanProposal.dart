@@ -360,6 +360,9 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                print(widget.handymanInfo['handymanId']);
+                print(widget.handymanInfo['NewRequestId']);
+                print(widget.handymanInfo['bidPrice']);
                 Navigator.of(context)
                     .pop(false); // Return false when cancel is pressed
               },

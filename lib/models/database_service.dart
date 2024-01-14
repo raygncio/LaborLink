@@ -242,7 +242,7 @@ class DatabaseService {
             rating += reviewData['rating'];
             count++;
           }
-          rates = rating / count;
+          rates = count > 0 ? rating / count : 0;
           // Combine user and handyman data into a single map
           Map<String, dynamic> combinedData = {
             ...userData,
@@ -285,7 +285,7 @@ class DatabaseService {
             rating += reviewData['rating'];
             count++;
           }
-          rates = rating / count;
+          rates = count > 0 ? rating / count : 0;
           // Combine user and handyman data into a single map
           Map<String, dynamic> combinedData = {
             ...userData,
@@ -534,7 +534,7 @@ class DatabaseService {
           count++;
           combinedData.addAll(reviewData);
         }
-        rates = rating / count;
+        rates = count > 0 ? rating / count : 0;
         combinedData.addAll({'rates': rates});
       }
       // print(combinedData);
@@ -557,6 +557,9 @@ class DatabaseService {
 
     // Process 'request' query results
     for (var requestDoc in requestQuery.docs) {
+      double rating = 0;
+      double count = 0;
+      double rates = 0;
       final requestId = requestDoc.id;
       final requestData = requestDoc.data();
       final handymanId = requestData["handymanId"];
@@ -587,8 +590,13 @@ class DatabaseService {
         // Process 'review' query results
         for (var reviewDoc in reviewsQuery.docs) {
           final reviewData = reviewDoc.data();
+          rating += reviewData['rating'];
+          count++;
           combinedData.addAll(reviewData);
         }
+        rates = count > 0 ? rating / count : 0;
+        combinedData.addAll({'rates': rates});
+        print(rates);
       }
       resultList.add(combinedData);
     }
@@ -681,6 +689,9 @@ class DatabaseService {
   Future<Map<String, dynamic>> getClientHistory(
       String requestId, String userRole) async {
     Map<String, dynamic> resultMap = {};
+    double rating = 0;
+    double count = 0;
+    double rates = 0;
     String checkId;
     final requestDoc = await _db.collection('request').doc(requestId).get();
 
@@ -728,9 +739,14 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewsQuery.docs) {
             final reviewData = reviewDoc.data();
+            rating += reviewData['rating'];
+            count++;
             combinedData.addAll(reviewData);
           }
         }
+        rates = count > 0 ? rating / count : 0;
+        print('Ratse fs $rates');
+        resultMap.addAll({'rates': rates});
       }
 
       resultMap.addAll(combinedData);
@@ -829,7 +845,7 @@ class DatabaseService {
           }
         }
       }
-      rates = rating / count;
+      rates = count > 0 ? rating / count : 0;
 
       resultMap.addAll({'rates': rates});
     }
@@ -928,7 +944,7 @@ class DatabaseService {
         .toList(); // makes iterable list to list
   }
 
-  // Update the progress to cancelled request
+  // Update the progress to cancel request
   Future<void> cancelRequest(String userId) async {
     final requestQuery = await _db
         .collection('request')
@@ -939,6 +955,21 @@ class DatabaseService {
     for (var doc in requestQuery.docs) {
       await doc.reference.update({
         'progress': 'cancelled',
+      });
+    }
+  }
+
+  // Update the progress to cancel approval
+  Future<void> cancelApproval(String userId) async {
+    final approvalQuery = await _db
+        .collection('handymanApproval')
+        .where('handymanId', isEqualTo: userId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    for (var doc in approvalQuery.docs) {
+      await doc.reference.update({
+        'status': 'cancelled',
       });
     }
   }
@@ -1212,7 +1243,10 @@ class DatabaseService {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
 
-      Map<String, dynamic> groupData = {...requestData, 'requestId': requestId};
+      Map<String, dynamic> groupData = {
+        ...requestData,
+        'activeRequestId': requestId
+      };
 
       final handymanQuery = await _db
           .collection('handymanApproval')
@@ -1262,8 +1296,7 @@ class DatabaseService {
             }
           }
         }
-        rates = rating / count;
-        print(rates);
+        rates = count > 0 ? rating / count : 0;
         groupData.addAll({'rates': rates});
       }
 
@@ -1358,7 +1391,7 @@ class DatabaseService {
             }
           }
         }
-        rates = rating / count;
+        rates = count > 0 ? rating / count : 0;
         resultMap.addAll({'rates': rates});
       } else {
         final offerQuery = await _db
@@ -1409,7 +1442,7 @@ class DatabaseService {
             }
           }
         }
-        rates = rating / count;
+        rates = count > 0 ? rating / count : 0;
         resultMap.addAll({'rates': rates});
       }
     }
@@ -1706,11 +1739,6 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getInterestedHandymanAndOffer(
       String userId) async {
     List<Map<String, dynamic>> resultList = [];
-    double rating = 0;
-    double count = 0;
-    double rates = 0;
-
-    bool check = false;
 
     // Query 'request' collection using userId from 'offer'
     final requestQuery = await _db
@@ -1724,14 +1752,6 @@ class DatabaseService {
       final requestId = requestDoc.id;
       final clientId = requestData['userId'];
 
-      Map<String, dynamic> groupData = {
-        ...requestData,
-        'NewRequestId': requestId,
-        'clientId': clientId
-      };
-      // resultList.add(groupData);
-      //print("*************************CHECK THE USER DATA123 $requestData");
-
       // Query 'offer' collection
       final offerQuery = await _db
           .collection('offer')
@@ -1741,36 +1761,43 @@ class DatabaseService {
 
       for (var offerDoc in offerQuery.docs) {
         final offerData = offerDoc.data();
-        check = true;
+        double rating = 0;
+        double count = 0;
+        double rates = 0;
 
-        final userIdOnOffer = offerData["userId"];
-        groupData.addAll({...offerData, 'handymanId': userIdOnOffer});
+        // Create a new groupData map for each offer
+        Map<String, dynamic> groupData = {
+          ...requestData,
+          'NewRequestId': requestId,
+          'clientId': clientId,
+          ...offerData,
+          'handymanId': offerData["userId"],
+        };
 
         // Query 'handyman' collection using userId from 'offer'
         final handymanQuery = await _db
             .collection('handyman')
-            .where('userId', isEqualTo: userIdOnOffer)
+            .where('userId', isEqualTo: groupData['handymanId'])
             .get();
 
         for (var handymanDoc in handymanQuery.docs) {
-          final handymanData = handymanDoc.data();
-          groupData.addAll(handymanData);
+          groupData.addAll(handymanDoc.data());
+
           // Query 'user' collection using userId from 'offer'
           final userQuery = await _db
               .collection('user')
-              .where('userId', isEqualTo: userIdOnOffer)
+              .where('userId', isEqualTo: groupData['handymanId'])
               .where('userRole', isEqualTo: 'handyman')
               .get();
 
           // Process 'user' query results
           for (var userDoc in userQuery.docs) {
-            final userData = userDoc.data();
-            groupData.addAll(userData);
+            groupData.addAll(userDoc.data());
 
             // Query 'review' collection using some key from userData, adjust as needed
             final reviewQuery = await _db
                 .collection('review')
-                .where('userId', isEqualTo: userIdOnOffer)
+                .where('userId', isEqualTo: groupData['handymanId'])
                 .get();
 
             // Process 'review' query results
@@ -1782,18 +1809,15 @@ class DatabaseService {
             }
           }
         }
-        rates = rating / count;
+        rates = count > 0 ? rating / count : 0;
         groupData.addAll({'rates': rates});
+
+        // Add the combined data to the resultList
+        resultList.add(groupData);
       }
-
-      // Add the combined data to the resultList
-      resultList.add(groupData);
     }
 
-    if (check) {
-      return resultList;
-    }
-    return [];
+    return resultList;
   }
 
   // REVIEWS

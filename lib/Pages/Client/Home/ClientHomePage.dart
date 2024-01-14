@@ -109,7 +109,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     // DatabaseService service = DatabaseService();
     print(searchText);
     bool fromButton = false;
-    print("dddddddddddd");
+
     if (searchText == null) return;
 
     if (searchText.length > 4 && searchText.substring(0, 4) == 'btn-') {

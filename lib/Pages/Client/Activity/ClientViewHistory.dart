@@ -47,7 +47,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
     try {
       completedRequest =
           await service.getClientHistory(widget.userId, widget.userRole);
-      // print(completedRequest);
+      // print(double.parse(completedRequest["rates"] ?? 0).toStringAsFixed(2));
     } catch (error) {
       print('Error fetching interested laborers: $error');
     }

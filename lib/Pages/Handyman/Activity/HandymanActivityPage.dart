@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Client/Activity/ClientActiveRequest.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import 'package:laborlink/Pages/Handyman/Activity/HandymanActiveRequest.dart';
 import 'package:laborlink/Pages/Handyman/Activity/ViewOfferPage.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Cards/ClientInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanHireCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanProposalCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanSelectedCard.dart';
-import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 
@@ -141,11 +136,11 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
         future: historyTab(deviceWidth),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Return a loading indicator or placeholder
+            return const CircularProgressIndicator(); // Return a loading indicator or placeholder
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}'); // Handle the error
           } else {
-            return snapshot.data ?? SizedBox.shrink();
+            return snapshot.data ?? const SizedBox.shrink();
           }
         },
       );
@@ -254,6 +249,20 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           type: BadgeType.blocked,
                           padding:
                               EdgeInsets.symmetric(horizontal: 7, vertical: 2)),
+                      AppOutlinedButton(
+                          height: 20,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          text: "Cancel Request",
+                          textStyle: getTextStyle(
+                              textColor: AppColors.accentOrange,
+                              fontFamily: AppFonts.montserrat,
+                              fontWeight: AppFontWeights.bold,
+                              fontSize: 9),
+                          color: AppColors.accentOrange,
+                          command: onCancelRequest,
+                          borderRadius: 8,
+                          borderWidth: 1),
                     ],
                   ),
                   Text(
@@ -284,13 +293,29 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextWithIcon(
-                              icon: const Icon(Icons.place,
-                                  size: 17, color: AppColors.accentOrange),
-                              text: getActiveRequest['address'],
-                              fontSize: 12,
-                              contentPadding: 19,
+                            Container(
+                              width: 200, // Set your specific width here
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: TextWithIcon(
+                                  icon: const Icon(
+                                    Icons.place,
+                                    size: 17,
+                                    color: AppColors.accentOrange,
+                                  ),
+                                  text: getActiveRequest['address'],
+                                  fontSize: 12,
+                                  contentPadding: 19,
+                                ),
+                              ),
                             ),
+                            // TextWithIcon(
+                            //   icon: const Icon(Icons.place,
+                            //       size: 17, color: AppColors.accentOrange),
+                            //   text: getActiveRequest['address'],
+                            //   fontSize: 12,
+                            //   contentPadding: 19,
+                            // ),
                             Padding(
                               padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
@@ -347,8 +372,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 7.76),
                                 child: AppBadge(
-                                  label: "Offered ₱" +
-                                      getActiveRequest['bidPrice'].toString(),
+                                  label:
+                                      "Offered ₱${getActiveRequest['bidPrice'].toString()}",
                                   type: BadgeType.offer,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 7, vertical: 1),
@@ -400,7 +425,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
   Widget activeRequest() {
     return FutureBuilder(
       future: Future.delayed(
-          Duration(seconds: 1)), // Adjust the delay duration as needed
+          const Duration(seconds: 1)), // Adjust the delay duration as needed
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Padding(
@@ -411,7 +436,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           );
         } else {
           // You can return a loading indicator or an empty container while waiting
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -704,5 +729,55 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
         },
       ),
     );
+  }
+
+  void onCancelRequest() async {
+    bool confirmCancel = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Request'),
+          content: const Text('Are you sure you want to cancel your request?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false when cancel is pressed
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true when confirm is pressed
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmCancel == true) {
+      DatabaseService service = DatabaseService();
+
+      try {
+        await service.cancelApproval(widget.userId);
+        print('Document updated successfully');
+        // Show SnackBar when request is successfully cancelled
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Your request has been successfully cancelled'),
+            duration: Duration(seconds: 2),
+            backgroundColor: AppColors.tertiaryBlue,
+          ),
+        );
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => HandymanMainPage(userId: widget.userId),
+        ));
+      } catch (e) {
+        print('Error updating document: $e');
+      }
+    }
   }
 }

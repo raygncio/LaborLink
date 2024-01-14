@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
@@ -220,11 +221,16 @@ class HandymanHireCardState extends State<HandymanHireCard> {
         false;
 
     if (confirmHire == true) {
+      print(widget.handymanInfo['userId']);
+      print(widget.handymanInfo['activeRequestId']);
+      print(widget.requestId);
+      print(widget.handymanInfo['handymanId']);
       try {
-        await service.hiredHandyman(
-            widget.handymanInfo['userId'], widget.handymanInfo['requestId']);
+        await service.hiredHandyman(widget.handymanInfo['userId'],
+            widget.handymanInfo['activeRequestId']);
         await service.updateRequestProgress(
-            widget.requestId, widget.handymanInfo['handymanId']);
+            widget.handymanInfo['activeRequestId'],
+            widget.handymanInfo['handymanId']);
 
         print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
@@ -235,9 +241,9 @@ class HandymanHireCardState extends State<HandymanHireCard> {
             backgroundColor: AppColors.tertiaryBlue,
           ),
         );
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => ClientMainPage(userId: userId),
-        // ));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ClientMainPage(userId: widget.requestId),
+        ));
       } catch (e) {
         print('Error updating document: $e');
       }
