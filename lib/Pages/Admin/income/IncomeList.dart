@@ -1,5 +1,6 @@
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/Pages/Admin/income/IncomeItem.dart';
+import 'package:laborlink/Pages/Admin/income/IncomeHeader.dart';
 import 'package:flutter/material.dart';
 
 class IncomeList extends StatelessWidget {
@@ -9,9 +10,16 @@ class IncomeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (ctx, index) => IncomeItem(result: results[index]),
+    return Column(
+      children: [
+        const IncomeHeader(),
+        Expanded(
+          child: ListView.builder(
+            itemCount: results.length,
+            itemBuilder: (ctx, index) => IncomeItem(result: results[index]),
+          ),
+        ),
+      ],
     );
   }
 }

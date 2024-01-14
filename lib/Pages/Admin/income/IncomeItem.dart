@@ -23,14 +23,14 @@ class IncomeItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 20,
+              height: 25,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Text(
-                        'Request ID: ${result.requestId!}',
+                        'Title: ${result.title[0].toUpperCase()}${result.title.substring(1).toLowerCase()}',
                         style: getTextStyle(
                             textColor: AppColors.secondaryBlue,
                             fontFamily: AppFonts.poppins,
@@ -41,7 +41,7 @@ class IncomeItem extends StatelessWidget {
                       Text(
                         'User ID: ${result.userId}',
                         style: getTextStyle(
-                            textColor: AppColors.accentOrange,
+                            textColor: AppColors.grey,
                             fontFamily: AppFonts.poppins,
                             fontWeight: AppFontWeights.semiBold,
                             fontSize: 6),
@@ -50,11 +50,19 @@ class IncomeItem extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      Text(
+                        'Request ID: ${result.requestId!}',
+                        style: getTextStyle(
+                            textColor: AppColors.accentOrange,
+                            fontFamily: AppFonts.poppins,
+                            fontWeight: AppFontWeights.bold,
+                            fontSize: 6),
+                      ),
                       const Spacer(),
                       Text(
                         'Handyman ID: ${result.handymanId!}',
                         style: getTextStyle(
-                            textColor: AppColors.accentOrange,
+                            textColor: AppColors.grey,
                             fontFamily: AppFonts.poppins,
                             fontWeight: AppFontWeights.semiBold,
                             fontSize: 6),
@@ -71,16 +79,8 @@ class IncomeItem extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  result.category,
-                  style: getTextStyle(
-                      textColor: AppColors.black,
-                      fontFamily: AppFonts.poppins,
-                      fontWeight: AppFontWeights.semiBold,
-                      fontSize: 8),
-                ),
-                const Spacer(), // space
-                Text(
-                  result.progress,
+                  '${result.category[0].toUpperCase()}${result.category.substring(1).toLowerCase()}',
+                  textAlign: TextAlign.center,
                   style: getTextStyle(
                       textColor: AppColors.black,
                       fontFamily: AppFonts.poppins,
@@ -90,6 +90,7 @@ class IncomeItem extends StatelessWidget {
                 const Spacer(), // space
                 Text(
                   result.suggestedPrice.toString(),
+                  textAlign: TextAlign.center,
                   style: getTextStyle(
                       textColor: AppColors.black,
                       fontFamily: AppFonts.poppins,
@@ -99,6 +100,7 @@ class IncomeItem extends StatelessWidget {
                 const Spacer(), // space
                 Text(
                   income.toStringAsFixed(2),
+                  textAlign: TextAlign.center,
                   style: getTextStyle(
                       textColor: AppColors.black,
                       fontFamily: AppFonts.poppins,
@@ -107,7 +109,8 @@ class IncomeItem extends StatelessWidget {
                 ),
                 const Spacer(), // space
                 Text(
-                  result.createdAt.toString(),
+                  result.createdAt.toString().substring(0, 16),
+                  textAlign: TextAlign.center,
                   style: getTextStyle(
                       textColor: AppColors.black,
                       fontFamily: AppFonts.poppins,
