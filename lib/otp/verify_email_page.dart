@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/Pages/Client/ClientMainPage.dart';
-import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/otp/verify_phone_page.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/client.dart';

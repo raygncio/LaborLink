@@ -409,7 +409,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
     if (getActiveRequest["approvalStatus"] != "completed" ||
-        getActiveRequest["approvalStatus"] != "cancelled") {
+        getActiveRequest["approvalStatus"] != "cancelled" ||
+        getActiveRequest["approvalStatus"] != null) {
       return OngoingRequestCard(
         title: getActiveRequest['title'],
         address: getActiveRequest['address'],

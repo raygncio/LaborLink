@@ -991,6 +991,18 @@ class DatabaseService {
         'status': 'cancelled',
       });
     }
+
+    final offerQuery = await _db
+        .collection('offer')
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    for (var doc in offerQuery.docs) {
+      await doc.reference.update({
+        'status': 'cancelled',
+      });
+    }
   }
 
   // Decline Direct Request
@@ -1364,8 +1376,7 @@ class DatabaseService {
       final handymanQuery = await _db
           .collection('handymanApproval')
           .where('requestId', isEqualTo: requestId)
-          .where('status', isEqualTo: 'hired')
-          .get();
+          .where('status', whereIn: ['hired', 'rating']).get();
 
       if (handymanQuery.docs.isNotEmpty) {
         // Process 'handyman approval' query results
@@ -1416,8 +1427,7 @@ class DatabaseService {
         final offerQuery = await _db
             .collection('offer')
             .where('requestId', isEqualTo: requestId)
-            .where('status', isEqualTo: 'hired')
-            .get();
+            .where('status', whereIn: ['hired', 'rating']).get();
 
         // Process 'handyman approval' query results
         for (var offerDoc in offerQuery.docs) {
@@ -1682,7 +1692,7 @@ class DatabaseService {
       final approvalQuery = await _db
           .collection('handymanApproval')
           .where('handymanId', isEqualTo: userId)
-          .where('status', whereIn: ['pending', 'hired']).get();
+          .where('status', whereIn: ['pending', 'hired', 'rating']).get();
 
       for (var approvalDoc in approvalQuery.docs) {
         final approvalData = approvalDoc.data();

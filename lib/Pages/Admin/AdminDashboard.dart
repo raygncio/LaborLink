@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Admin/ReportGenerationPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
+import 'package:laborlink/charts/bar graph/anomaly_bar_graph.dart';
+import 'package:laborlink/charts/bar graph/face_bar_graph.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/request.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/styles.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -12,6 +18,29 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  FaceResults? faceResult;
+  AnomalyResults? anomalyResult;
+  Request? completedRequest;
+  DatabaseService service = DatabaseService();
+
+  List<AnomalyResults> anomalyResults = [];
+  List<FaceResults> faceResults = [];
+  List<Request> completedRequests = [];
+
+  _loadData() async {
+    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
+    anomalyResults = await service.getAllAnomalyResults();
+    faceResults = await service.getAllFaceResults();
+    completedRequests = await service.getAllCompletedRequests();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -22,25 +51,69 @@ class _AdminDashboardState extends State<AdminDashboard> {
       body: SafeArea(
           child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 65),
-            child: Container(
-              padding:
-                  const EdgeInsets.only(left: 9, right: 8, top: 19, bottom: 28),
-              height: deviceHeight,
-              width: deviceWidth,
-              color: AppColors.white,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    generateReportsSection(deviceWidth),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 15),
-                      child: LogoutButton(),
+          Container(
+            padding:
+                const EdgeInsets.only(left: 9, right: 8, top: 0, bottom: 0),
+            height: deviceHeight,
+            width: deviceWidth,
+            color: AppColors.white,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 70,
+                  ),
+                  generateReportsSection(deviceWidth),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Anomaly Detection',
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: AnomalyBarGraph(
+                      anomalyResults: anomalyResults,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Face Verification',
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: FaceBarGraph(
+                      faceResults: faceResults,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 25),
+                    child: LogoutButton(),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
               ),
             ),
           ),
@@ -70,10 +143,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Text(
               "Generate Reports",
               style: getTextStyle(
-                  textColor: AppColors.secondaryBlue,
+                  textColor: AppColors.primaryBlue,
                   fontFamily: AppFonts.montserrat,
                   fontWeight: AppFontWeights.bold,
-                  fontSize: 15),
+                  fontSize: 18),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 6),

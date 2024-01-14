@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/Cards/ClientAccountStatusCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanAccountStatusCard.dart';
-import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';

@@ -167,7 +167,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                         textColor: AppColors.secondaryBlue,
                         fontFamily: AppFonts.montserrat,
                         fontWeight: AppFontWeights.bold,
-                        fontSize: 15)),
+                        fontSize: 18)),
               ),
               Padding(
                 padding:
@@ -180,7 +180,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       textColor: AppColors.black,
                       fontFamily: AppFonts.montserrat,
                       fontWeight: AppFontWeights.regular,
-                      fontSize: 7),
+                      fontSize: 11),
                 ),
               ),
               Padding(

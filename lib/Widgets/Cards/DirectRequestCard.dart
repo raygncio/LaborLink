@@ -311,17 +311,32 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
   void onAccept() async {
     // Accept the request, update the request
     // direct to home page
-    try {
-      await service.updateRequestProgress(
-          widget.requestInfo["ActiveRequestId"], widget.userId);
-    } catch (e) {
-      // Handle errors during user creation
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    if (getActiveRequest["approvalStatus"] != "completed" ||
+        getActiveRequest["approvalStatus"] != "cancelled" ||
+        getActiveRequest["approvalStatus"] != null) {
+      // Handle errors during accepting request
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error creating user: $e"),
+        const SnackBar(
+          content: Text("Invalid. You can only accept one request at a time."),
           backgroundColor: Colors.red,
         ),
       );
+    } else {
+      try {
+        await service.updateRequestProgress(
+            widget.requestInfo["ActiveRequestId"], widget.userId);
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error creating user: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
 
     Navigator.of(context).push(MaterialPageRoute(

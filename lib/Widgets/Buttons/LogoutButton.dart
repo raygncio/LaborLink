@@ -58,6 +58,8 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
         //     builder: (ctx) => const LandingPage(),
         //   ),
         // );
+
+        //Navigator.of(context).popUntil((route) => false);
       }
     });
   }
