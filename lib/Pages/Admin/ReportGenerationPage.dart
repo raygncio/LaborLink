@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:laborlink/Pages/Admin/income/IncomeList.dart';
 import 'package:laborlink/Pages/Admin/face/FaceList.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
+import 'package:laborlink/models/request.dart';
 import 'package:laborlink/Pages/Admin/anomaly/AnomalyList.dart';
 import 'package:laborlink/Pages/Admin/pdf_service.dart';
 import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/styles.dart';
 
-enum ReportType { faceVerification, anomalyDetection }
+enum ReportType {
+  faceVerification,
+  anomalyDetection,
+  income,
+}
 
 class ReportGenerationPage extends StatefulWidget {
   final dynamic reportType;
@@ -24,16 +30,19 @@ class ReportGenerationPage extends StatefulWidget {
 class _ReportGenerationPageState extends State<ReportGenerationPage> {
   FaceResults? faceResult;
   AnomalyResults? anomalyResult;
+  Request? completedRequest;
   DatabaseService service = DatabaseService();
   PdfInvoiceService pdfService = PdfInvoiceService();
 
   List<AnomalyResults> anomalyResults = [];
   List<FaceResults> faceResults = [];
+  List<Request> completedRequests = [];
 
   _loadData() async {
     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
     anomalyResults = await service.getAllAnomalyResults();
     faceResults = await service.getAllFaceResults();
+    completedRequests = await service.getAllCompletedRequests();
     print(faceResults);
     setState(() {});
   }
@@ -61,6 +70,11 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
     if (widget.reportType == ReportType.faceVerification &&
         faceResults.isNotEmpty) {
       mainContent = FaceList(results: faceResults);
+    }
+
+    if (widget.reportType == ReportType.income &&
+        completedRequests.isNotEmpty) {
+      mainContent = IncomeList(results: completedRequests);
     }
 
     return Scaffold(
@@ -152,6 +166,8 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
                         );
                       }
                     }
+                    // DOWNLOAD INCOME REPORT
+                    // ...
                   },
                 ),
               ],

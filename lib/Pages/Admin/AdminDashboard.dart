@@ -118,6 +118,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ],
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: SizedBox(
+                height: 50,
+                width: 300,
+                child: Row(
+                  children: [
+                    AppFilledButton(
+                        text: "Income Report",
+                        fontSize: 15,
+                        fontFamily: AppFonts.montserrat,
+                        color: AppColors.secondaryBlue,
+                        command: () =>
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const ReportGenerationPage(
+                                  reportType: ReportType.income),
+                            )),
+                        borderRadius: 8),
+                  ],
+                ),
+              ),
             )
           ],
         ),
