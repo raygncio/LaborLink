@@ -313,10 +313,10 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     // direct to home page
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-
-    if (getActiveRequest["approvalStatus"] != "completed" ||
-        getActiveRequest["approvalStatus"] != "cancelled" ||
-        getActiveRequest["approvalStatus"] != null) {
+    print('drgtdrgd ${getActiveRequest["approvalStatus"]}');
+    if (getActiveRequest["approvalStatus"] != "completed" &&
+        getActiveRequest["approvalStatus"] != "cancelled" &&
+        getActiveRequest["approvalStatus"] == null) {
       // Handle errors during accepting request
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -325,6 +325,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         ),
       );
     } else {
+      print('updaterequest');
       try {
         await service.updateRequestProgress(
             widget.requestInfo["ActiveRequestId"], widget.userId);

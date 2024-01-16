@@ -279,9 +279,9 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
-    if (getActiveRequest["approvalStatus"] != "completed" ||
-        getActiveRequest["approvalStatus"] != "cancelled" ||
-        getActiveRequest["approvalStatus"] != null) {
+    if (getActiveRequest["approvalStatus"] != "completed" &&
+        getActiveRequest["approvalStatus"] != "cancelled" &&
+        getActiveRequest["approvalStatus"] == null) {
       // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
