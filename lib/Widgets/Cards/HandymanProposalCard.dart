@@ -48,13 +48,17 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
   @override
   Widget build(BuildContext context) {
     // Use null-aware and null-coalescing operators to handle null values
-    String firstName = widget.handymanInfo['firstName'] ?? '';
-    String middleName = widget.handymanInfo['middleName'] ?? '';
-    String lastName = widget.handymanInfo['lastName'] ?? '';
-    String suffix = widget.handymanInfo['suffix'] ?? '';
+    String firstName =
+        capitalizeFirstLetter(widget.handymanInfo["firstName"] ?? '');
+    String middleName =
+        capitalizeFirstLetter(widget.handymanInfo["middleName"] ?? '');
+    String lastName =
+        capitalizeFirstLetter(widget.handymanInfo["lastName"] ?? '');
+    String suffix = capitalizeFirstLetter(widget.handymanInfo["suffix"] ?? '');
 
     // Concatenate non-null values
     fullname = '$firstName $middleName $lastName $suffix';
+
     return Container(
       height: 81,
       decoration: const BoxDecoration(
@@ -71,7 +75,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.file(File('icons/person-circle-blue.png')),
+                    child: Image.asset('assets/icons/person-circle-blue.png'),
                   ),
                 ),
                 Padding(
@@ -93,13 +97,14 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label:
+                                  label: capitalizeFirstLetter(
                                       widget.handymanInfo["specialization"] ??
-                                          '',
+                                          ''),
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["city"] ?? '',
+                                label: capitalizeFirstLetter(
+                                    widget.handymanInfo["city"] ?? ''),
                                 type: BadgeType.normal)
                           ],
                         ),
@@ -107,7 +112,7 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: RateWidget(
-                            rate: widget.handymanInfo["rating"] ?? 0,
+                            rate: (widget.handymanInfo["rates"] ?? 0).toInt(),
                             iconSize: 12),
                       ),
                     ],
@@ -159,5 +164,12 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
       builder: (context) =>
           ViewHandymanProposal(handymanInfo: widget.handymanInfo),
     ));
+  }
+
+  String capitalizeFirstLetter(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    return input[0].toUpperCase() + input.substring(1);
   }
 }

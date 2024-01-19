@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/models/review.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 
 class RatingsPage extends StatefulWidget {
-  const RatingsPage({Key? key}) : super(key: key);
+  final Map<String, dynamic> ratings;
+  final String user;
+  const RatingsPage({Key? key, required this.ratings, required this.user})
+      : super(key: key);
 
   @override
   State<RatingsPage> createState() => _RatingsPageState();
@@ -14,10 +21,23 @@ class RatingsPage extends StatefulWidget {
 
 class _RatingsPageState extends State<RatingsPage> {
   final _reviewController = TextEditingController();
-  int rating = 0;
+  double rating = 0;
+
+  @override
+  void dispose() {
+    _reviewController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.ratings['firstName'] ?? '';
+    String middleName = widget.ratings['middleName'] ?? '';
+    String lastName = widget.ratings['lastName'] ?? '';
+    String suffix = widget.ratings['suffix'] ?? '';
+
+    String fullname =
+        '${firstName[0].toUpperCase()}${firstName.substring(1).toLowerCase()} $middleName ${lastName[0].toUpperCase()}${lastName.substring(1).toLowerCase()} $suffix';
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -37,7 +57,7 @@ class _RatingsPageState extends State<RatingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "Rob Shandell Bautista",
+                          fullname,
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -56,14 +76,16 @@ class _RatingsPageState extends State<RatingsPage> {
                                   color: AppColors.dirtyWhite,
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                child: Image.asset("assets/icons/plumbing.png",
-                                    width: 23.53, height: 22.59),
+                                child: Image.asset(
+                                    "assets/icons/${widget.ratings['specialization'].toString().toLowerCase()}.png",
+                                    width: 23.53,
+                                    height: 22.59),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 7),
                               child: Text(
-                                "Clogged Toilet",
+                                widget.ratings['title'],
                                 style: getTextStyle(
                                     textColor: AppColors.secondaryBlue,
                                     fontFamily: AppFonts.montserrat,
@@ -71,10 +93,12 @@ class _RatingsPageState extends State<RatingsPage> {
                                     fontSize: 10),
                               ),
                             ),
-                            const AppBadge(
-                              label: "Handyman",
+                            AppBadge(
+                              label: widget.ratings['userRole'] == 'client'
+                                  ? 'Client'
+                                  : "Handyman",
                               type: BadgeType.normal,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 4, vertical: 1),
                             )
                           ],
@@ -148,7 +172,7 @@ class _RatingsPageState extends State<RatingsPage> {
                                     fontSize: 15,
                                     fontFamily: AppFonts.montserrat,
                                     color: AppColors.accentOrange,
-                                    command: () {},
+                                    command: submitRating,
                                     borderRadius: 5),
                               ],
                             ),
@@ -173,18 +197,18 @@ class _RatingsPageState extends State<RatingsPage> {
                     ]),
                 child: Stack(
                   children: [
-                    Positioned(
-                      top: 17,
-                      left: 14,
-                      child: GestureDetector(
-                        onTap: onBack,
-                        child: Image.asset(
-                          "assets/icons/back-btn-2.png",
-                          width: 12,
-                          height: 23,
-                        ),
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: 17,
+                    //   left: 14,
+                    //   child: GestureDetector(
+                    //     onTap: onBack,
+                    //     child: Image.asset(
+                    //       "assets/icons/back-btn-2.png",
+                    //       width: 12,
+                    //       height: 23,
+                    //     ),
+                    //   ),
+                    // ),
                     Align(
                       alignment: const FractionalOffset(0.5, 5),
                       child: Container(
@@ -284,6 +308,66 @@ class _RatingsPageState extends State<RatingsPage> {
           ],
         ),
       );
+
+  void submitRating() async {
+    // Get the values
+    double selectedRating = rating;
+    String review = _reviewController.text;
+
+    // Validate if the user has selected a rating
+    if (selectedRating == 0 || review == " ") {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please rate the user before submitting."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      DatabaseService service = DatabaseService();
+      try {
+        Review reviews = Review(
+          rating: selectedRating,
+          comment: review,
+          userId: widget.ratings["userId"],
+          requestId: widget.ratings["requestId"],
+        );
+
+        await service.addReviews(reviews);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Reviews submitted succesfully."),
+            backgroundColor: Colors.orangeAccent,
+          ),
+        );
+
+        if (widget.user == 'client') {
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) =>
+                  ClientMainPage(userId: widget.ratings["clientId"]),
+            ));
+          });
+        } else {
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) =>
+                  HandymanMainPage(userId: widget.ratings["handymanId"]),
+            ));
+          });
+        }
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error creating user: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   void onBack() => Navigator.of(context).pop();
 }

@@ -9,28 +9,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:laborlink/models/report.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final _firestore = FirebaseFirestore.instance;
 
-// class ReportIssuePage extends StatefulWidget {
-//   final String userId;
-//   const ReportIssuePage({Key? key, required this.userId}) : super(key: key);
+class ReportIssuePage extends StatefulWidget {
+  final String userId;
+  const ReportIssuePage({Key? key, required this.userId}) : super(key: key);
 
-//   @override
-//   State<ReportIssuePage> createState() => _ReportIssuePageState();
-// }
+  @override
+  State<ReportIssuePage> createState() => _ReportIssuePageState();
+}
 
-// get the user id
-
-class ReportIssuePage extends ConsumerWidget {
+class _ReportIssuePageState extends State<ReportIssuePage> {
   final _descriptionController = TextEditingController();
   final _filePickerKey = GlobalKey<UploadFilePickerState>();
   //file
-   File? _selectedImage;
-  late String userId;
+  File? _selectedImage;
 
   final _labelTextStyle = getTextStyle(
       textColor: AppColors.secondaryBlue,
@@ -38,18 +33,14 @@ class ReportIssuePage extends ConsumerWidget {
       fontWeight: AppFontWeights.semiBold,
       fontSize: 15);
 
-  // @override
-  // void dispose() {
-  //   _descriptionController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
-
-    Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-    userId = userInfo['userId'] ?? '';
+  Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -148,7 +139,7 @@ class ReportIssuePage extends ConsumerWidget {
                                           fontSize: 16,
                                           fontFamily: AppFonts.montserrat,
                                           color: AppColors.accentOrange,
-                                          command: () => onSubmit(context),
+                                          command: onSubmit,
                                           borderRadius: 8),
                                     ],
                                   ),
@@ -162,9 +153,7 @@ class ReportIssuePage extends ConsumerWidget {
                   ),
                 ),
               ),
-              Align(
-                  alignment: Alignment.topCenter,
-                  child: appBar(deviceWidth, context)),
+              Align(alignment: Alignment.topCenter, child: appBar(deviceWidth)),
             ],
           ),
         ),
@@ -172,9 +161,9 @@ class ReportIssuePage extends ConsumerWidget {
     );
   }
 
-  void onBack(BuildContext context) => Navigator.of(context).pop();
+  void onBack() => Navigator.of(context).pop();
 
-  void onSubmit(BuildContext context) async {
+  void onSubmit() async {
     String? descriptionError = validateField(_descriptionController.text);
 
     if (descriptionError != null) {
@@ -190,20 +179,20 @@ class ReportIssuePage extends ConsumerWidget {
         // Create a user in Firebase Authentication
         DatabaseService service = DatabaseService();
 
-        String reportUrl =
-            await service.uploadReportAttachment(userId, _selectedImage!);
+        String reportUrl = await service.uploadReportAttachment(
+            widget.userId, _selectedImage!);
 
         Report report = Report(
             issue: _descriptionController.text,
             proof: reportUrl,
-            status: "waiting",
-            userId: userId);
+            status: "Waiting",
+            userId: widget.userId);
 
         await service.addReports(report);
         // Continue with your navigation or any other logic
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => ReportSubmittedPage(),
+            builder: (context) => ReportSubmittedPage(userId: widget.userId),
           ),
         );
       } catch (e) {
@@ -218,7 +207,7 @@ class ReportIssuePage extends ConsumerWidget {
     }
   }
 
-  Widget appBar(deviceWidth, context) => Container(
+  Widget appBar(deviceWidth) => Container(
         color: AppColors.secondaryBlue,
         height: 74,
         child: Align(
@@ -234,7 +223,7 @@ class ReportIssuePage extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16),
                       child: GestureDetector(
-                        onTap: () => onBack(context),
+                        onTap: onBack,
                         child: Image.asset("assets/icons/back-btn-2.png",
                             height: 23,
                             width: 13,

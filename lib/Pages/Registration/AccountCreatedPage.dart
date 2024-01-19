@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/LoginPage.dart';
+import 'package:laborlink/Pages/LandingPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/ai/screens/splash_success.dart';
 import 'package:laborlink/styles.dart';
@@ -101,9 +102,14 @@ class _AccountCreatedPageState extends State<AccountCreatedPage> {
     Timer(const Duration(seconds: 5), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (ctx) => const LoginPage(),
+          builder: (ctx) => const LandingPage(),
         ),
       );
+      // Navigator.of(context).pushAndRemoveUntil(
+      //     MaterialPageRoute(
+      //       builder: (ctx) => const LandingPage(),
+      //     ),
+      //     (route) => false);
     });
   }
 }

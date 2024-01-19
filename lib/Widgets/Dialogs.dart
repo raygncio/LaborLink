@@ -10,7 +10,8 @@ import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
 import 'package:laborlink/Widgets/FilePickers/ChooseFilePicker.dart';
 import 'package:laborlink/Widgets/SuggestedFee.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
-import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/styles.dart';
 
 Future<String?> confirmationDialog(BuildContext context) => showDialog<String>(
@@ -402,8 +403,11 @@ Future<String?> yesCancelDialog(BuildContext context, String prompt) =>
       },
     ).then((value) => value);
 
-Future<String?> attachServiceProofDialog(BuildContext context) {
-  final filePickerKey = GlobalKey<ChooseFilePickerState>();
+Future<String?> attachServiceProofDialog(BuildContext context,
+    Map<String, dynamic> clientDetails, String requestId) {
+  final _filePickerKey = GlobalKey<UploadFilePickerState>();
+  //file
+  File? _selectedImage;
 
   return showModalBottomSheet<String>(
     backgroundColor: AppColors.white,
@@ -426,20 +430,24 @@ Future<String?> attachServiceProofDialog(BuildContext context) {
                     fontSize: 11)),
             Padding(
               padding: const EdgeInsets.only(top: 5),
-              child: ChooseFilePicker(
-                key: filePickerKey,
+              child: UploadFilePicker(
+                key: _filePickerKey,
                 label: "Attachment",
-                labelTextStyle: getTextStyle(
-                    textColor: AppColors.accentOrange,
-                    fontFamily: AppFonts.montserrat,
-                    fontWeight: AppFontWeights.semiBold,
-                    fontSize: 15),
-                buttonColor: AppColors.accentOrange,
-                containerBorderWidth: 0.7,
-                containerBorderColor: AppColors.grey,
-                buttonBorderRadius: 8,
-                containerPadding: const EdgeInsets.symmetric(
-                    vertical: 4.71, horizontal: 6.18),
+                // labelStyle: getTextStyle(
+                //     textColor: AppColors.accentOrange,
+                //     fontFamily: AppFonts.montserrat,
+                //     fontWeight: AppFontWeights.semiBold,
+                //     fontSize: 15),
+                // buttonColor: AppColors.accentOrange,
+                // containerBorderWidth: 0.7,
+                // containerBorderColor: AppColors.grey,
+                // buttonBorderRadius: 8,
+                // containerPadding: const EdgeInsets.symmetric(
+                //     vertical: 4.71, horizontal: 6.18),
+                onPickImage: (pickedImage) {
+                  // receive image file
+                  _selectedImage = pickedImage;
+                },
               ),
             ),
             Align(
@@ -456,10 +464,32 @@ Future<String?> attachServiceProofDialog(BuildContext context) {
                         height: 35,
                         fontFamily: AppFonts.montserrat,
                         color: AppColors.accentOrange,
-                        command: () {
+                        command: () async {
+                          // upload the attachment link to the
+                          try {
+                            // Create a user in Firebase Authentication
+                            DatabaseService service = DatabaseService();
+
+                            String completionUrl =
+                                await service.uploadReportAttachment(
+                                    clientDetails['userId'], _selectedImage!);
+                            await service.updateRequestCompletion(
+                                requestId, completionUrl);
+                          } catch (e) {
+                            // Handle errors during user creation
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Error creating user"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                           Navigator.of(context)
                               .pushReplacement(MaterialPageRoute(
-                            builder: (context) => const RatingsPage(),
+                            builder: (context) => RatingsPage(
+                              ratings: clientDetails,
+                              user: 'handyman',
+                            ),
                           ));
                         },
                         borderRadius: 8),

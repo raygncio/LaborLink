@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
+import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 
 class HandymanHireCard extends StatefulWidget {
   final Map<String, dynamic> handymanInfo;
@@ -52,10 +51,13 @@ class HandymanHireCardState extends State<HandymanHireCard> {
   @override
   Widget build(BuildContext context) {
     // Use null-aware and null-coalescing operators to handle null values
-    String firstName = widget.handymanInfo['firstName'] ?? '';
-    String middleName = widget.handymanInfo['middleName'] ?? '';
-    String lastName = widget.handymanInfo['lastName'] ?? '';
-    String suffix = widget.handymanInfo['suffix'] ?? '';
+    String firstName =
+        capitalizeFirstLetter(widget.handymanInfo["firstName"] ?? '');
+    String middleName =
+        capitalizeFirstLetter(widget.handymanInfo["middleName"] ?? '');
+    String lastName =
+        capitalizeFirstLetter(widget.handymanInfo["lastName"] ?? '');
+    String suffix = capitalizeFirstLetter(widget.handymanInfo["suffix"] ?? '');
 
     // Concatenate non-null values
     fullname = '$firstName $middleName $lastName $suffix';
@@ -109,11 +111,12 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                           ],
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 4),
-                      //   child: RateWidget(
-                      //       rate: widget.handymanInfo["rating"], iconSize: 12),
-                      // ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: RateWidget(
+                            rate: (widget.handymanInfo["rates"] ?? 0).toInt(),
+                            iconSize: 12),
+                      ),
                     ],
                   ),
                 ),
@@ -142,7 +145,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                             fontSize: 9,
                             fontFamily: AppFonts.montserrat,
                             color: AppColors.accentOrange,
-                            command: onViewProposal,
+                            command: hireHandyman,
                             borderRadius: 8),
                       ],
                     ),
@@ -218,11 +221,16 @@ class HandymanHireCardState extends State<HandymanHireCard> {
         false;
 
     if (confirmHire == true) {
+      print(widget.handymanInfo['userId']);
+      print(widget.handymanInfo['activeRequestId']);
+      print(widget.requestId);
+      print(widget.handymanInfo['handymanId']);
       try {
-        await service.hiredHandyman(
-            widget.handymanInfo['userId'], widget.handymanInfo['requestId']);
+        await service.hiredHandyman(widget.handymanInfo['userId'],
+            widget.handymanInfo['activeRequestId']);
         await service.updateRequestProgress(
-            widget.requestId, widget.handymanInfo['handymanId']);
+            widget.handymanInfo['activeRequestId'],
+            widget.handymanInfo['handymanId']);
 
         print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
@@ -233,12 +241,19 @@ class HandymanHireCardState extends State<HandymanHireCard> {
             backgroundColor: AppColors.tertiaryBlue,
           ),
         );
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => ClientMainPage(userId: userId),
-        // ));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ClientMainPage(userId: widget.requestId),
+        ));
       } catch (e) {
         print('Error updating document: $e');
       }
     }
+  }
+
+  String capitalizeFirstLetter(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    return input[0].toUpperCase() + input.substring(1);
   }
 }

@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
-import 'package:laborlink/Pages/Handyman/Activity/HandymanActivityPage.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/DirectRequestCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanDirectRequestCard.dart';
-import 'package:laborlink/Widgets/Cards/NoOngoingServiceCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
-import 'package:laborlink/Widgets/Dialogs.dart';
 import 'package:laborlink/Widgets/Forms/RequestForm.dart';
-import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
-import 'package:laborlink/dummyDatas.dart';
+import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/models/request.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 class HandymanHomePage extends StatefulWidget {
@@ -34,18 +28,63 @@ class HandymanHomePage extends StatefulWidget {
 class _HandymanHomePageState extends State<HandymanHomePage> {
   final _searchController = TextEditingController();
   DatabaseService service = DatabaseService();
+  final _firebase = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   late GlobalKey<RequestFormState> requestFormKey;
+  late String specialization;
   List<Map<String, dynamic>> _searchResults = [];
   List<Map<String, dynamic>> offers = [];
   List<Map<String, dynamic>> interested = [];
+  Handyman? handyman;
 
   int _selectedTabIndex = 0;
 
   bool _showSearchResult = false;
 
+  late double currentDeviceHeight; // get current device height
+  String currentUserFirstName = '';
+  Client? clientInfo;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getUserData();
+    displayRequest();
+    super.initState();
+  }
+
+  getUserData() async {
+    Client userData =
+        await service.getUserData(FirebaseAuth.instance.currentUser!.uid);
+    clientInfo = userData;
+    currentUserFirstName = clientInfo!.firstName;
+    setState(() {});
+  }
+
+  void displayRequest() async {
+    try {
+      handyman = await service.getHandymanData(widget.userId);
+
+      if (handyman!.specialization.isNotEmpty) {
+        specialization = handyman!.specialization;
+        updateFindLaborTabContent(specialization);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+    currentDeviceHeight = deviceHeight;
+    // check user first name
+    if (currentUserFirstName.isNotEmpty) {
+      currentUserFirstName =
+          '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
+      print('>>>>>>>>>> user name: $currentUserFirstName');
+    }
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -81,22 +120,37 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     });
   }
 
+  _loadData() async {
+    try {
+      List<Map<String, dynamic>> results = await service
+          .getUserAndRequestBaseOnSearch(_searchController.text.toLowerCase());
+
+      // Check if the widget is still mounted before updating the state
+      if (mounted) {
+        setState(() {
+          _showSearchResult = results.isNotEmpty;
+          _searchResults = results;
+        });
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+  }
+
   void updateFindLaborTabContent(String? searchText) async {
-    DatabaseService service = DatabaseService();
     if (searchText == null) return;
 
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndRequestBaseOnSearch(searchText.toLowerCase());
 
-      // searchResultSection();
-      // print(searchText);
-      print(results);
-
-      setState(() {
-        _showSearchResult = results.isNotEmpty;
-        _searchResults = results;
-      });
+      // Check if the widget is still mounted before updating the state
+      if (mounted) {
+        setState(() {
+          _showSearchResult = results.isNotEmpty;
+          _searchResults = results;
+        });
+      }
     } catch (error) {
       print('Error fetching user data: $error');
     }
@@ -121,7 +175,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 38),
-                        child: Text("Hello, User!",
+                        child: Text("Hello, $currentUserFirstName!",
                             style: getTextStyle(
                                 textColor: AppColors.secondaryYellow,
                                 fontFamily: AppFonts.montserrat,
@@ -203,44 +257,38 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   Widget findLaborTab() => Padding(
         padding: const EdgeInsets.only(top: 54),
-        child: Container(
-          color: AppColors.dirtyWhite,
-          child: Stack(
-            children: [
-              openRequestsSection(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 10, right: 13, bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Use FutureBuilder here
-                      FutureBuilder<Widget>(
-                        future: getOngoingService(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text("Error: ${snapshot.error}");
-                          } else {
-                            return snapshot.data ?? const SizedBox();
-                          }
-                        },
+        child: Stack(
+          children: [
+            openRequestsSection(),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.only(top: currentDeviceHeight - 380),
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 23),
+                    child: Column(children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Use FutureBuilder here
+                          getOngoingService(),
+
+                          // HistoryButton(
+                          //   command: onHistoryButtonClick,
+                          //   backgroundColor: AppColors.white,
+                          // ),
+                        ],
                       ),
-                      HistoryButton(
-                        command: onHistoryButtonClick,
-                        backgroundColor: AppColors.white,
-                      ),
-                    ],
+                    ]),
                   ),
                 ),
               ),
-              searchSection(),
-            ],
-          ),
+            ),
+            searchSection(),
+          ],
         ),
       );
 
@@ -298,7 +346,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
       future: service.getDirectRequestOfHandyman(widget.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text("Error: ${snapshot.error}");
         } else {
@@ -343,18 +391,33 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     );
   }
 
-  Future<Widget> getOngoingService() async {
-    DatabaseService service = DatabaseService();
-    Request? requestInfo = await service.getHandymanService(widget.userId);
-    print(">>>>>>>>>>>>$requestInfo");
-    if (requestInfo != null) {
+  Widget getOngoingService() {
+    return FutureBuilder<Widget>(
+      future: getOngoingServiceContent(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return snapshot.data ?? const NoOngoingRequestCard();
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Future<Widget> getOngoingServiceContent() async {
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+    print(getActiveRequest["approvalStatus"]);
+    if (getActiveRequest["approvalStatus"] != "completed" &&
+        getActiveRequest["approvalStatus"] != "cancelled" &&
+        getActiveRequest["approvalStatus"] == null) {
       return OngoingRequestCard(
-        title: requestInfo.title,
-        address: requestInfo.address,
+        title: getActiveRequest['title'],
+        address: getActiveRequest['address'],
         // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
       );
     } else {
-      return NoOngoingRequestCard();
+      return const NoOngoingRequestCard();
     }
   }
 }

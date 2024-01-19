@@ -6,7 +6,6 @@ import 'package:laborlink/Widgets/Cards/HandymanProposalCard.dart';
 import 'package:laborlink/Widgets/Cards/HandymanSelectedCard.dart';
 import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
@@ -30,35 +29,43 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   bool _havePendingOpenRequest = false;
   bool _havePendingDirectRequest = false;
   bool _forApproval = false;
+  String checkRequest = '';
   Request? requestInfo;
   DatabaseService service = DatabaseService();
   List<Map<String, dynamic>> interestedLaborer = [];
   List<Map<String, dynamic>> interestedLaborerWithOffer = [];
   List<Map<String, dynamic>> combinedInterestedLaborers = [];
   Map<String, dynamic> getActiveRequest = {};
+  Map<String, dynamic> getDirectInfo = {};
   Future<Map<String, dynamic>>? activeRequestFuture;
 
   @override
   void initState() {
     super.initState();
     checkForRequests();
-    // fetchInterestedLaborers();
+    fetchInterestedLaborers();
     fetchOffersOfLaborers();
     activeRequestFuture = getTheActiveRequest();
   }
 
   void checkForRequests() async {
+    bool direct = false;
     try {
       requestInfo = await service.getRequestsData(widget.userId);
 
       String progress = requestInfo!.progress;
+      String? handymanId = requestInfo?.handymanId;
       print('progress: $progress');
 
       setState(() {
-        if (progress == "pending") {
-          _havePendingOpenRequest = true;
+        if (progress == "pending" && handymanId != null) {
           _havePendingDirectRequest = true;
           // _forApproval = true;
+          checkRequest = "direct";
+          direct = true;
+        } else if (progress == "pending") {
+          _havePendingOpenRequest = true;
+          checkRequest = "open";
         } else if (progress == "hired" ||
             progress == "omw" ||
             progress == "arrived" ||
@@ -67,8 +74,24 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
           _haveActiveRequest = true;
         }
       });
+
+      if (direct) {
+        getDirectRequest();
+      }
     } catch (error) {
-      print('Error fetching user data:1 $error');
+      print('Error fetching get user data: $error');
+    }
+  }
+
+  void getDirectRequest() async {
+    try {
+      getDirectInfo = await service.getDirectRequest(
+          widget.userId); // print("GET THE DIRECT INFO: $getDirectInfo");
+      setState(() {
+        getDirectInfo = getDirectInfo;
+      });
+    } catch (error) {
+      print('Error fetching interested laborers: 1 $error');
     }
   }
 
@@ -76,12 +99,17 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       interestedLaborerWithOffer =
           await service.getInterestedHandymanAndOffer(widget.userId);
+      // print(interestedLaborerWithOffer);
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 2 $error');
     }
 
-    // Combine the lists
-    combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+    if (interestedLaborerWithOffer.isNotEmpty) {
+      // Combine the lists
+      setState(() {
+        combinedInterestedLaborers.addAll(interestedLaborerWithOffer);
+      });
+    }
   }
 
   Future<Map<String, dynamic>> getTheActiveRequest() async {
@@ -96,13 +124,18 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   void fetchOffersOfLaborers() async {
     try {
       interestedLaborer = await service.getInterestedHandyman(widget.userId);
-      print(
-          "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
+      // print(
+      //     "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 3 $error');
     }
 
-    combinedInterestedLaborers.addAll(interestedLaborer);
+    if (interestedLaborer.isNotEmpty) {
+      setState(() {
+        combinedInterestedLaborers.addAll(interestedLaborer);
+      });
+    }
+
     // print(
     //     "*************************CHECK THE COMBINE 2 ${combinedInterestedLaborers.length}");
     // print(
@@ -203,11 +236,11 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         future: historyTab(deviceWidth),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Return a loading indicator or placeholder
+            return const CircularProgressIndicator(); // Return a loading indicator or placeholder
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}'); // Handle the error
           } else {
-            return snapshot.data ?? SizedBox.shrink();
+            return snapshot.data ?? const SizedBox.shrink();
           }
         },
       );
@@ -287,7 +320,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
@@ -307,7 +340,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
@@ -338,13 +371,22 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: convertRequestToMap(requestInfo!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Return a loading indicator or placeholder
+          return const CircularProgressIndicator(); // Return a loading indicator or placeholder
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Handle the error
         } else {
           Map<String, dynamic> requestDetail = snapshot.data!;
 
-          return _buildPendingDirectRequest(requestDetail);
+          return FutureBuilder(
+            future: Future.delayed(const Duration(milliseconds: 400)),
+            builder: (context, delaySnapshot) {
+              if (delaySnapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator(); // Return a loading indicator or placeholder during the delay
+              } else {
+                return _buildPendingDirectRequest(requestDetail);
+              }
+            },
+          );
         }
       },
     );
@@ -376,7 +418,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 9, top: 8),
                 child: HandymanSelectedCard(
-                  handymanInfo: dummyFilteredHandyman[4],
+                  handymanInfo: getDirectInfo,
                 ),
               ),
             ],
@@ -395,7 +437,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       future: activeRequestFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -438,25 +480,35 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                 itemBuilder: (context, index) {
                   Map<String, dynamic> currentHandyman =
                       combinedInterestedLaborers[index];
-                  print("Index: $index");
                   print(
                       "*************************CHECK THE CURRENT HANDYMAN ${combinedInterestedLaborers.length}");
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
-                  print('>>>>>>>>>>>>>>>>>>> HAS OFFER $hasOffer');
 
-                  // Choose the appropriate card based on whether there's an offer or not
-                  Widget card = hasOffer
-                      ? HandymanProposalCard(handymanInfo: currentHandyman)
-                      : HandymanHireCard(
-                          handymanInfo: currentHandyman,
-                          requestId: widget.userId);
+                  // print(
+                  //     '>>>>>>>>>>>>>>>>>>> HAS OFFER ${currentHandyman.containsKey('suggestedPrice')}');
+                  if (hasOffer) {
+                    return HandymanProposalCard(handymanInfo: currentHandyman);
+                  } else if (currentHandyman.containsKey('suggestedPrice')) {
+                    print("checking");
+                    print(currentHandyman['specialization']);
+                    return HandymanHireCard(
+                        handymanInfo: currentHandyman,
+                        requestId: widget.userId);
+                  } else {}
+
+                  // // Choose the appropriate card based on whether there's an offer or not
+                  // Widget card = hasOffer
+                  //     ? HandymanProposalCard(handymanInfo: currentHandyman)
+                  //     : HandymanHireCard(
+                  //         handymanInfo: currentHandyman,
+                  //         requestId: widget.userId);
 
                   return Padding(
                     padding:
                         EdgeInsets.only(top: index == 0 ? 5 : 0, bottom: 8),
-                    child: card,
+                    //child: card,
                   );
                 },
               ),
@@ -473,14 +525,15 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     bool openCancelledRequest = false;
     List<Map<String, dynamic>> cancelledRequest = [];
     List<Map<String, dynamic>> completedRequest = [];
+    // print(widget.userId);
 
     try {
       completedRequest = await service.getCompletedRequest(widget.userId);
       cancelledRequest = await service.getCancelledRequest(widget.userId);
-      print('*************************COMPLETED REQUEST $completedRequest');
+      //print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      print('Error fetching interested laborers: 4 $error');
     }
 
     if (completedRequest.isNotEmpty) {
@@ -544,6 +597,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                             itemBuilder: (context, index) {
                               Map<String, dynamic> currentRequest =
                                   completedRequest[index];
+                              print(
+                                  ">>>>>>>>>>>>${currentRequest['validRequestId']}");
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -551,7 +606,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                   onTap: () => Navigator.of(context)
                                       .push(MaterialPageRoute(
                                     builder: (context) => ClientViewHistory(
-                                      userId: currentRequest['requestId'],
+                                      userId: currentRequest['validRequestId'],
+                                      userRole: currentRequest['userRole'],
                                     ),
                                   )),
                                   child: Container(
@@ -577,9 +633,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  currentRequest[
-                                                          'description'] ??
-                                                      '',
+                                                  currentRequest['title'] ?? '',
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -700,7 +754,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                                             children: [
                                               Text(
                                                 currentCancelledRequest[
-                                                    'description'],
+                                                    'title'],
                                                 style: getTextStyle(
                                                     textColor: AppColors.grey,
                                                     fontFamily:

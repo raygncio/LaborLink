@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Buttons/HistoryButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanDirectRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
@@ -10,12 +10,12 @@ import 'package:laborlink/Widgets/Forms/RequestForm.dart';
 import 'package:laborlink/Widgets/LaborMenu.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
+import 'package:laborlink/models/client.dart';
 import 'package:laborlink/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
-import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -42,9 +42,32 @@ class _ClientHomePageState extends State<ClientHomePage> {
   List<Map<String, dynamic>> _searchResults = [];
   double _totalFee = 0.0;
 
+  String currentUserFirstName = '';
+  Client? clientInfo;
+
+  getUserData() async {
+    Client userData =
+        await service.getUserData(FirebaseAuth.instance.currentUser!.uid);
+    clientInfo = userData;
+    currentUserFirstName = clientInfo!.firstName;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
+
+    // check user first name
+    if (currentUserFirstName.isNotEmpty) {
+      currentUserFirstName =
+          '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
+    }
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -82,16 +105,33 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   void updateDirectRequestTabContent(String? searchText) async {
     // retrieved the handyman whose name will match on the entered text
-    // DatabaseService service = DatabaseService();
+    bool fromButton = false;
+
     if (searchText == null) return;
+
+    if (searchText.length > 4 && searchText.substring(0, 4) == 'btn-') {
+      fromButton = true;
+      searchText = searchText.substring(4);
+    }
+
+    print('>>>>>>>>>>>>>>>>>$searchText');
 
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndHandymanDataByFirstName(searchText);
 
-      // searchResultSection();
-      // print(searchText);
-      //print(results);
+      // print('>>>>>>>>>>>>>$results');
+
+      // prints if and only if search text is from button
+      if (fromButton && results.isEmpty) {
+        Fluttertoast.showToast(
+            msg: "No Handyman Found",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
 
       setState(() {
         _showSearchResult = results.isNotEmpty;
@@ -102,10 +142,10 @@ class _ClientHomePageState extends State<ClientHomePage> {
     }
   }
 
-  void onHistoryButtonClick() =>
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => ClientViewHistory(userId: widget.userId),
-      ));
+  // void onHistoryButtonClick() =>
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+  //       builder: (context) => ClientViewHistory(userId: widget.userId),
+  //     ));
 
   Future<void> submitRequest(requestType) async {
     setState(() {
@@ -179,16 +219,29 @@ class _ClientHomePageState extends State<ClientHomePage> {
     });
   }
 
-  void onOpenRequestProceed() {
-    confirmationDialog(context).then((value) {
-      if (value == null) return;
+  void onOpenRequestProceed() async {
+    // Check if the user has an ongoing request
+    Request? requestInfo = await service.getRequestsData(widget.userId);
 
-      if (value == "proceed") {
-        suggestedFeeDialog(context, _getTotalFee).then((value) {
-          submitRequest('open');
-        });
-      }
-    });
+    if (requestInfo != null) {
+      // Handle errors during user creation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only create one request at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      confirmationDialog(context).then((value) {
+        if (value == null) return;
+
+        if (value == "proceed") {
+          suggestedFeeDialog(context, _getTotalFee).then((value) {
+            submitRequest('open');
+          });
+        }
+      });
+    }
   }
 
   Widget header(deviceWidth) => KeyboardVisibilityBuilder(
@@ -206,7 +259,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 44),
-                        child: Text("Hello, User!",
+                        child: Text("Hello, $currentUserFirstName!",
                             style: getTextStyle(
                                 textColor: AppColors.secondaryYellow,
                                 fontFamily: AppFonts.montserrat,
@@ -307,14 +360,16 @@ class _ClientHomePageState extends State<ClientHomePage> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Column(children: [
-                            const LaborMenu(
-                                padding: EdgeInsets.only(bottom: 28)),
+                            LaborMenu(
+                              padding: const EdgeInsets.only(bottom: 28),
+                              onLaborSelected: onLaborSelectedCallback,
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 getOngoingRequest(),
-                                HistoryButton(command: onHistoryButtonClick),
+                                // HistoryButton(command: onHistoryButtonClick),
                               ],
                             )
                           ]),
@@ -401,9 +456,20 @@ class _ClientHomePageState extends State<ClientHomePage> {
     );
   }
 
+  void onLaborSelectedCallback(String selectedLaborName) {
+    String text = '';
+    // Handle the selected labor category name as needed
+    if (selectedLaborName == 'Installation') {
+      text = '${selectedLaborName}s';
+    } else {
+      text = selectedLaborName;
+    }
+    print('Labor selected in main code: $text');
+
+    updateDirectRequestTabContent('btn-${text.toLowerCase()}');
+  }
+
   Future<Widget> getOngoingRequestContent() async {
-    // TODO: Add logic for ongoing Request
-    //DatabaseService service = DatabaseService();
     Request? requestInfo = await service.getRequestsData(widget.userId);
 
     if (requestInfo != null) {
@@ -413,7 +479,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
         // imgUrl: "https://monstar-lab.com/global/assets/uploads/2019/04/male-placeholder-image.jpeg.webp", //replace with the profile pic image
       );
     } else {
-      return NoOngoingRequestCard();
+      return const NoOngoingRequestCard();
     }
   }
 }

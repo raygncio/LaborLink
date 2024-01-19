@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Cards/IssueCard.dart';
-import 'package:laborlink/Widgets/Cards/RequestCard.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/users.dart';
 
-class ReviewedIssuePage extends StatefulWidget {
-  const ReviewedIssuePage({Key? key}) : super(key: key);
+class ApprovedIssuesPage extends StatefulWidget {
+  const ApprovedIssuesPage({Key? key}) : super(key: key);
 
   @override
-  State<ReviewedIssuePage> createState() => _ReviewedIssuePageState();
+  State<ApprovedIssuesPage> createState() => _ApprovedIssuesPageState();
 }
 
-class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
+class _ApprovedIssuesPageState extends State<ApprovedIssuesPage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -37,9 +35,7 @@ class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
                       padding:
                           EdgeInsets.only(top: 13, bottom: index == 9 ? 13 : 0),
                       child: IssueCard(
-                          issueStatus: index % 2 == 0
-                              ? IssueStatus.resolved
-                              : IssueStatus.returned,
+                          issueStatus: IssueStatus.approved,
                           reporterUserType: index % 2 == 0
                               ? AppUserType.client
                               : AppUserType.handyman),
@@ -74,7 +70,7 @@ class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
                 ),
               ),
               Text(
-                "Reported Issues",
+                "Approved Issues",
                 style: getTextStyle(
                     textColor: AppColors.secondaryYellow,
                     fontFamily: AppFonts.montserrat,

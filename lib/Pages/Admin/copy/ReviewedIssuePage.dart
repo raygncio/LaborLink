@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Cards/RequestCard.dart';
+import 'package:laborlink/Widgets/Cards/IssueCard.dart';
 import 'package:laborlink/styles.dart';
+import 'package:laborlink/users.dart';
 
-class RequestsForApprovalPage extends StatefulWidget {
-  const RequestsForApprovalPage({Key? key}) : super(key: key);
+class ReviewedIssuePage extends StatefulWidget {
+  const ReviewedIssuePage({Key? key}) : super(key: key);
 
   @override
-  State<RequestsForApprovalPage> createState() =>
-      _RequestsForApprovalPageState();
+  State<ReviewedIssuePage> createState() => _ReviewedIssuePageState();
 }
 
-class _RequestsForApprovalPageState extends State<RequestsForApprovalPage> {
+class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -35,8 +34,13 @@ class _RequestsForApprovalPageState extends State<RequestsForApprovalPage> {
                     return Padding(
                       padding:
                           EdgeInsets.only(top: 13, bottom: index == 9 ? 13 : 0),
-                      child: const RequestCard(
-                          requestStatus: RequestStatus.pending),
+                      child: IssueCard(
+                          issueStatus: index % 2 == 0
+                              ? IssueStatus.resolved
+                              : IssueStatus.returned,
+                          reporterUserType: index % 2 == 0
+                              ? AppUserType.client
+                              : AppUserType.handyman),
                     );
                   },
                 ),
@@ -68,7 +72,7 @@ class _RequestsForApprovalPageState extends State<RequestsForApprovalPage> {
                 ),
               ),
               Text(
-                "Requests for Approval",
+                "Reported Issues",
                 style: getTextStyle(
                     textColor: AppColors.secondaryYellow,
                     fontFamily: AppFonts.montserrat,

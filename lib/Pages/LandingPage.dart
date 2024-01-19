@@ -114,9 +114,15 @@ class _LandingPageState extends State<LandingPage> {
     ));
   }
 
-  void onLogin() {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const LoginPage(),
-    ));
+  onLogin() {
+    // Navigator.of(context).pushReplacement(MaterialPageRoute(
+    //   builder: (context) => const LoginPage(),
+    // ));
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const LoginPage(),
+      ),
+    );
   }
 }

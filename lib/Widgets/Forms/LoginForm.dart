@@ -64,7 +64,7 @@ class LoginFormState extends State<LoginForm> {
               height: 42,
               contentPadding: const EdgeInsets.only(
                   left: 12, right: 12, top: 13, bottom: 15),
-              label: "Username or E-mail",
+              label: "E-mail",
               labelTextStyle: _labelTextStyle,
               defaultBorder: _defaultBorder,
               errorBorder: _errorBorder,

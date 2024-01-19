@@ -237,6 +237,16 @@ class BasicInformationFormState extends State<BasicInformationForm> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(right: 3.5),
+                                  child: IconButton(
+                                    onPressed: _presentDatePicker,
+                                    icon: const Icon(
+                                      Icons.calendar_month,
+                                      color: AppColors.tertiaryBlue,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 3.5),
                                   child: Text(
                                     _selectedDate == null
                                         ? 'No date selected'
@@ -247,15 +257,6 @@ class BasicInformationFormState extends State<BasicInformationForm> {
                                         fontWeight: AppFontWeights.semiBold,
                                         fontSize: 11),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 3.5),
-                                  child: IconButton(
-                                      onPressed: _presentDatePicker,
-                                      icon: const Icon(
-                                        Icons.calendar_month,
-                                        color: AppColors.tertiaryBlue,
-                                      )),
                                 ),
                               ],
                             ),

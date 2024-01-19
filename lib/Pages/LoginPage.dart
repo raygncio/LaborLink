@@ -8,6 +8,7 @@ import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Forms/LoginForm.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
+import 'package:laborlink/otp/verify_email_page.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/styles.dart';
 import '../Widgets/Buttons/FilledButton.dart';
@@ -67,19 +68,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 borderRadius: 5),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14),
-                          child: Flex(
-                            direction: Axis.horizontal,
-                            children: [
-                              AppOutlinedButton(
-                                  text: "BACK",
-                                  color: AppColors.accentOrange,
-                                  command: onBack,
-                                  borderRadius: 5),
-                            ],
-                          ),
-                        )
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 14),
+                        //   child: Flex(
+                        //     direction: Axis.horizontal,
+                        //     children: [
+                        //       AppOutlinedButton(
+                        //           text: "BACK",
+                        //           color: AppColors.accentOrange,
+                        //           command: onBack,
+                        //           borderRadius: 5),
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   )
@@ -121,11 +122,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               email: emailFromUsername,
               password: enteredPassword,
             );
-          } 
+          }
         }
 
-        Navigator.of(context).pop();
+        // await Future.delayed(const Duration(seconds: 1));
 
+        // if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+        //   await Future.delayed(
+        //     const Duration(seconds: 3),
+        //   );
+        // }
+
+        // pop out of login page
+        // Navigator.of(context).pop();
+
+        Navigator.of(context).popUntil((route) => route.isFirst);
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.
         print("Login error: $e");

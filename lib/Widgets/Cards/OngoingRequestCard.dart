@@ -58,7 +58,7 @@ class _OngoingRequestCardState extends State<OngoingRequestCard> {
               Container(
                 padding: const EdgeInsets.all(2),
                 decoration: const BoxDecoration(
-                    color: AppColors.accentOrange, shape: BoxShape.circle),
+                    color: AppColors.orangeBadge, shape: BoxShape.circle),
                 child: ClipOval(
                   child: Image.asset(
                     widget.imgUrl ?? 'assets/icons/person-circle-blue.png',

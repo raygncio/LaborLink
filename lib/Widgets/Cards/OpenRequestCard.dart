@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -189,13 +190,27 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextWithIcon(
-                            icon: const Icon(Icons.place,
-                                size: 13, color: AppColors.accentOrange),
-                            text: address,
-                            fontSize: 12,
-                            contentPadding: 8,
+                          SizedBox(
+                            width: 160,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: TextWithIcon(
+                                icon: const Icon(Icons.place,
+                                    size: 13, color: AppColors.accentOrange),
+                                text: address,
+                                fontSize: 12,
+                                contentPadding: 8,
+                              ),
+                            ),
                           ),
+
+                          // TextWithIcon(
+                          //   icon: const Icon(Icons.place,
+                          //       size: 13, color: AppColors.accentOrange),
+                          //   text: address,
+                          //   fontSize: 12,
+                          //   contentPadding: 8,
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 6.75),
                             child: TextWithIcon(
@@ -261,32 +276,47 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
   }
 
   void onAccept() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmation'),
-          content: const Text('Do you really want to accept this request?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Perform action on 'No' button press (if needed)
-              },
-              child: Text('No'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Perform action on 'Yes' button press
-                performAcceptAction();
-              },
-              child: Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    if (getActiveRequest["approvalStatus"] != "completed" &&
+        getActiveRequest["approvalStatus"] != "cancelled" &&
+        getActiveRequest["approvalStatus"] == null) {
+      // Handle errors during request accept
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only create one request at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirmation'),
+            content: const Text('Do you really want to accept this request?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Perform action on 'No' button press (if needed)
+                },
+                child: Text('No'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Perform action on 'Yes' button press
+                  performAcceptAction();
+                },
+                child: Text('Yes'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void performAcceptAction() async {
@@ -301,6 +331,17 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
 
       await service.addHandymanApproval(handymanApproval);
       // Show a success message or perform further actions upon accepting the request
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Request accepted succesfully."),
+          backgroundColor: Color.fromARGB(255, 54, 114, 244),
+        ),
+      );
+
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId),
+      ));
     } catch (e) {
       print('Error: $e');
       // Handle error scenario if required

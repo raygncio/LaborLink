@@ -9,6 +9,8 @@ const List<String> validIds = <String>[
   'PhilHealth',
   'SSS',
   'Postal ID',
+  'Student ID',
+  'Others',
 ];
 
 class ClientRequirementForm extends StatefulWidget {
@@ -95,7 +97,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
-                    enabled: value == 'NBI',
+                    //enabled: value == 'NBI',
                   );
                 }).toList(),
                 onChanged: (String? newValue) {

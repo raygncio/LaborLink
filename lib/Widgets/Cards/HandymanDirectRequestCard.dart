@@ -110,11 +110,12 @@ class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
                         ],
                       ),
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 4),
-                    //   child: RateWidget(
-                    //       rate: widget.handymanInfo["rating"], iconSize: 12),
-                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: RateWidget(
+                          rate: (widget.handymanInfo["rates"] ?? 0).toInt(),
+                          iconSize: 12),
+                    ),
                   ],
                 ),
               ),

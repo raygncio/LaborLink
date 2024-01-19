@@ -4,7 +4,9 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/styles.dart';
 
 class RequestCompleteSuccessPage extends StatefulWidget {
-  const RequestCompleteSuccessPage({Key? key}) : super(key: key);
+  final Map<String, dynamic> details;
+  const RequestCompleteSuccessPage({Key? key, required this.details})
+      : super(key: key);
 
   @override
   State<RequestCompleteSuccessPage> createState() =>
@@ -67,7 +69,7 @@ class _RequestCompleteSuccessPageState
                 child: Padding(
                   padding: const EdgeInsets.only(top: 19),
                   child: Text(
-                    "₱550",
+                    "₱" + widget.details["suggestedPrice"].toString(),
                     style: getTextStyle(
                         textColor: AppColors.accentOrange,
                         fontFamily: AppFonts.montserrat,
@@ -107,7 +109,8 @@ class _RequestCompleteSuccessPageState
       });
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const RatingsPage(),
+        builder: (context) =>
+            RatingsPage(ratings: widget.details, user: 'client'),
       ));
     }
   }

@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Client/Activity/ClientActiveRequest.dart';
 import 'package:laborlink/Pages/Client/Activity/ClientViewHistory.dart';
 import 'package:laborlink/Pages/Handyman/Activity/HandymanActiveRequest.dart';
 import 'package:laborlink/Pages/Handyman/Activity/ViewOfferPage.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Cards/ClientInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanHireCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanProposalCard.dart';
-import 'package:laborlink/Widgets/Cards/HandymanSelectedCard.dart';
-import 'package:laborlink/Widgets/Cards/PendingRequestInfoCard.dart';
 import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/styles.dart';
 
@@ -35,7 +30,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
   Map<String, dynamic> getClientRequest = {};
   DatabaseService service = DatabaseService();
 
-  bool _haveActiveRequest = true;
+  bool _haveActiveRequest = false;
   bool _forApproval = false;
 
   @override
@@ -49,11 +44,16 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
     try {
       getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
       getClientRequest = await service.getActiveRequestClient(widget.userId);
-      print("testingggggggg $getActiveRequest");
+      print("testingggggggg ${getActiveRequest['activeRequestId']}");
       setState(() {
         if (getActiveRequest["approvalStatus"] == "pending") {
           _forApproval = true;
-        } else if (getActiveRequest["approvalStatus"] == "hired") {
+        } else if (getActiveRequest["progress"] == "hired" ||
+            getActiveRequest["progress"] == "omw" ||
+            getActiveRequest["progress"] == "arrived" ||
+            getActiveRequest["progress"] == "inprogress" ||
+            getActiveRequest["progress"] == "completion" ||
+            getActiveRequest["progress"] == "rating") {
           _haveActiveRequest = true;
         }
       });
@@ -129,13 +129,26 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
       );
 
   Widget displayTabContent(deviceWidth) {
-    return _selectedTabIndex == 0
-        ? ongoingTab(deviceWidth)
-        : historyTab(deviceWidth);
+    if (_selectedTabIndex == 0) {
+      return ongoingTab(deviceWidth);
+    } else {
+      return FutureBuilder<Widget>(
+        future: historyTab(deviceWidth),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(); // Return a loading indicator or placeholder
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}'); // Handle the error
+          } else {
+            return snapshot.data ?? const SizedBox.shrink();
+          }
+        },
+      );
+    }
   }
 
   Widget ongoingTab(deviceWidth) {
-    final noActiveRequest = !_haveActiveRequest;
+    final noActiveRequest = !_haveActiveRequest && !_forApproval;
 
     // IF NO ACTIVE REQUEST
     if (noActiveRequest) {
@@ -153,7 +166,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
 
   void onViewOffer() => Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            ViewClientProposal(handymanInfo: dummyFilteredHandyman[0]),
+            ViewClientProposal(handymanInfo: getActiveRequest),
       ));
 
   Widget noRequest(deviceWidth) => Padding(
@@ -223,7 +236,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Text(
-                          "Request Title",
+                          getActiveRequest['title'],
                           style: getTextStyle(
                               textColor: AppColors.tertiaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -236,10 +249,24 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           type: BadgeType.blocked,
                           padding:
                               EdgeInsets.symmetric(horizontal: 7, vertical: 2)),
+                      AppOutlinedButton(
+                          height: 20,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          text: "Cancel Request",
+                          textStyle: getTextStyle(
+                              textColor: AppColors.accentOrange,
+                              fontFamily: AppFonts.montserrat,
+                              fontWeight: AppFontWeights.bold,
+                              fontSize: 9),
+                          color: AppColors.accentOrange,
+                          command: onCancelRequest,
+                          borderRadius: 8,
+                          borderWidth: 1),
                     ],
                   ),
                   Text(
-                    "Request ID",
+                    "Request ID:${getActiveRequest['activeRequestId']}",
                     style: getTextStyle(
                         textColor: AppColors.tertiaryBlue,
                         fontFamily: AppFonts.montserrat,
@@ -249,7 +276,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 13),
                     child: Text(
-                      "I'm experiencing a clogged sink issue in my kitchen that requires attention. The clog seems to be located near the drain area and has been causing slow drainage over the past few days.",
+                      getActiveRequest['description'],
                       overflow: TextOverflow.visible,
                       style: getTextStyle(
                           textColor: AppColors.black,
@@ -263,42 +290,59 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextWithIcon(
-                              icon: Icon(Icons.place,
-                                  size: 17, color: AppColors.accentOrange),
-                              text: "556 Juan Luna Ave.",
-                              fontSize: 12,
-                              contentPadding: 19,
+                            Container(
+                              width: 200, // Set your specific width here
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: TextWithIcon(
+                                  icon: const Icon(
+                                    Icons.place,
+                                    size: 17,
+                                    color: AppColors.accentOrange,
+                                  ),
+                                  text: getActiveRequest['address'],
+                                  fontSize: 12,
+                                  contentPadding: 19,
+                                ),
+                              ),
                             ),
+                            // TextWithIcon(
+                            //   icon: const Icon(Icons.place,
+                            //       size: 17, color: AppColors.accentOrange),
+                            //   text: getActiveRequest['address'],
+                            //   fontSize: 12,
+                            //   contentPadding: 19,
+                            // ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.calendar_month_rounded,
+                                icon: const Icon(Icons.calendar_month_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "Today",
+                                text: getActiveRequest['date'],
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.watch_later,
+                                icon: const Icon(Icons.watch_later,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "12:00 - 1:00 PM",
+                                text: getActiveRequest['time'],
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 12),
+                              padding: const EdgeInsets.only(top: 12),
                               child: TextWithIcon(
-                                icon: Icon(Icons.local_offer_rounded,
+                                icon: const Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
-                                text: "₱550",
+                                text: getActiveRequest['suggestedPrice']
+                                    .toString(),
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -306,35 +350,37 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           ],
                         ),
                         const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: 71,
-                              child: Row(
-                                children: [
-                                  AppFilledButton(
-                                      height: 20,
-                                      text: "View Offer",
-                                      fontSize: 9,
-                                      fontFamily: AppFonts.montserrat,
-                                      color: AppColors.secondaryBlue,
-                                      command: onViewOffer,
-                                      borderRadius: 8),
-                                ],
+                        if (getActiveRequest['hasOffer'] == true)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: 71,
+                                child: Row(
+                                  children: [
+                                    AppFilledButton(
+                                        height: 20,
+                                        text: "View Offer",
+                                        fontSize: 9,
+                                        fontFamily: AppFonts.montserrat,
+                                        color: AppColors.secondaryBlue,
+                                        command: onViewOffer,
+                                        borderRadius: 8),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 7.76),
-                              child: AppBadge(
-                                label: "Offered ₱650",
-                                type: BadgeType.offer,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 7, vertical: 1),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 7.76),
+                                child: AppBadge(
+                                  label:
+                                      "Offered ₱${getActiveRequest['bidPrice'].toString()}",
+                                  type: BadgeType.offer,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 7, vertical: 1),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
@@ -346,22 +392,22 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4.5),
                             child: Image.network(
-                              imgPlaceholder,
-                              height: 101,
-                              fit: BoxFit.cover,
+                              getActiveRequest['attachment'],
+                              height: 160,
+                              fit: BoxFit.fill,
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4.5),
-                            child: Image.network(
-                              imgPlaceholder,
-                              height: 101,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.only(left: 4.5),
+                        //     child: Image.network(
+                        //       getActiveRequest['attachment'],
+                        //       height: 101,
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   )
@@ -371,7 +417,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 54),
-            child: ClientInfoCard(clientInfo: dummyClients[0]),
+            child: ClientInfoCard(clientInfo: getActiveRequest),
           ),
         ],
       );
@@ -379,7 +425,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
   Widget activeRequest() {
     return FutureBuilder(
       future: Future.delayed(
-          Duration(seconds: 1)), // Adjust the delay duration as needed
+          const Duration(seconds: 1)), // Adjust the delay duration as needed
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Padding(
@@ -390,15 +436,38 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           );
         } else {
           // You can return a loading indicator or an empty container while waiting
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
   }
 
-  Widget historyTab(deviceWidth) {
-    bool openCompletedRequest = true;
-    bool openCancelledRequest = true;
+  Future<Widget> historyTab(deviceWidth) async {
+    bool openCompletedRequest = false;
+    bool openCancelledRequest = false;
+
+    List<Map<String, dynamic>> cancelledRequest = [];
+    List<Map<String, dynamic>> completedRequest = [];
+
+    try {
+      completedRequest =
+          await service.getCompletedRequestHandyman(widget.userId);
+      cancelledRequest =
+          await service.getCancelledRequestHandyman(widget.userId);
+      //print('*************************COMPLETED REQUEST $completedRequest');
+
+      print('*************************CANCELLED REQUEST $cancelledRequest');
+    } catch (error) {
+      print('Error fetching interested laborers: $error');
+    }
+
+    if (completedRequest.isNotEmpty) {
+      openCompletedRequest = true;
+    }
+
+    if (cancelledRequest.isNotEmpty) {
+      openCancelledRequest = true;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 54),
@@ -446,13 +515,21 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 10,
+                            itemCount: completedRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentRequest =
+                                  completedRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: () => Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => ClientViewHistory(
+                                      userId: currentRequest['validRequestId'],
+                                      userRole: currentRequest['userRole'],
+                                    ),
+                                  )),
                                   child: Container(
                                     height: 52,
                                     color: AppColors.white,
@@ -462,7 +539,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           padding:
                                               const EdgeInsets.only(right: 15),
                                           child: Image.asset(
-                                            "assets/icons/plumbing.png",
+                                            "assets/icons/${currentRequest['category'].toString().toLowerCase()}.png",
                                             height: 32,
                                             width: 32,
                                           ),
@@ -476,7 +553,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  "My sink is leaking!",
+                                                  currentRequest['title'] ?? '',
                                                   style: getTextStyle(
                                                       textColor: AppColors
                                                           .secondaryBlue,
@@ -489,7 +566,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                               ],
                                             ),
                                             Text(
-                                              "07 Aug 2023, 11:12 AM",
+                                              "${currentRequest['date']}${','}${currentRequest['time']}",
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -507,7 +584,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           child: Align(
                                             alignment: Alignment.topRight,
                                             child: Text(
-                                              "₱650.00",
+                                              currentRequest['suggestedPrice']
+                                                  .toString(),
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,
@@ -566,8 +644,10 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           height: scrollableSectionHeight,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: 0,
+                            itemCount: cancelledRequest.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> currentCancelledRequest =
+                                  cancelledRequest[index];
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),
@@ -579,7 +659,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                         padding:
                                             const EdgeInsets.only(right: 15),
                                         child: Image.asset(
-                                          "assets/icons/pest-2.png",
+                                          "assets/icons/${currentCancelledRequest['category'].toString().toLowerCase()}.png",
                                           height: 32,
                                           width: 32,
                                         ),
@@ -593,7 +673,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                "Roaches everywhere",
+                                                currentCancelledRequest[
+                                                    'title'],
                                                 style: getTextStyle(
                                                     textColor: AppColors.grey,
                                                     fontFamily:
@@ -605,7 +686,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                             ],
                                           ),
                                           Text(
-                                            "15 June 2023, 10:48 AM",
+                                            "${currentCancelledRequest['date']}${','}${currentCancelledRequest['time']}",
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,
@@ -621,7 +702,8 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                                         child: Align(
                                           alignment: Alignment.topRight,
                                           child: Text(
-                                            "₱700.00",
+                                            currentCancelledRequest['bidPrice']
+                                                .toString(),
                                             style: getTextStyle(
                                                 textColor: AppColors.grey,
                                                 fontFamily: AppFonts.montserrat,
@@ -647,5 +729,55 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
         },
       ),
     );
+  }
+
+  void onCancelRequest() async {
+    bool confirmCancel = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Request'),
+          content: const Text('Are you sure you want to cancel your request?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false when cancel is pressed
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true when confirm is pressed
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmCancel == true) {
+      DatabaseService service = DatabaseService();
+
+      try {
+        await service.cancelApproval(widget.userId);
+        print('Document updated successfully');
+        // Show SnackBar when request is successfully cancelled
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Your request has been successfully cancelled'),
+            duration: Duration(seconds: 2),
+            backgroundColor: AppColors.tertiaryBlue,
+          ),
+        );
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => HandymanMainPage(userId: widget.userId),
+        ));
+      } catch (e) {
+        print('Error updating document: $e');
+      }
+    }
   }
 }

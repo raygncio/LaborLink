@@ -1,68 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Badge.dart';
+import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/report.dart';
-import 'dart:async';
-import 'dart:io';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
+import 'package:laborlink/models/client.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../dummyDatas.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
-// class IssuesReportedPage extends StatefulWidget {
-//   final String userId;
-//   const IssuesReportedPage({Key? key, required this.userId}) : super(key: key);
+class IssuesReportedPage extends StatefulWidget {
+  final String userId;
+  final bool hide;
+  const IssuesReportedPage({Key? key, required this.userId, required this.hide})
+      : super(key: key);
 
-//   @override
-//   State<IssuesReportedPage> createState() => _IssuesReportedPageState();
-// }
+  @override
+  State<IssuesReportedPage> createState() => _IssuesReportedPageState();
+}
 
-class IssuesReportedPage extends ConsumerWidget {
+class _IssuesReportedPageState extends State<IssuesReportedPage> {
   List<Report> issues = []; // This will hold your list of issues
   String fullName = "";
-  File? defaultAvatar;
   final formattedDate = DateFormat('yyyy-MM-dd hh:mm');
+  File? defaultAvatar;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Call an async function to fetch data
-  //   _loadData();
-  //   fetchUserData();
-  //   _loadDefaultAvatar();
-  // }
-
-  // Define an async function to fetch data
-  _loadData(String userId) async {
-    // Use await to wait for the result
-    List<Report> reports = await getAllReportData(userId);
-    issues = reports;
+  @override
+  void initState() {
+    super.initState();
+    // Call an async function to fetch data
+    _loadData();
+    fetchUserData();
+    _loadDefaultAvatar();
   }
 
-  // Future<void> fetchUserData() async {
-  //   DatabaseService service = DatabaseService();
-  //   try {
-  //     Client clientInfo = await service.getUserData("test");
+  // Define an async function to fetch data
+  _loadData() async {
+    List<Report> reports = await getAllReportData(widget.userId);
 
-  //     fullName = clientInfo.firstName +
-  //         ' ' +
-  //         (clientInfo.middleName ?? "") +
-  //         ' ' +
-  //         clientInfo.lastName +
-  //         ' ' +
-  //         (clientInfo.suffix ?? "");
-  //   } catch (error) {
-  //     print('Error fetching user data: $error');
-  //   }
-  // }
+    // Update the state with the result
+    setState(() {
+      issues = reports;
+    });
+  }
+
+  Future<void> fetchUserData() async {
+    DatabaseService service = DatabaseService();
+    try {
+      Client clientInfo = await service.getUserData(widget.userId);
+
+      fullName = clientInfo.firstName +
+          ' ' +
+          (clientInfo.middleName ?? "") +
+          ' ' +
+          clientInfo.lastName +
+          ' ' +
+          (clientInfo.suffix ?? "");
+    } catch (error) {
+      print('Error fetching user data: $error');
+    }
+  }
 
   Future<List<Report>> getAllReportData(String userId) async {
     DatabaseService service = DatabaseService();
     try {
-      List<Report> reports = await service.getAllReportData("test");
+      List<Report> reports = await service.getAllReportData(widget.userId);
       return reports;
     } catch (error) {
       print('Error fetching user data 2: $error');
@@ -88,21 +94,7 @@ class IssuesReportedPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
-
-    Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-    String? userId = userInfo['userId'];
-    String? fullName = userInfo['firstName'] +
-        ' ' +
-        (userInfo['middleName'] ?? "") +
-        ' ' +
-        userInfo['lastName'] +
-        ' ' +
-        (userInfo['suffix'] ?? "");
-    _loadData(userId ?? '');
-    // fetchUserData();
-    _loadDefaultAvatar();
+  Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -225,7 +217,7 @@ class IssuesReportedPage extends ConsumerWidget {
                             Positioned(
                               top: 15,
                               right: 17,
-                              child: reportBadge("Waiting"),
+                              child: reportBadge(report.status),
                             ),
                           ],
                         ),
@@ -259,12 +251,17 @@ class IssuesReportedPage extends ConsumerWidget {
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16),
-                      child: GestureDetector(
-                        onTap: () => onBack(context),
-                        child: Image.asset("assets/icons/back-btn-2.png",
+                      child: Visibility(
+                        visible: !widget.hide,
+                        child: GestureDetector(
+                          onTap: () => onBack(context),
+                          child: Image.asset(
+                            "assets/icons/back-btn-2.png",
                             height: 23,
                             width: 13,
-                            alignment: Alignment.centerLeft),
+                            alignment: Alignment.centerLeft,
+                          ),
+                        ),
                       ),
                     ),
                   ),

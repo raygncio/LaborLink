@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/Activity/ViewHandymanProposal.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -17,6 +18,14 @@ class HandymanSelectedCard extends StatefulWidget {
 class HandymanSelectedCardState extends State<HandymanSelectedCard> {
   @override
   Widget build(BuildContext context) {
+    String firstName = widget.handymanInfo['firstName'] ?? '';
+    String middleName = widget.handymanInfo['middleName'] ?? '';
+    String lastName = widget.handymanInfo['lastName'] ?? '';
+    String suffix = widget.handymanInfo['suffix'] ?? '';
+
+    String fullname = '$firstName $middleName $lastName $suffix';
+    print("GET THE DIRECT INFO: $fullname");
+    bool hasBidPrice = widget.handymanInfo.containsKey('bidPrice');
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.white,
@@ -33,7 +42,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                   height: 61,
                   width: 61,
                   child: ClipOval(
-                    child: Image.network(widget.handymanInfo["img_url"]),
+                    child: Image.asset("assets/icons/person-circle-blue.png"),
                   ),
                 ),
                 Padding(
@@ -42,7 +51,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.handymanInfo['name'],
+                      Text(fullname,
                           style: getTextStyle(
                               textColor: AppColors.primaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -55,11 +64,13 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                             Padding(
                               padding: const EdgeInsets.only(right: 6),
                               child: AppBadge(
-                                  label: widget.handymanInfo["service"],
+                                  label:
+                                      widget.handymanInfo["specialization"] ??
+                                          ' ',
                                   type: BadgeType.normal),
                             ),
                             AppBadge(
-                                label: widget.handymanInfo["area"],
+                                label: widget.handymanInfo["city"] ?? ' ',
                                 type: BadgeType.normal)
                           ],
                         ),
@@ -67,27 +78,69 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: RateWidget(
-                            rate: widget.handymanInfo["rating"], iconSize: 12),
+                            rate: (widget.handymanInfo["rating"] ?? 3).toInt(),
+                            iconSize: 12),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: EdgeInsets.only(top: 7),
-                child: AppBadge(
-                  label: "Waiting",
-                  type: BadgeType.blocked,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 1),
+            if (hasBidPrice)
+              Positioned(
+                top: 18,
+                right: 0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    AppBadge(
+                      label: "Offered ₱ ${widget.handymanInfo["bidPrice"]}",
+                      type: BadgeType.offer,
+                      padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                    ),
+                    SizedBox(
+                      width: 85,
+                      child: Row(
+                        children: [
+                          AppFilledButton(
+                            padding: const EdgeInsets.only(top: 6),
+                            height: 20,
+                            text: "View Proposal",
+                            fontSize: 9,
+                            fontFamily: AppFonts.montserrat,
+                            color: AppColors.secondaryBlue,
+                            command: onViewProposal,
+                            borderRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            )
+              )
+            else
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 7),
+                  child: AppBadge(
+                    label: "Waiting",
+                    type: BadgeType.blocked,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 1),
+                  ),
+                ),
+              )
           ],
         ),
       ),
     );
+  }
+
+  void onViewProposal() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) =>
+          ViewHandymanProposal(handymanInfo: widget.handymanInfo),
+    ));
   }
 }

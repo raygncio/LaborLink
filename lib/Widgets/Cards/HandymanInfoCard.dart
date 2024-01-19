@@ -31,10 +31,13 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
   }
 
   void initializeFullname() {
-    String firstName = widget.handymanInfo['firstName'] ?? '';
-    String middleName = widget.handymanInfo['middleName'] ?? '';
-    String lastName = widget.handymanInfo['lastName'] ?? '';
-    String suffix = widget.handymanInfo['suffix'] ?? '';
+    String firstName =
+        capitalizeFirstLetter(widget.handymanInfo["firstName"] ?? '');
+    String middleName =
+        capitalizeFirstLetter(widget.handymanInfo["middleName"] ?? '');
+    String lastName =
+        capitalizeFirstLetter(widget.handymanInfo["lastName"] ?? '');
+    String suffix = capitalizeFirstLetter(widget.handymanInfo["suffix"] ?? '');
 
     fullname = '$firstName $middleName $lastName $suffix';
   }
@@ -103,13 +106,14 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                     padding: const EdgeInsets.only(top: 3),
                     child: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: AppBadge(
-                              label:
-                                  widget.handymanInfo["specialization"] ?? '',
-                              type: BadgeType.normal),
-                        ),
+                        if (widget.handymanInfo['userRole'] == 'handyman')
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: AppBadge(
+                                label:
+                                    widget.handymanInfo["specialization"] ?? '',
+                                type: BadgeType.normal),
+                          ),
                         AppBadge(
                             label: widget.handymanInfo["city"] ?? '',
                             type: BadgeType.normal)
@@ -121,7 +125,10 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: RatingBar.builder(
-                        initialRating: 3, // input
+                        initialRating: double.parse(
+                          (widget.handymanInfo["rates"] ?? 0)
+                              .toStringAsFixed(2),
+                        ), // input
                         itemCount: 5,
                         itemSize: 15,
                         ignoreGestures: true,
@@ -135,21 +142,29 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
               ),
             ),
             const Spacer(),
-            Container(
-              height: 45,
-              width: 45,
-              decoration: BoxDecoration(
-                color: AppColors.dirtyWhite,
-                borderRadius: BorderRadius.circular(50),
+            if (widget.handymanInfo['userRole'] == 'handyman')
+              Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                  color: AppColors.dirtyWhite,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Image.asset(
+                    "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
+                    width: 50,
+                    height: 48),
               ),
-              child: Image.asset(
-                  "assets/icons/${widget.handymanInfo['specialization'].toString().toLowerCase()}.png",
-                  width: 50,
-                  height: 48),
-            ),
           ],
         ),
       ),
     );
+  }
+
+  String capitalizeFirstLetter(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    return input[0].toUpperCase() + input.substring(1);
   }
 }

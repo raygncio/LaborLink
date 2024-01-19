@@ -8,6 +8,8 @@ import 'package:laborlink/ai/screens/splash_id.dart';
 import 'package:laborlink/ai/screens/verdict.dart';
 import 'package:laborlink/ai/widgets/id_scan.dart';
 import 'package:laborlink/ai/style.dart';
+import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
 
 class IdVerification extends StatefulWidget {
   const IdVerification({super.key, required this.data});
@@ -53,6 +55,9 @@ class _IdVerificationState extends State<IdVerification> {
 
       if (_currentFileIndex.value >= files.length) {
         _interpretOutputs();
+        // upload results to Firebase
+        _recordResults();
+
         setState(() {
           _isExiting = true;
         });
@@ -125,6 +130,22 @@ class _IdVerificationState extends State<IdVerification> {
         _currentFileIndex.value++;
       });
     });
+  }
+
+  _recordResults() async {
+    DatabaseService service = DatabaseService();
+    AnomalyResults anomalyResults;
+
+    for (var i = 0; i < files.length; i++) {
+      // Upload files to Firebase Storage
+      String imageUrl = await service.uploadId(i.toString(), files[i]['file']);
+
+      anomalyResults = AnomalyResults(
+          idType: files[i]['type'], attachment: imageUrl, result: outputs[i]);
+      await service.addAnomalyResult(anomalyResults);
+    }
+
+    print('############################## RECORDING RESULTS!!!');
   }
 
   @override

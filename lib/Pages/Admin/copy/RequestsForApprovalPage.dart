@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Cards/IssueCard.dart';
 import 'package:laborlink/Widgets/Cards/RequestCard.dart';
 import 'package:laborlink/styles.dart';
-import 'package:laborlink/users.dart';
 
-class ApprovedIssuesPage extends StatefulWidget {
-  const ApprovedIssuesPage({Key? key}) : super(key: key);
+class RequestsForApprovalPage extends StatefulWidget {
+  const RequestsForApprovalPage({Key? key}) : super(key: key);
 
   @override
-  State<ApprovedIssuesPage> createState() => _ApprovedIssuesPageState();
+  State<RequestsForApprovalPage> createState() =>
+      _RequestsForApprovalPageState();
 }
 
-class _ApprovedIssuesPageState extends State<ApprovedIssuesPage> {
+class _RequestsForApprovalPageState extends State<RequestsForApprovalPage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -36,11 +34,8 @@ class _ApprovedIssuesPageState extends State<ApprovedIssuesPage> {
                     return Padding(
                       padding:
                           EdgeInsets.only(top: 13, bottom: index == 9 ? 13 : 0),
-                      child: IssueCard(
-                          issueStatus: IssueStatus.approved,
-                          reporterUserType: index % 2 == 0
-                              ? AppUserType.client
-                              : AppUserType.handyman),
+                      child: const RequestCard(
+                          requestStatus: RequestStatus.pending),
                     );
                   },
                 ),
@@ -72,7 +67,7 @@ class _ApprovedIssuesPageState extends State<ApprovedIssuesPage> {
                 ),
               ),
               Text(
-                "Approved Issues",
+                "Requests for Approval",
                 style: getTextStyle(
                     textColor: AppColors.secondaryYellow,
                     fontFamily: AppFonts.montserrat,

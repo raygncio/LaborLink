@@ -89,6 +89,7 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
 
     if (confirmCancel == true) {
       DatabaseService service = DatabaseService();
+      print(userId);
       try {
         await service.cancelRequest(userId);
         print('Document updated successfully');
@@ -137,15 +138,20 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
                   padding: const EdgeInsets.only(top: 17),
                   child: Row(
                     children: [
-                      Padding(
+                      Container(
                         padding: const EdgeInsets.only(right: 8),
-                        child: Text(
-                          title,
-                          style: getTextStyle(
-                              textColor: AppColors.tertiaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 17),
+                        width: 200,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            title,
+                            softWrap: false,
+                            style: getTextStyle(
+                                textColor: AppColors.tertiaryBlue,
+                                fontFamily: AppFonts.montserrat,
+                                fontWeight: AppFontWeights.bold,
+                                fontSize: 17),
+                          ),
                         ),
                       ),
                       AppBadge(

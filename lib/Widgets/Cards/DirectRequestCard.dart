@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -50,7 +51,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 9, top: 12),
       child: Container(
-        height: 279,
+        height: 339,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
@@ -74,6 +75,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                         ),
                       ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             fullname,
@@ -83,10 +85,11 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                 fontWeight: AppFontWeights.bold,
                                 fontSize: 15),
                           ),
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(top: 1.27),
                             child: AppBadge(
-                              label: "Request ID: 12345",
+                              label: "Request ID: " +
+                                  widget.requestInfo["ActiveRequestId"],
                               type: BadgeType.normal,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 1),
@@ -106,7 +109,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                       borderRadius: BorderRadius.circular(50),
                                     ),
                                     child: Image.asset(
-                                      "assets/icons/plumbing.png",
+                                      "assets/icons/${widget.requestInfo['specialization'].toString().toLowerCase()}.png",
                                     ),
                                   ),
                                 ),
@@ -140,12 +143,19 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextWithIcon(
-                                  icon: const Icon(Icons.place,
-                                      size: 13, color: AppColors.accentOrange),
-                                  text: widget.requestInfo["address"] ?? '',
-                                  fontSize: 9,
-                                  contentPadding: 8,
+                                SizedBox(
+                                  width: 160,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: TextWithIcon(
+                                      icon: const Icon(Icons.place,
+                                          size: 13,
+                                          color: AppColors.accentOrange),
+                                      text: widget.requestInfo['address'],
+                                      fontSize: 12,
+                                      contentPadding: 8,
+                                    ),
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6.75),
@@ -153,7 +163,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                     icon: const Icon(Icons.local_offer_rounded,
                                         size: 13,
                                         color: AppColors.accentOrange),
-                                    text: widget.requestInfo["suggestedFee"] ??
+                                    text: widget.requestInfo["suggestedPrice"]
+                                            .toString() ??
                                         '',
                                     fontSize: 9,
                                     contentPadding: 8,
@@ -206,33 +217,33 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                         fontSize: 9),
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 14, right: 14, top: 10),
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //         child: Padding(
-                //           padding: const EdgeInsets.only(right: 4.5),
-                //           child: Image.network(
-                //             imgPlaceholder,
-                //             height: 101,
-                //             fit: BoxFit.cover,
-                //           ),
-                //         ),
-                //       ),
-                //       Expanded(
-                //         child: Padding(
-                //           padding: const EdgeInsets.only(left: 4.5),
-                //           child: Image.network(
-                //             imgPlaceholder,
-                //             height: 101,
-                //             fit: BoxFit.cover,
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // )
+                Padding(
+                  padding: const EdgeInsets.only(left: 14, right: 14, top: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 4.5),
+                          child: Image.network(
+                            widget.requestInfo["attachment"],
+                            height: 151,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                      // Expanded(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.only(left: 4.5),
+                      //     child: Image.network(
+                      //       imgPlaceholder,
+                      //       height: 101,
+                      //       fit: BoxFit.cover,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                )
               ],
             ),
             Positioned(
@@ -297,7 +308,41 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     );
   }
 
-  void onAccept() {}
+  void onAccept() async {
+    // Accept the request, update the request
+    // direct to home page
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+    print('drgtdrgd ${getActiveRequest["approvalStatus"]}');
+    if (getActiveRequest["approvalStatus"] != "completed" &&
+        getActiveRequest["approvalStatus"] != "cancelled" &&
+        getActiveRequest["approvalStatus"] == null) {
+      // Handle errors during accepting request
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only accept one request at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      print('updaterequest');
+      try {
+        await service.updateRequestProgress(
+            widget.requestInfo["ActiveRequestId"], widget.userId);
+      } catch (e) {
+        // Handle errors during user creation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error creating user: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId)));
+  }
 
   _getTotalFee(double fee) {
     setState(() {
@@ -327,7 +372,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         description: _offerDesc,
         attachment: imageUrl,
         userId: widget.userId,
-        requestId: widget.requestInfo['requestId'],
+        requestId: widget.requestInfo['ActiveRequestId'],
       );
 
       await service.addOffers(offers);
@@ -359,10 +404,22 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
   void onDecline() async {
     DatabaseService service = DatabaseService();
     try {
-      await service.declineDirectRequest(widget.requestInfo["userId"]);
-      print('Document updated successfully');
+      await service.declineDirectRequest(widget.requestInfo["ActiveRequestId"]);
+      Future.delayed(Duration(milliseconds: 400), () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Direct Request declined succesfully."),
+            backgroundColor: Color.fromARGB(255, 15, 83, 186),
+          ),
+        );
+      });
     } catch (e) {
       print('Error updating document: $e');
     }
+
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) =>
+          HandymanMainPage(userId: widget.requestInfo["handymanId"]),
+    ));
   }
 }

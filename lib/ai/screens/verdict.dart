@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/LoginPage.dart';
@@ -7,6 +8,8 @@ import 'package:laborlink/ai/screens/dummy.dart';
 import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/handyman.dart';
+import 'package:laborlink/models/results/anomaly_results.dart';
+import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/services/analytics_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,10 @@ import 'package:laborlink/providers/registration_data_provider.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 final _firebase = FirebaseAuth.instance;
 final AnalyticsService _analytics = AnalyticsService();
@@ -23,10 +30,12 @@ class VerdictPage extends ConsumerStatefulWidget {
       {super.key,
       required this.outputs,
       this.regulaOutputs,
+      this.images,
       required this.isSuccessful});
 
   final List<String> outputs;
   final List<double>? regulaOutputs;
+  final List<Image>? images;
   final bool isSuccessful;
 
   @override
@@ -34,9 +43,19 @@ class VerdictPage extends ConsumerStatefulWidget {
 }
 
 class _VerdictPageState extends ConsumerState<VerdictPage> {
+  Widget resultsButton = const SizedBox();
   Widget button = const SizedBox();
   Map<String, dynamic> savedUserData = {};
   bool isRegistered = false;
+
+  bool hasFaceResults = false;
+
+  checkFaceResults() {
+    if (widget.images != null && widget.regulaOutputs != null) {
+      return true;
+    }
+    return false;
+  }
 
   String processOutputs() {
     if (widget.outputs.isEmpty) return '';
@@ -118,11 +137,12 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     setState(() {
       button = delayed;
-      isRegistered = true;
+      isRegistered = true; // to stop reloading create account functions
     });
   }
 
   createClientAccount() async {
+    print('>>>>>>>>>>>>>>>>>>>>create client account');
     print(savedUserData);
 
     // Create a user in Firebase Authentication
@@ -165,9 +185,14 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     } on FirebaseAuthException catch (error) {
       print('Error fetching user data: $error');
     }
+
+    setState(() {
+      isRegistered = true;
+    });
   }
 
   createHandymanAccount() async {
+    print('>>>>>>>>>>>>>>>>>>>>create handyman account');
     print(savedUserData);
 
     // Create a user in Firebase Authentication
@@ -235,13 +260,108 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
     } on FirebaseAuthException catch (error) {
       print('>>>>>>>>>>>>>>>>>>>>Error fetching user data: $error');
     }
+
+    setState(() {
+      isRegistered = true;
+    });
+  }
+
+  showResultsButton() {
+    setState(() {
+      resultsButton = TextButton(
+        onPressed: showResultsDialog,
+        child: Text(
+          'Show Results',
+          style: getTextStyle(
+              textColor: AppColors.primaryBlue,
+              fontFamily: AppFonts.montserrat,
+              fontWeight: AppFontWeights.bold,
+              fontSize: 15),
+        ),
+      );
+    });
+  }
+
+  showResultsDialog() {
+    List<Image> resultImages = widget.images!;
+    List<double> regulaResults = widget.regulaOutputs!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        content: Container(
+          height: 230,
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ListView.builder(
+              //   scrollDirection: Axis.horizontal,
+              //   itemCount: resultImages.length,
+              //   itemBuilder: (context, index) {
+              //     return Container(
+              //       width: 200,
+              //       child: resultImages[index],
+              //     );
+              //   },
+              // ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (var image in resultImages)
+                        Container(
+                          padding: const EdgeInsets.only(
+                            right: 10,
+                            left: 10,
+                          ),
+                          width: 150,
+                          child: image,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              for (var result in regulaResults)
+                Text('Match Percentage: ${result.toStringAsFixed(2)}',
+                    style: getTextStyle(
+                        textColor: AppColors.secondaryBlue,
+                        fontFamily: AppFonts.poppins,
+                        fontWeight: AppFontWeights.regular,
+                        fontSize: 15)),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Okay',
+              style: getTextStyle(
+                  textColor: AppColors.primaryBlue,
+                  fontFamily: AppFonts.poppins,
+                  fontWeight: AppFontWeights.bold,
+                  fontSize: 15),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override
   void initState() {
-    Timer(const Duration(seconds: 4), () {
+    Timer(const Duration(seconds: 6), () {
       showButton();
     });
+    hasFaceResults = checkFaceResults();
     super.initState();
   }
 
@@ -252,12 +372,15 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('>>>>>>>>>>>isSuccessful: ${widget.isSuccessful}');
     if (widget.isSuccessful) {
       savedUserData = ref.watch(registrationDataProvider);
     }
 
     if (!isRegistered && savedUserData.isNotEmpty) {
+      print('>>>>>>>>>>>savedUserData.isNotEmpty: ${savedUserData.isNotEmpty}');
       if (savedUserData['userRole'] == 'client') {
+        //print('>>>>>>create client account');
         createClientAccount();
       }
       if (savedUserData['userRole'] == 'handyman') {
@@ -270,6 +393,10 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
 
     if (widget.isSuccessful) {
       lottie = Lottie.asset('assets/animations/check.json');
+    }
+
+    if (hasFaceResults) {
+      showResultsButton();
     }
 
     return Scaffold(
@@ -295,6 +422,7 @@ class _VerdictPageState extends ConsumerState<VerdictPage> {
           const SizedBox(
             height: 15,
           ),
+          resultsButton,
           button,
         ],
       ),

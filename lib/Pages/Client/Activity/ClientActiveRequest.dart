@@ -1,18 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/RequestCompleteSuccessPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/MessageButton.dart';
-import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Buttons/ReportIssueButton.dart';
 import 'package:laborlink/Widgets/Cards/HandymanInfoCard.dart';
 import 'package:laborlink/Widgets/ProgressIndicator.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/request.dart';
 import 'package:laborlink/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
 class ClientActiveRequest extends StatefulWidget {
   final Map<String, dynamic> requestDetail;
@@ -26,6 +25,9 @@ class ClientActiveRequest extends StatefulWidget {
 class _ClientActiveRequestState extends State<ClientActiveRequest> {
   late int _currentProgress;
   late bool _requestCompleted;
+  late String _progress = ' ';
+  Request? requestInfo;
+  Timer? timer;
   DatabaseService service = DatabaseService();
   List<String> progressDescriptions = [
     "Waiting for the handyman",
@@ -35,23 +37,84 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     "Service complete!",
     "Service complete on both parties!"
   ];
-
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+
     if (widget.requestDetail["progress"] == 'completion') {
       _currentProgress = 4;
+      _progress = 'Completion';
     } else if (widget.requestDetail["progress"] == 'omw') {
       _currentProgress = 1;
+      _progress = 'On the way';
     } else if (widget.requestDetail["progress"] == 'arrived') {
       _currentProgress = 2;
+      _progress = 'Arrived';
     } else if (widget.requestDetail["progress"] == 'inprogress') {
       _currentProgress = 3;
+      _progress = 'In Progress';
     } else {
       _currentProgress = 0;
     }
     _requestCompleted = _currentProgress == 4;
-    print('Request Detail: ${widget.requestDetail}');
 
+    if (widget.requestDetail["progress"] != 'completion') {
+      //check email verification status every 3 sec
+      timer = Timer.periodic(
+        const Duration(seconds: 4),
+        (timer) => reloadPage(),
+      );
+    } else if (widget.requestDetail["progress"] == 'completion') {
+      timer?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void reloadPage() async {
+    int currentProgress = 0;
+    String status = ' ';
+    // Use setState to trigger a rebuild of the widget
+    try {
+      requestInfo =
+          await service.getRequestsData(widget.requestDetail["clientId"]);
+
+      print('progress: ${requestInfo!.progress}');
+
+      if (requestInfo!.progress == 'completion') {
+        currentProgress = 4;
+        status = 'Completion';
+      } else if (requestInfo!.progress == 'omw') {
+        currentProgress = 1;
+        status = 'On the way';
+      } else if (requestInfo!.progress == 'arrived') {
+        currentProgress = 2;
+        status = 'Arrived';
+      } else if (requestInfo!.progress == 'inprogress') {
+        currentProgress = 3;
+        status = 'In Progress';
+      } else if (requestInfo!.progress == 'hired') {
+        currentProgress = 0;
+        status = 'Hired';
+      }
+
+      setState(() {
+        _currentProgress = currentProgress;
+        _progress = status;
+        _requestCompleted = currentProgress == 4;
+      });
+    } catch (error) {
+      print('Error fetching get user data: $error');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -72,21 +135,26 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                           children: [
                             Row(
                               children: [
-                                Padding(
+                                Container(
                                   padding: const EdgeInsets.only(right: 8),
-                                  child: Text(
-                                    widget.requestDetail["title"] ?? '',
-                                    style: getTextStyle(
-                                        textColor: AppColors.tertiaryBlue,
-                                        fontFamily: AppFonts.montserrat,
-                                        fontWeight: AppFontWeights.bold,
-                                        fontSize: 17),
+                                  width: 200,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Text(
+                                      widget.requestDetail["title"] ?? '',
+                                      softWrap: false,
+                                      style: getTextStyle(
+                                          textColor: AppColors.tertiaryBlue,
+                                          fontFamily: AppFonts.montserrat,
+                                          fontWeight: AppFontWeights.bold,
+                                          fontSize: 17),
+                                    ),
                                   ),
                                 ),
                                 AppBadge(
                                     label: _requestCompleted
                                         ? "Completed"
-                                        : "In Progress",
+                                        : _progress,
                                     type: _requestCompleted
                                         ? BadgeType.complete
                                         : BadgeType.inProgress,
@@ -94,20 +162,27 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                         horizontal: 7, vertical: 2)),
                               ],
                             ),
-                            Text(
-                              widget.requestDetail["requestId"] ?? '',
-                              style: getTextStyle(
-                                  textColor: AppColors.tertiaryBlue,
-                                  fontFamily: AppFonts.montserrat,
-                                  fontWeight: AppFontWeights.regular,
-                                  fontSize: 13),
+                            Container(
+                              width: 150,
+                              child: Text(
+                                "Request ID: " +
+                                        widget.requestDetail["requestId"] ??
+                                    '',
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                style: getTextStyle(
+                                    textColor: AppColors.tertiaryBlue,
+                                    fontFamily: AppFonts.montserrat,
+                                    fontWeight: AppFontWeights.regular,
+                                    fontSize: 13),
+                              ),
                             ),
                             Column(
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.only(top: 27),
+                                  padding: const EdgeInsets.only(top: 27),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.place,
+                                    icon: const Icon(Icons.place,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["address"] ?? '',
@@ -116,9 +191,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 12),
+                                  padding: const EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.calendar_month_rounded,
+                                    icon: const Icon(
+                                        Icons.calendar_month_rounded,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["date"] ?? '',
@@ -127,9 +203,9 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 12),
+                                  padding: const EdgeInsets.only(top: 12),
                                   child: TextWithIcon(
-                                    icon: Icon(Icons.watch_later,
+                                    icon: const Icon(Icons.watch_later,
                                         size: 17,
                                         color: AppColors.accentOrange),
                                     text: widget.requestDetail["time"] ?? '',
@@ -139,9 +215,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                 ),
                                 InkWell(
                                   child: Padding(
-                                    padding: EdgeInsets.only(top: 12),
+                                    padding: const EdgeInsets.only(top: 12),
                                     child: TextWithIcon(
-                                      icon: Icon(Icons.local_offer_rounded,
+                                      icon: const Icon(
+                                          Icons.local_offer_rounded,
                                           size: 17,
                                           color: AppColors.accentOrange),
                                       text: widget
@@ -152,6 +229,29 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                                     ),
                                   ),
                                 ),
+                                // Update the padding for the description text
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 15,
+                                      left: 10,
+                                      right:
+                                          10), // Adjust left padding as needed
+                                  child: Text(
+                                    widget.requestDetail["requestDesc"] ?? '',
+                                    textAlign: TextAlign.justify,
+                                    overflow: TextOverflow
+                                        .ellipsis, // You can adjust overflow property based on your requirement
+                                    maxLines:
+                                        3, // You can adjust maxLines based on your requirement
+                                    style: getTextStyle(
+                                      textColor: AppColors.black,
+                                      fontFamily: AppFonts.montserrat,
+                                      fontWeight: AppFontWeights.regular,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+
                                 AppProgressIndicator(
                                     padding: const EdgeInsets.only(top: 51),
                                     description:
@@ -197,11 +297,12 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                     ),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 15),
-                    child: ReportIssueButton(),
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: ReportIssueButton(
+                        userId: widget.requestDetail["clientId"]),
                   ),
                 ),
                 HandymanInfoCard(handymanInfo: widget.requestDetail),
@@ -242,13 +343,14 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
 
   void onConfirm() async {
     try {
-      // await service.updateRequest(widget.requestDetail["requestId"]);
+      await service.updateRequest(widget.requestDetail["clientId"]);
     } catch (error) {
       print('Error fetching user data: $error');
     }
 
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const RequestCompleteSuccessPage(),
+      builder: (context) =>
+          RequestCompleteSuccessPage(details: widget.requestDetail),
     ));
   }
 }

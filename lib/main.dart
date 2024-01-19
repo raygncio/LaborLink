@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:laborlink/Pages/Admin/AdminDashboard.dart';
 import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
 import 'package:laborlink/ai/style.dart';
+import 'package:laborlink/otp/verify_email_page.dart';
 import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:laborlink/splash/splash_loading.dart';
@@ -46,48 +48,36 @@ class MyApp extends ConsumerWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (ctx, snapshot) {
-          bool isLoadingLoginData = false;
+          // bool isLoadingLoginData = false;
 
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              isLoadingLoginData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             print('>>>>>>>>>>> connection state waiting');
             return const SplashHandymanPage();
           }
 
           if (snapshot.hasData) {
-            // means a user is logged in  (has token)
             print('>>>>>>>>>>> snapshot has data');
-            isLoadingLoginData = true;
 
-            ref.read(currentUserProvider.notifier).saveCurrentUserInfo();
-
-            Map<String, dynamic> userInfo = ref.watch(currentUserProvider);
-            String? userId = userInfo['userId'];
-            String? userRole = userInfo['userRole'];
-
-            print('>>>>>>>>>>> userId: $userId');
-            print('>>>>>>>>>>> userrole: $userRole');
-
-            if (userId != null || userRole != null) {
-              isLoadingLoginData = false;
+            // ADMIN
+            if (FirebaseAuth.instance.currentUser!.email ==
+                'laborlink@gmail.com') {
+              return const AdminDashboard();
             }
 
-            if (userRole == 'client') {
-              return ClientMainPage(userId: userId ?? '');
-            } else if (userRole == 'handyman') {
-              return HandymanMainPage(userId: userId!);
-            }
+            // USERS!
+            return const VerifyEmailPage();
+
+            // return VerifyEmailPage(userId: userId!, userRole: userRole!);
+
+            // if (userRole == 'client') {
+            //   return ClientMainPage(userId: userId ?? '');
+            // } else if (userRole == 'handyman') {
+            //   return HandymanMainPage(userId: userId!);
+            // }
           }
 
-          if (isLoadingLoginData) {
-            // display white bg (very fast)
-            return const Scaffold(
-              backgroundColor: AppColors.white,
-            );
-          } else {
-            print('>>>>>>>>>>> no login data');
-            return const LandingPage();
-          }
+          print('>>>>>>>>>>> no login data');
+          return const LandingPage();
         },
       ),
     );

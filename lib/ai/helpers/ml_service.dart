@@ -123,10 +123,13 @@ class MLService {
       h.round(),
     );
 
-    // turn 90 if web cam
-    if (data['type'] == 'camera') {
-      croppedImage = img_lib.copyRotate(croppedImage, -90);
-    }
+    // UNCOMMENT IF WEBCAM ANDROID EMULATOR
+    // if (data['type'] == 'camera') {
+    //   print('################################ IF CAMERA: ROTATING!!!');
+    //   croppedImage = img_lib.copyRotate(croppedImage, 90);
+
+    //   return croppedImage;
+    // }
 
     return croppedImage;
   }
@@ -135,7 +138,7 @@ class MLService {
   Future<img_lib.Image?> _convertCameraImage(CameraImage image) async {
     //var img = convertToImage(image);
     var img = await convertYUV420toImageColor(image);
-    img = img_lib.copyRotate(img!, -90);
+    img = img_lib.copyRotate(img!, -90); // comment this if web cam
     return img;
   }
 
@@ -238,9 +241,10 @@ class MLService {
       h.round(),
     );
 
-    if (data['type'] == 'camera') {
-      croppedImage = img_lib.copyRotate(croppedImage, 90);
-    }
+    // UNCOMMENT IF WEB CAM ANDROID EMULATOR
+    // if (data['type'] == 'camera') {
+    //   croppedImage = img_lib.copyRotate(croppedImage, 90);
+    // }
 
     img_lib.PngEncoder pngEncoder = new img_lib.PngEncoder(level: 0, filter: 0);
     List<int> png = pngEncoder.encodeImage(croppedImage);
