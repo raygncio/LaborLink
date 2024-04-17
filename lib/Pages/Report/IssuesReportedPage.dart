@@ -144,7 +144,7 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                             radius: 27,
                                             backgroundColor: AppColors.white,
                                             foregroundImage:
-                                                FileImage(defaultAvatar!),
+                                                FileImage(defaultAvatar! ),
                                           ),
                                         ),
                                         Column(

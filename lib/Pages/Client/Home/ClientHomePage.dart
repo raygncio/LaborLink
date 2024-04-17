@@ -44,6 +44,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   String currentUserFirstName = '';
   Client? clientInfo;
+  bool _hasPendingOrOngoingRequest = false;
 
   getUserData() async {
     Client userData =
@@ -53,9 +54,18 @@ class _ClientHomePageState extends State<ClientHomePage> {
     setState(() {});
   }
 
+  // Function to check if there is any pending or ongoing request
+  Future<void> checkPendingOrOngoingRequest() async {
+    Request? requestInfo = await service.getRequestsData(widget.userId);
+    setState(() {
+      _hasPendingOrOngoingRequest = requestInfo != null;
+    });
+  }
+
   @override
   void initState() {
     getUserData();
+    checkPendingOrOngoingRequest();
     super.initState();
   }
 
@@ -98,9 +108,19 @@ class _ClientHomePageState extends State<ClientHomePage> {
   }
 
   void updateSelectedTab(int selectedTabIndex) {
-    setState(() {
-      _selectedTabIndex = selectedTabIndex;
-    });
+     if (selectedTabIndex == 1 && _hasPendingOrOngoingRequest) {
+      // Optionally, provide feedback to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("You cannot create a new request while you have a pending or ongoing request."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedTabIndex = selectedTabIndex;
+      });
+    }
   }
 
   void updateDirectRequestTabContent(String? searchText) async {

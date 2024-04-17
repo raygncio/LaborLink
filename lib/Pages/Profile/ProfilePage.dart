@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -87,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
     DatabaseService service = DatabaseService();
     try {
       Client clientInfo = await service.getUserData(widget.userId);
-      getUserInfo = await service.getUserInfo(widget.userId);
+      getUserInfo = await service.getUserInfo(widget.userId); // this is the code that gets the user info
       String fullName =
           '${clientInfo.firstName[0].toUpperCase()}${clientInfo.firstName.substring(1).toLowerCase()} ${clientInfo.middleName ?? " "} ${clientInfo.lastName[0].toUpperCase()}${clientInfo.lastName.substring(1).toLowerCase()} ${clientInfo.suffix ?? ""}';
 
@@ -276,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               width: 16,
                                             ),
                                             () {
-                                              print("Edit icon clicked");
+                                              onEditIconClicked();
                                             },
                                           ),
                                         ),
@@ -314,7 +315,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -353,7 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -361,7 +362,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           inputTextStyle: _inputTextStyle,
                                           textAlign: TextAlign.center,
                                           defaultBorder: _defaultBorder,
-                                          errorBorder: _defaultBorder),
+                                          errorBorder: _defaultBorder,),
+                                          
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
@@ -392,7 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -431,7 +433,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -567,6 +569,25 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context) => ViewHandymanProfile(handymanInfo: getUserInfo),
     ));
   }
+
+  void onEditIconClicked() {
+    Map<String, dynamic> updatedData = {
+      'fullName': _fullNameController.text,
+      'birthdate': _birthdateController.text,
+      'phoneNumber': _phoneNumberController.text,
+      'address': _addressController.text,
+    };
+    updateUserInformation(updatedData, widget.userId);
+  }
+
+  void updateUserInformation(Map<String, dynamic> updatedData, String userId) async {
+  try {
+    await service.userInfoUpdate(updatedData, userId);
+    print('User information updated successfully!');
+  } catch (error) {
+    print('Error updating user information: $error');
+  }
+}
 
   void onChangePassword() {}
 
