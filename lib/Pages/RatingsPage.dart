@@ -326,10 +326,14 @@ class _RatingsPageState extends State<RatingsPage> {
     } else {
       DatabaseService service = DatabaseService();
       try {
+         String userId = widget.user == 'client'
+          ? widget.ratings["clientId"]
+          : widget.ratings["handymanId"];
+
         Review reviews = Review(
           rating: selectedRating,
           comment: review,
-          userId: widget.ratings["userId"],
+          userId: userId,
           requestId: widget.ratings["requestId"],
         );
 

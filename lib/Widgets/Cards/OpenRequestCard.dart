@@ -279,13 +279,13 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
-    if (getActiveRequest["approvalStatus"] != "completed" &&
-        getActiveRequest["approvalStatus"] != "cancelled" &&
-        getActiveRequest["approvalStatus"] == null) {
+    if (getActiveRequest["approvalStatus"] == "pending" ||
+        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
       // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Invalid. You can only create one request at a time."),
+          content: Text("Invalid. You can only accept one request at a time."),
           backgroundColor: Colors.red,
         ),
       );
@@ -393,8 +393,22 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     }
   }
 
-  void onMakeOffer() {
-    makeOfferDialog(context, _getTotalFee, _getOfferData).then(
+  void onMakeOffer() async {
+     Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+    print(getActiveRequest["approvalStatus"]);
+    if (getActiveRequest["approvalStatus"] == "pending" ||
+        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
+      // Handle errors during request accept
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only make one offer at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      makeOfferDialog(context, _getTotalFee, _getOfferData).then(
       (value) {
         if (value == null) return;
 
@@ -405,5 +419,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
         }
       },
     );
+    }
+    
   }
 }

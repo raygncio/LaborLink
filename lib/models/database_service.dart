@@ -2035,23 +2035,24 @@ class DatabaseService {
     if (userRole == "client") {
       requestQuery =
         await _db.collection('request').where('progress', isEqualTo: 'completed').where('userId', isEqualTo: userId).get();
+       
     } else {
       requestQuery =
         await _db.collection('request').where('progress', isEqualTo: 'completed').where('handymanId', isEqualTo: userId).get();
     }
-    int i = 0; 
+
     for (var requestDoc in requestQuery.docs) {
       
       final requestData = requestDoc.data();
-      final requestId = requestData['requestId'];
-
+      final requestId = requestDoc.id;
+      print("++++++++++++++++++++++++++++ $requestId");
         // Query 'user' collection
       final reviewQuery =
-          await _db.collection('review').where('requestId', isEqualTo: requestId).get();
+          await _db.collection('review').where('requestId', isEqualTo: requestId).where('userId', isNotEqualTo: userId).get();
 
       // Process 'user' query results
       for (var reviewDoc in reviewQuery.docs) {
-        print(i++);
+        print("testingggggg");
         final reviewData = reviewDoc.data();
         final userId = reviewData['userId'];
 
