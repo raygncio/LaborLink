@@ -263,8 +263,9 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
   }
 
   void onMessageButtonClick() {
+     String phoneNumber = '+63${widget.clientDetail['phoneNumber']}';
     sendMessage(
-      '0123456789',
+      phoneNumber,
       'Hello, this is a test message!', // Your desired message content
     );
   }

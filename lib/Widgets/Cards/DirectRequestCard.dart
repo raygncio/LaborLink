@@ -311,13 +311,13 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
   void onAccept() async {
     // Accept the request, update the request
     // direct to home page
-    Map<String, dynamic> getActiveRequest = {};
+     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-    print('drgtdrgd ${getActiveRequest["approvalStatus"]}');
-    if (getActiveRequest["approvalStatus"] != "completed" &&
-        getActiveRequest["approvalStatus"] != "cancelled" &&
-        getActiveRequest["approvalStatus"] == null) {
-      // Handle errors during accepting request
+
+    if (getActiveRequest["approvalStatus"] == "pending" ||
+        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
+      // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Invalid. You can only accept one request at a time."),
@@ -338,10 +338,10 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
           ),
         );
       }
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId)));
     }
 
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => HandymanMainPage(userId: widget.userId)));
   }
 
   _getTotalFee(double fee) {
@@ -387,8 +387,22 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     }
   }
 
-  void onMakeOffer() {
-    makeOfferDialog(context, _getTotalFee, _getOfferData).then(
+  void onMakeOffer() async {
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    if (getActiveRequest["approvalStatus"] == "pending" ||
+        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
+      // Handle errors during request accept
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only make one offer at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      makeOfferDialog(context, _getTotalFee, _getOfferData).then(
       (value) {
         if (value == null) return;
 
@@ -399,6 +413,8 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         }
       },
     );
+    }
+    
   }
 
   void onDecline() async {

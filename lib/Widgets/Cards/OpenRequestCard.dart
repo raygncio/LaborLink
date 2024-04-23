@@ -396,7 +396,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
   void onMakeOffer() async {
      Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-    print(getActiveRequest["approvalStatus"]);
+
     if (getActiveRequest["approvalStatus"] == "pending" ||
         getActiveRequest["approvalStatus"] == "hired" ||
         getActiveRequest["approvalStatus"] == "rating") {

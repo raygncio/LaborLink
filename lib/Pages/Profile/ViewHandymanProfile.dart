@@ -31,9 +31,8 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   }
 
   void getReviews() async {
-    print(widget.handymanInfo["rates"]);
     try {
-      results = await service.getHandymanReviews(widget.handymanInfo["userId"], widget.handymanInfo["userRole"]);
+      results = await service.getHandymanReviews(widget.handymanInfo["ActiveUserId"], widget.handymanInfo["userRole"]);
       print(results);
       setState(() {
         results = results;

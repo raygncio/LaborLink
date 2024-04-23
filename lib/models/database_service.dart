@@ -675,7 +675,7 @@ class DatabaseService {
 
     final approvalQuery = await _db
         .collection('handymanApproval')
-        .where('userId', isEqualTo: userId)
+        .where('handymanId', isEqualTo: userId)
         .where('status', isEqualTo: 'cancelled')
         .get();
 
@@ -794,6 +794,7 @@ class DatabaseService {
         'userId': userId,
         'handymanId': handymanId,
       };
+      print("Active Request ::::::::::: $requestId ");
 
       final userQuery = await _db
           .collection('user')
@@ -832,19 +833,40 @@ class DatabaseService {
       final userData = userDoc.data();
       final userRole = userData['userRole'];
 
-      resultMap.addAll(userData);
-      final reviewQuery = await _db
-          .collection('review')
-          .where('userId', isEqualTo: userId)
-          .get();
-      for (var reviewDoc in reviewQuery.docs) {
-        final reviewData = reviewDoc.data();
-        rating += reviewData['rating'];
-        count++;
-        resultMap.addAll(reviewData);
-      }
 
-      if (userRole == 'handyman') {
+      resultMap = {...userData, 'ActiveUserId': userId};
+      if (userRole == 'client') {
+      final requestQuery = await _db
+          .collection('request')
+          .where('userId', isEqualTo: userId)
+          .where('progress', isEqualTo: 'completed')
+          .get();
+      
+      for (var requestDoc in requestQuery.docs) {
+        final requestId = requestDoc.id;
+        final reviewQuery = await _db
+            .collection('review')
+            .where('requestId', isEqualTo: requestId)
+            .where('userId', isNotEqualTo: userId)
+            .get();
+
+        for (var reviewDoc in reviewQuery.docs) {
+          final reviewData = reviewDoc.data();
+          rating += reviewData['rating'];
+          count++;
+          resultMap.addAll(reviewData);
+        }
+      }
+    } else if (userRole == 'handyman') {
+       final requestQuery = await _db
+          .collection('request')
+          .where('handymanId', isEqualTo: userId)
+          .where('progress', isEqualTo: 'completed')
+          .get();
+      
+   
+      for (var requestDoc in requestQuery.docs) {
+        final requestId = requestDoc.id;
         final handymanQuery = await _db
             .collection('handyman')
             .where('userId', isEqualTo: userId)
@@ -855,18 +877,21 @@ class DatabaseService {
 
           final reviewQuery = await _db
               .collection('review')
-              .where('userId', isEqualTo: userId)
+              .where('requestId', isEqualTo: requestId)
+              .where('userId', isNotEqualTo: userId)
               .get();
+
           for (var reviewDoc in reviewQuery.docs) {
             final reviewData = reviewDoc.data();
             rating += reviewData['rating'];
             count++;
-            resultMap.addAll(reviewData);
+              resultMap.addAll(reviewData);
+            }
           }
         }
       }
       rates = count > 0 ? rating / count : 0;
-
+  
       resultMap.addAll({'rates': rates});
     }
     return resultMap;
@@ -1015,10 +1040,37 @@ class DatabaseService {
         .where('progress', isEqualTo: 'pending')
         .get();
 
-    for (var doc in requestQuery.docs) {
-      await doc.reference.update({
+    for (var requestDoc in requestQuery.docs) {
+      await requestDoc.reference.update({
         'progress': 'cancelled',
       });
+
+      // Find and update related documents (e.g., offers or handymanApproval)
+      final requestId = requestDoc.id;
+
+      // Update offers with matching requestId
+      final offerQuery = await _db
+          .collection('offer')
+          .where('requestId', isEqualTo: requestId)
+          .get();
+
+      for (var offerDoc in offerQuery.docs) {
+        await offerDoc.reference.update({
+          'status': 'cancelled',
+        });
+      }
+
+      // Update handymanApproval with matching requestId
+      final approvalQuery = await _db
+          .collection('handymanApproval')
+          .where('requestId', isEqualTo: requestId)
+          .get();
+
+      for (var approvalDoc in approvalQuery.docs) {
+        await approvalDoc.reference.update({
+          'status': 'cancelled',
+        });
+      }
     }
   }
 
@@ -1609,7 +1661,7 @@ class DatabaseService {
 
       Map<String, dynamic> groupData = {
         ...requestData,
-        'requestId': requestId,
+        'ActiveRequestId': requestId,
         'requestDesc': desc,
         'clientId': clientId
       };
@@ -1745,7 +1797,7 @@ class DatabaseService {
         final offerDesc = offerData['description'];
         final offerPic = offerData['attachment'];
         final requestId = offerData["requestId"];
-        print('>>>>>>>>>>>>$offerData');
+        // print('>>>>>>>>>>>>$offerData');
         resultMap.addAll({
           'approvalStatus': offerStatus,
           'hasOffer': true,
@@ -1876,7 +1928,10 @@ class DatabaseService {
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
-      resultMap.addAll(requestData);
+      final stats = requestData['progress'];
+      resultMap.addAll({
+          'approvalStatus': stats, ...requestData});
+     
       final userQuery =
           await _db.collection('user').where('userId', isEqualTo: userId).get();
 
@@ -1961,7 +2016,7 @@ class DatabaseService {
           ...offerData,
           'handymanId': offerData["userId"],
         };
-
+        print(requestId);
         // Query 'handyman' collection using userId from 'offer'
         final handymanQuery = await _db
             .collection('handyman')
@@ -2027,10 +2082,7 @@ class DatabaseService {
   // Get the information of user and its reviews
   Future<List<Map<String, dynamic>>> getHandymanReviews(String userId, String userRole) async {
     List<Map<String, dynamic>> resultList = [];
-    // if user is client, get the request by userId, if user is handyman, get the request by handymanId
-    //reviews
-    //users
-
+    print("check");
     final requestQuery;
     if (userRole == "client") {
       requestQuery =
@@ -2071,36 +2123,6 @@ class DatabaseService {
       }
 
     }
-  
-    // Query 'user' collection
-    // final reviewQuery =
-    //     await _db.collection('review').where('userId', isEqualTo: userId).get();
-
-    // // Process 'user' query results
-    // for (var reviewDoc in reviewQuery.docs) {
-    //   final reviewData = reviewDoc.data();
-    //   final requestId = reviewData['requestId'];
-
-    //   final requestDoc = await _db.collection('request').doc(requestId).get();
-
-    //   // Process 'request' query results
-    //   if (requestDoc.exists) {
-    //     final requestData = requestDoc.data();
-    //     final clientId = requestData!['userId'];
-
-    //     final userQuery = await _db
-    //         .collection('user')
-    //         .where('userId', isEqualTo: clientId)
-    //         .get();
-
-    //     // Process 'user' query results
-    //     for (var userDoc in userQuery.docs) {
-    //       final userData = userDoc.data();
-    //       Map<String, dynamic> combinedData = {...reviewData, ...userData};
-    //       resultList.add(combinedData);
-    //     }
-    //   }
-    // }
 
     return resultList;
   }

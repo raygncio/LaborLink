@@ -435,7 +435,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                 clientDetail: getClientRequest),
           );
         } else {
-          // You can return a loading indicator or an empty container while waiting
+          // Return a loading indicator or an empty container while waiting
           return const CircularProgressIndicator();
         }
       },

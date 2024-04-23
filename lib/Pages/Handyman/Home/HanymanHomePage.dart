@@ -408,9 +408,9 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
     print(getActiveRequest["approvalStatus"]);
-    if ((getActiveRequest["approvalStatus"] != "completed" &&
-        getActiveRequest["approvalStatus"] != "cancelled") ||
-        getActiveRequest["approvalStatus"] == null) {
+    if (getActiveRequest["approvalStatus"] == "pending" ||
+        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
       return OngoingRequestCard(
         title: getActiveRequest['title'],
         address: getActiveRequest['address'],
