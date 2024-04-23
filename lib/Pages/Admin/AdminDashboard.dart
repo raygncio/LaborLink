@@ -4,6 +4,8 @@ import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/charts/bar graph/anomaly_bar_graph.dart';
 import 'package:laborlink/charts/bar graph/face_bar_graph.dart';
+import 'package:laborlink/charts/pie%20chart/anomaly_pie_chart.dart';
+import 'package:laborlink/charts/pie%20chart/face_pie_chart.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
@@ -82,7 +84,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   SizedBox(
                     height: 200,
-                    child: AnomalyBarGraph(
+                    child: AnomalyPieChart(
                       anomalyResults: anomalyResults,
                     ),
                   ),
@@ -102,7 +104,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   SizedBox(
                     height: 200,
-                    child: FaceBarGraph(
+                    child: FacePieChart(
                       faceResults: faceResults,
                     ),
                   ),
