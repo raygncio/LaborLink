@@ -190,6 +190,47 @@ class DatabaseService {
     return completedRequestsList;
   }
 
+  //
+
+  Future<List<AnomalyResults>> getClientHandymanCount() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('anomalyResults')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
+      return AnomalyResults.fromFireStore(doc);
+    }).toList();
+
+    return anomalyResultsList;
+  }
+
+  Future<List<AnomalyResults>> getCategoryCount() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('anomalyResults')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
+      return AnomalyResults.fromFireStore(doc);
+    }).toList();
+
+    return anomalyResultsList;
+  }
+
+  Future<List<AnomalyResults>> getRequestTypeCount() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('anomalyResults')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
+      return AnomalyResults.fromFireStore(doc);
+    }).toList();
+
+    return anomalyResultsList;
+  }
+
   // USERS
 
   addUser(Client userData) async {
