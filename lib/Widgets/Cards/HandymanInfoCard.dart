@@ -129,7 +129,7 @@ class HandymanInfoCardState extends State<HandymanInfoCard> {
                           (widget.handymanInfo["rates"] ?? 0)
                               .toStringAsFixed(2),
                         ), // input
-                        itemCount: 5,
+                        itemCount: (widget.handymanInfo["rates"] ?? 0).toInt(),
                         itemSize: 15,
                         ignoreGestures: true,
                         itemBuilder: (ctx, index) => const Icon(

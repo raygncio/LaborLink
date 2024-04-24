@@ -2163,7 +2163,8 @@ class DatabaseService {
   // Get the information of user and its reviews
   Future<List<Map<String, dynamic>>> getHandymanReviews(String userId, String userRole) async {
     List<Map<String, dynamic>> resultList = [];
-    print("check");
+
+    
     final requestQuery;
     if (userRole == "client") {
       requestQuery =
@@ -2178,14 +2179,14 @@ class DatabaseService {
       
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
-      print("++++++++++++++++++++++++++++ $requestId");
+    
         // Query 'user' collection
       final reviewQuery =
           await _db.collection('review').where('requestId', isEqualTo: requestId).where('userId', isNotEqualTo: userId).get();
 
       // Process 'user' query results
       for (var reviewDoc in reviewQuery.docs) {
-        print("testingggggg");
+
         final reviewData = reviewDoc.data();
         final userId = reviewData['userId'];
 
