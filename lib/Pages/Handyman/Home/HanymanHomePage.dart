@@ -409,7 +409,10 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
     print(getActiveRequest["approvalStatus"]);
     if (getActiveRequest["approvalStatus"] == "pending" ||
-        getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "hired" ||  getActiveRequest["progress"] == "omw" ||
+            getActiveRequest["progress"] == "arrived" ||
+            getActiveRequest["progress"] == "inprogress" ||
+            getActiveRequest["progress"] == "completion" ||
         getActiveRequest["approvalStatus"] == "rating") {
       return OngoingRequestCard(
         title: getActiveRequest['title'],

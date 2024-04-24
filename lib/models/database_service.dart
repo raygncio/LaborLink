@@ -211,9 +211,7 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getUserAndHandymanDataByFirstName(
       String searchText) async {
     List<Map<String, dynamic>> resultList = [];
-    double rating = 0;
-    double count = 0;
-    double rates = 0;
+    
     List<String> categoriesToCheck = [
       'plumbing',
       'installations',
@@ -228,25 +226,25 @@ class DatabaseService {
     ];
 
     if (categoriesToCheck.contains(searchText.toLowerCase())) {
-      // Query 'user' collection
-      final userQuery = await _db.collection('user').get();
 
-      // Process 'user' query results
-      for (var userDoc in userQuery.docs) {
-        final userId = userDoc.id;
-
-        // Query 'handyman' collection using userId
-        final handymanQuery = await _db
+      final handymanQuery = await _db
             .collection('handyman')
-            .where('userId', isEqualTo: userId)
             .where('specialization', isEqualTo: searchText)
             .get();
+      
+       for (var handymanDoc in handymanQuery.docs) {
+        final handymanData = handymanDoc.data();
+        final handymanId = handymanDoc.id;
+        final userId = handymanData['userId'];
+        // Query 'user' collection
+        final userQuery = await _db.collection('user') .where('userId', isEqualTo: userId).get();
+        double rating = 0;
+        double count = 0;
+        double rates = 0;
 
-        // Process 'handyman' query results
-        for (var handymanDoc in handymanQuery.docs) {
+         // Process 'user' query results
+        for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
-          final handymanData = handymanDoc.data();
-          final handymanId = handymanDoc.id;
 
           final reviewQuery = await _db
               .collection('review')
@@ -263,11 +261,53 @@ class DatabaseService {
             ...userData,
             ...handymanData,
             'handymanId': handymanId,
+            'ActiveUserId': userId,
             'rates': rates,
           };
           resultList.add(combinedData);
         }
-      }
+       }
+
+      // // Query 'user' collection
+      // final userQuery = await _db.collection('user').get();
+
+      // // Process 'user' query results
+      // for (var userDoc in userQuery.docs) {
+      //   final userId = userDoc.id;
+
+      //   // Query 'handyman' collection using userId
+      //   final handymanQuery = await _db
+      //       .collection('handyman')
+      //       .where('userId', isEqualTo: userId)
+      //       .where('specialization', isEqualTo: searchText)
+      //       .get();
+
+      //   // Process 'handyman' query results
+      //   for (var handymanDoc in handymanQuery.docs) {
+      //     final userData = userDoc.data();
+      //     final handymanData = handymanDoc.data();
+      //     final handymanId = handymanDoc.id;
+
+      //     final reviewQuery = await _db
+      //         .collection('review')
+      //         .where('userId', isEqualTo: userId)
+      //         .get();
+      //     for (var reviewDoc in reviewQuery.docs) {
+      //       final reviewData = reviewDoc.data();
+      //       rating += reviewData['rating'];
+      //       count++;
+      //     }
+      //     rates = count > 0 ? rating / count : 0;
+      //     // Combine user and handyman data into a single map
+      //     Map<String, dynamic> combinedData = {
+      //       ...userData,
+      //       ...handymanData,
+      //       'handymanId': handymanId,
+      //       'rates': rates,
+      //     };
+      //     resultList.add(combinedData);
+      //   }
+      // }
     } else {
       // Query 'user' collection
       final userQuery = await _db
@@ -278,6 +318,9 @@ class DatabaseService {
       // Process 'user' query results
       for (var userDoc in userQuery.docs) {
         final userId = userDoc.id;
+        double rating = 0;
+        double count = 0;
+        double rates = 0;
 
         // Query 'handyman' collection using userId
         final handymanQuery = await _db
@@ -398,17 +441,9 @@ class DatabaseService {
     // });
 
     if (categoriesToCheck.contains(searchText.toLowerCase())) {
-      // Query 'user' collection
-      final userQuery = await _db.collection('user').get();
-
-      // Process 'user' query results
-      for (var userDoc in userQuery.docs) {
-        final userId = userDoc.id;
-
-        // Query 'request' collection using userId
+      // Query 'request' collection using userId
         final requestQuery = await _db
             .collection('request')
-            .where('userId', isEqualTo: userId)
             .where('category', isEqualTo: searchText)
             .where('progress', isEqualTo: 'pending')
             .where('handymanId', isNull: true)
@@ -416,19 +451,64 @@ class DatabaseService {
 
         // Process 'request' query results
         for (var requestDoc in requestQuery.docs) {
-          final userData = userDoc.data();
           final requestData = requestDoc.data();
           final requestId = requestDoc.id;
+          final userId = requestData['userId'];
 
-          // Combine user and request data into a single map
-          Map<String, dynamic> combinedData = {
-            ...userData,
-            ...requestData,
-            'requestId': requestId,
-          };
-          resultList.add(combinedData);
+          final userQuery = await _db.collection('user').where('userId', isEqualTo: userId).get();
+
+            for (var userDoc in userQuery.docs) {
+              final userData = userDoc.data();
+
+                // Combine user and request data into a single map
+                Map<String, dynamic> combinedData = {
+                  ...userData,
+                  ...requestData,
+                  'requestId': requestId,
+                };
+                resultList.add(combinedData);
+            }
+          
         }
-      }
+
+
+
+
+
+
+
+
+      // Query 'user' collection
+      // final userQuery = await _db.collection('user').get();
+
+      // // Process 'user' query results
+      // for (var userDoc in userQuery.docs) {
+      //   final userId = userDoc.id;
+
+      //   // Query 'request' collection using userId
+      //   final requestQuery = await _db
+      //       .collection('request')
+      //       .where('userId', isEqualTo: userId)
+      //       .where('category', isEqualTo: searchText)
+      //       .where('progress', isEqualTo: 'pending')
+      //       .where('handymanId', isNull: true)
+      //       .get();
+
+      //   // Process 'request' query results
+      //   for (var requestDoc in requestQuery.docs) {
+      //     final userData = userDoc.data();
+      //     final requestData = requestDoc.data();
+      //     final requestId = requestDoc.id;
+
+      //     // Combine user and request data into a single map
+      //     Map<String, dynamic> combinedData = {
+      //       ...userData,
+      //       ...requestData,
+      //       'requestId': requestId,
+      //     };
+      //     resultList.add(combinedData);
+      //   }
+      // }
     } else {
       // Query 'user' collection
       final userQuery = await _db
@@ -1928,9 +2008,10 @@ class DatabaseService {
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
+      final ActiveRequestId = requestDoc.id;
       final stats = requestData['progress'];
       resultMap.addAll({
-          'approvalStatus': stats, ...requestData});
+          'approvalStatus': stats,  'activeRequestId': ActiveRequestId, ...requestData});
      
       final userQuery =
           await _db.collection('user').where('userId', isEqualTo: userId).get();
