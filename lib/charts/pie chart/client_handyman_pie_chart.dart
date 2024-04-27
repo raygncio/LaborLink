@@ -1,39 +1,33 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/widgets.dart';
 import 'package:laborlink/models/client.dart';
-import 'package:laborlink/models/handyman_approval.dart';
-import 'package:laborlink/models/request.dart';
 import 'package:laborlink/styles.dart';
 
-class RequestPieChart extends StatelessWidget {
-  const RequestPieChart({
-    super.key,
-    required this.requestsList,
-    required this.approvalsList,
-  });
+class ClientHandymanPieChart extends StatelessWidget {
+  const ClientHandymanPieChart({super.key, required this.usersList});
 
-  final List<Request> requestsList;
-  final List<HandymanApproval> approvalsList;
+  final List<Client> usersList;
 
-  countRequests() {
-    int count = 0;
+  countClient() {
+    int client = 0;
 
-    for (var request in requestsList) {
-      if (request.progress.toLowerCase() != 'cancelled') {
-        count++;
+    for (var user in usersList) {
+      if (user.userRole.toLowerCase() == 'client') {
+        client++;
       }
+
     }
-    return count.toDouble();
+    return client.toDouble();
   }
 
-  countDirectApprovals() {
-    int count = 0;
-    for (var approval in approvalsList) {
-      if (approval.status.toLowerCase() == 'direct') {
-        count++;
+  countHandyman() {
+    int handyman = 0;
+    for (var user in usersList) {
+      if (user.userRole.toLowerCase() == 'handyman') {
+        handyman++;
       }
     }
-    return count.toDouble();
+    return handyman.toDouble();
   }
 
   @override
@@ -46,7 +40,7 @@ class RequestPieChart extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Open",
+              "Client",
               style: getTextStyle(
                   textColor: AppColors.secondaryBlue,
                   fontFamily: AppFonts.poppins,
@@ -54,7 +48,7 @@ class RequestPieChart extends StatelessWidget {
                   fontSize: 12),
             ),
             Text(
-              "Direct",
+              "Handyman",
               style: getTextStyle(
                   textColor: AppColors.accentOrange,
                   fontFamily: AppFonts.poppins,
@@ -71,8 +65,8 @@ class RequestPieChart extends StatelessWidget {
             sections: [
               // item 1
               PieChartSectionData(
-                value: countDirectApprovals(),
-                title: countDirectApprovals().toInt().toString(),
+                value: countHandyman(),
+                title: countHandyman().toInt().toString(),
                 titleStyle: getTextStyle(
                     textColor: AppColors.white,
                     fontFamily: AppFonts.poppins,
@@ -82,10 +76,8 @@ class RequestPieChart extends StatelessWidget {
               ),
               // item 1
               PieChartSectionData(
-                value: countRequests() - countDirectApprovals(),
-                title: (countRequests() - countDirectApprovals())
-                    .toInt()
-                    .toString(),
+                value: countClient(),
+                title: countClient().toInt().toString(),
                 titleStyle: getTextStyle(
                     textColor: AppColors.white,
                     fontFamily: AppFonts.poppins,

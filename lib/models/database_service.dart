@@ -192,43 +192,54 @@ class DatabaseService {
 
   //
 
-  Future<List<AnomalyResults>> getClientHandymanCount() async {
+  Future<List<Client>> getAllClientHandyman() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
-        .collection('anomalyResults')
+        .collection('user')
         .orderBy("createdAt", descending: true)
         .get();
 
-    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
-      return AnomalyResults.fromFireStore(doc);
+    List<Client> usersList = querySnapshot.docs.map((doc) {
+      return Client.fromFireStore(doc);
     }).toList();
 
-    return anomalyResultsList;
+    return usersList;
   }
 
-  Future<List<AnomalyResults>> getCategoryCount() async {
+  Future<List<Handyman>> getAllHandyman() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
-        .collection('anomalyResults')
+        .collection('handyman')
         .orderBy("createdAt", descending: true)
         .get();
 
-    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
-      return AnomalyResults.fromFireStore(doc);
+    List<Handyman> handymenList = querySnapshot.docs.map((doc) {
+      return Handyman.fromFireStore(doc);
     }).toList();
 
-    return anomalyResultsList;
+    return handymenList;
   }
 
-  Future<List<AnomalyResults>> getRequestTypeCount() async {
+  Future<List<Request>> getAllRequests() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
-        .collection('anomalyResults')
+        .collection('request')
         .orderBy("createdAt", descending: true)
         .get();
 
-    List<AnomalyResults> anomalyResultsList = querySnapshot.docs.map((doc) {
-      return AnomalyResults.fromFireStore(doc);
+    List<Request> requestsList = querySnapshot.docs.map((doc) {
+      return Request.fromFireStore(doc);
     }).toList();
 
-    return anomalyResultsList;
+    return requestsList;
+  }
+
+  Future<List<HandymanApproval>> getAllApprovals() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _db.collection('handymanApproval').get();
+
+    List<HandymanApproval> approvalsList = querySnapshot.docs.map((doc) {
+      return HandymanApproval.fromFireStore(doc);
+    }).toList();
+
+    return approvalsList;
   }
 
   // USERS
