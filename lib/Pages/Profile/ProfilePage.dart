@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Profile/CreditBalancePage.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -25,11 +26,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  DatabaseService service = DatabaseService();
   final _fullNameController = TextEditingController();
   final _birthdateController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
+  String? _userRole;
+  double? balance;
+
   Map<String, dynamic> getUserInfo = {};
 
   File? defaultAvatar;
@@ -64,6 +69,12 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     fetchUserData();
     _loadDefaultAvatar();
+    _getCreditBalance();
+  }
+
+  _getCreditBalance() async {
+    balance = await service.computeCreditBalance(widget.userId);
+    setState(() {});
   }
 
   Future<void> _loadDefaultAvatar() async {
@@ -84,7 +95,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchUserData() async {
-    DatabaseService service = DatabaseService();
     try {
       Client clientInfo = await service.getUserData(widget.userId);
       getUserInfo = await service.getUserInfo(widget.userId);
@@ -103,10 +113,23 @@ class _ProfilePageState extends State<ProfilePage> {
         _emailController.text = clientInfo.emailAdd;
         _phoneNumberController.text = '0${clientInfo.phoneNumber}';
         _addressController.text = address;
+        _userRole = clientInfo.userRole;
       });
     } catch (error) {
       print('Error fetching user data: $error');
     }
+  }
+
+  void payCreditBalance() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          return CreditBalancePage(
+            userId: widget.userId,
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -224,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 12),
                   child: Container(
                     width: deviceWidth,
                     color: AppColors.white,
@@ -232,10 +255,80 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
-                              left: 34, right: 52, top: 31),
+                              left: 34, right: 52, top: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              _userRole == 'handyman'
+                                  ? Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Credit Balance",
+                                            style: getTextStyle(
+                                                textColor: AppColors.black,
+                                                fontFamily: AppFonts.montserrat,
+                                                fontWeight: AppFontWeights.bold,
+                                                fontSize: 14),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 16, left: 18),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 35,
+                                                  child: Stack(
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          AppFilledButton(
+                                                            text: balance == 0.0
+                                                                ? 'No balance'
+                                                                : 'Php${balance.toString()}',
+                                                            fontFamily: AppFonts
+                                                                .montserrat,
+                                                            fontSize: 12,
+                                                            color: AppColors
+                                                                .secondaryBlue,
+                                                            command:
+                                                                payCreditBalance,
+                                                            borderRadius: 8,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 20),
+                                                            child: Icon(
+                                                              Icons.payment,
+                                                              color: AppColors
+                                                                  .white,
+                                                            )),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.secondaryBlue,
+                                        strokeWidth: 4,
+                                      ),
+                                    ),
                               Text(
                                 "My Information",
                                 style: getTextStyle(

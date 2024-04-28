@@ -12,6 +12,7 @@ import 'package:laborlink/Widgets/SuggestedFee.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
+import 'package:laborlink/models/transaction.dart';
 import 'package:laborlink/styles.dart';
 
 Future<String?> confirmationDialog(BuildContext context) => showDialog<String>(
@@ -475,11 +476,16 @@ Future<String?> attachServiceProofDialog(BuildContext context,
                                     clientDetails['userId'], _selectedImage!);
                             await service.updateRequestCompletion(
                                 requestId, completionUrl);
+
+                            // Credit balance
+                            Transaction? transactionData = await service
+                                .parseTransactionDetails(requestId);
+                            await service.addTransaction(transactionData!);
                           } catch (e) {
-                            // Handle errors during user creation
+                            // Handle errors
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Error creating user"),
+                                content: Text("Error completing request"),
                                 backgroundColor: Colors.red,
                               ),
                             );
