@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:laborlink/Pages/Client/ClientMainPage.dart';
-import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
-import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
+// import 'package:laborlink/Pages/Client/ClientMainPage.dart';
+// import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
+// import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/Forms/LoginForm.dart';
 import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/models/client.dart';
-import 'package:laborlink/otp/verify_email_page.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
+// import 'package:laborlink/models/client.dart';
+// import 'package:laborlink/otp/verify_email_page.dart';
+// import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/styles.dart';
 import '../Widgets/Buttons/FilledButton.dart';
 
@@ -139,7 +139,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         Navigator.of(context).popUntil((route) => route.isFirst);
       } on FirebaseAuthException catch (e) {
         // Handle login errors, e.g., show an error message.
-        print("Login error: $e");
+        // print("Login error: $e");
         displaySnackbar(e);
       }
     } else {

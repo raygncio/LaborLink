@@ -39,11 +39,11 @@ class _ReportGenerationPageState extends State<ReportGenerationPage> {
   List<Request> completedRequests = [];
 
   _loadData() async {
-    print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
+    // print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
     anomalyResults = await service.getAllAnomalyResults();
     faceResults = await service.getAllFaceResults();
     completedRequests = await service.getAllCompletedRequests();
-    print(faceResults);
+    // print(faceResults);
     setState(() {});
   }
 

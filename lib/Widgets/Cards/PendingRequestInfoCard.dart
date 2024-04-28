@@ -65,22 +65,22 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Cancel Request'),
-          content: Text('Are you sure you want to cancel your request?'),
+          title: const Text('Cancel Request'),
+          content: const Text('Are you sure you want to cancel your request?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context)
                     .pop(false); // Return false when cancel is pressed
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context)
                     .pop(true); // Return true when confirm is pressed
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
           ],
         );
@@ -89,13 +89,13 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
 
     if (confirmCancel == true) {
       DatabaseService service = DatabaseService();
-      print(userId);
+      // print(userId);
       try {
         await service.cancelRequest(userId);
-        print('Document updated successfully');
+        // print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Your request has been successfully cancelled'),
             duration: Duration(seconds: 2),
             backgroundColor: AppColors.tertiaryBlue,
@@ -105,7 +105,13 @@ class _PendingRequestInfoCardState extends State<PendingRequestInfoCard> {
           builder: (context) => ClientMainPage(userId: userId),
         ));
       } catch (e) {
-        print('Error updating document: $e');
+        // print('Error updating document: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating document."),
+          backgroundColor: Colors.red,
+        ),
+      );
       }
     }
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
-import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
+// import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
 import 'dart:io';
 
@@ -128,7 +128,7 @@ class ClientRequirementFormState extends State<ClientRequirementForm> {
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(_borderRadius),
-                    borderSide: BorderSide(color: AppColors.red, width: 1),
+                    borderSide: const BorderSide(color: AppColors.red, width: 1),
                   ),
                   filled: true,
                   fillColor: AppColors.white,

@@ -360,9 +360,9 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                print(widget.handymanInfo['handymanId']);
-                print(widget.handymanInfo['ActiveRequestId']);
-                print(widget.handymanInfo['bidPrice']);
+                // print(widget.handymanInfo['handymanId']);
+                // print(widget.handymanInfo['ActiveRequestId']);
+                // print(widget.handymanInfo['bidPrice']);
                 Navigator.of(context)
                     .pop(false); // Return false when cancel is pressed
               },
@@ -403,7 +403,13 @@ class _ViewHandymanProposalState extends State<ViewHandymanProposal> {
               ClientMainPage(userId: widget.handymanInfo['clientId']),
         ));
       } catch (e) {
-        print('Error updating document: $e');
+        // print('Error updating document: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating document."),
+          backgroundColor: Colors.red,
+        ),
+      );
       }
     }
   }

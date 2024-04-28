@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
+// import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/RateWidget.dart';
+// import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+// import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;

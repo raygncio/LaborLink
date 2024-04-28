@@ -13,8 +13,8 @@ class ReviewedIssuePage extends StatefulWidget {
 class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
+    // final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -36,11 +36,11 @@ class _ReviewedIssuePageState extends State<ReviewedIssuePage> {
                           EdgeInsets.only(top: 13, bottom: index == 9 ? 13 : 0),
                       child: IssueCard(
                           issueStatus: index % 2 == 0
-                              ? IssueStatus.resolved
-                              : IssueStatus.returned,
+                              ? IssueStatus.resolved.toString()
+                              : IssueStatus.returned.toString(),
                           reporterUserType: index % 2 == 0
-                              ? AppUserType.client
-                              : AppUserType.handyman),
+                              ? AppUserType.client.toString()
+                              : AppUserType.handyman.toString()),
                     );
                   },
                 ),

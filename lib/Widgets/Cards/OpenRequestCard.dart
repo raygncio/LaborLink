@@ -6,10 +6,10 @@ import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/TextWithIcon.dart';
-import 'package:laborlink/dummyDatas.dart';
+// import 'package:laborlink/dummyDatas.dart';
 import 'package:laborlink/models/offer.dart';
 import 'package:laborlink/styles.dart';
-import 'package:laborlink/models/client.dart';
+// import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/database_service.dart';
 
@@ -43,8 +43,8 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
     // Concatenate non-null values
     String fullname = '$firstName $middleName $lastName $suffix';
 
-    final String requestId = widget.clientRequestInfo['requestId'] ?? '';
-    final String category = widget.clientRequestInfo['category'] ?? '';
+    // final String requestId = widget.clientRequestInfo['requestId'] ?? '';
+    // final String category = widget.clientRequestInfo['category'] ?? '';
     final String title = widget.clientRequestInfo['title'] ?? '';
     final String address = widget.clientRequestInfo['address'] ?? '';
     final double? suggestedFee =
@@ -302,7 +302,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   Navigator.of(context).pop(); // Close the dialog
                   // Perform action on 'No' button press (if needed)
                 },
-                child: Text('No'),
+                child: const Text('No'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -310,7 +310,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
                   // Perform action on 'Yes' button press
                   performAcceptAction();
                 },
-                child: Text('Yes'),
+                child: const Text('Yes'),
               ),
             ],
           );
@@ -343,8 +343,13 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
         builder: (context) => HandymanMainPage(userId: widget.userId),
       ));
     } catch (e) {
-      print('Error: $e');
       // Handle error scenario if required
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
     setState(() {});
   }
@@ -352,7 +357,7 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
   _getTotalFee(double fee) {
     setState(() {
       _totalOffer = fee;
-      print('>>>>>>>makeoffer: $_totalOffer');
+      // print('>>>>>>>makeoffer: $_totalOffer');
     });
   }
 
@@ -369,8 +374,8 @@ class _OpenRequestCardState extends State<OpenRequestCard> {
       String imageUrl =
           await service.uploadOfferAttachment(widget.userId, _offerAttachment!);
 
-      print(
-          '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%submitoffer>>$_totalOffer,$_offerDesc,$imageUrl,${widget.userId},${widget.clientRequestInfo['requestId']}');
+      // print(
+      //     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%submitoffer>>$_totalOffer,$_offerDesc,$imageUrl,${widget.userId},${widget.clientRequestInfo['requestId']}');
 
       Offer offers = Offer(
         bidPrice: _totalOffer,

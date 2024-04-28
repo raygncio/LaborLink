@@ -6,13 +6,13 @@ import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/styles.dart';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:intl/intl.dart';
 import '../../dummyDatas.dart';
 
-final _firebase = FirebaseAuth.instance;
+// final _firebase = FirebaseAuth.instance;
 final formatter = DateFormat.yMd();
 
 // const List<String> specializations = <String>[
@@ -105,8 +105,8 @@ class RequestFormState extends State<RequestForm> {
 
   Map<String, dynamic> get getFormData {
     if (widget.handymanInfo != null) {
-      print('>>>getform file>>>$_selectedImage');
-      print('>>>getform time>>>$_timeValue');
+      // print('>>>getform file>>>$_selectedImage');
+      // print('>>>getform time>>>$_timeValue');
       return {
         "title": _titleController.text,
         "category": _categoryValue,
@@ -139,9 +139,15 @@ class RequestFormState extends State<RequestForm> {
 
       homeAddress =
           '${clientInfo.streetAddress} ${clientInfo.city ?? " "} ${clientInfo.state} ${clientInfo.zipCode ?? ""}';
-      ;
+      
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -152,7 +158,7 @@ class RequestFormState extends State<RequestForm> {
         : _categories.first;
     _dateValue = _dateOptions.first;
     _timeValue = _timeOptions.first;
-    print(_timeValue);
+    // print(_timeValue);
 
     super.initState();
     fetchUserAddress();
@@ -298,7 +304,7 @@ class RequestFormState extends State<RequestForm> {
                 onChanged: (value) {
                   setState(() {
                     _timeValue = value;
-                    print(_timeValue);
+                    // print(_timeValue);
                   });
                 },
               ),

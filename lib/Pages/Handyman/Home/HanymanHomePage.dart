@@ -8,7 +8,7 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
@@ -28,8 +28,8 @@ class HandymanHomePage extends StatefulWidget {
 class _HandymanHomePageState extends State<HandymanHomePage> {
   final _searchController = TextEditingController();
   DatabaseService service = DatabaseService();
-  final _firebase = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
+  // final _firebase = FirebaseAuth.instance;
+  // final _firestore = FirebaseFirestore.instance;
   late GlobalKey<RequestFormState> requestFormKey;
   late String specialization;
   List<Map<String, dynamic>> _searchResults = [];
@@ -47,7 +47,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    
     getUserData();
     displayRequest();
     super.initState();
@@ -70,7 +70,13 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         updateFindLaborTabContent(specialization);
       }
     } catch (e) {
-      print(e);
+      // print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching handyman data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -83,7 +89,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     if (currentUserFirstName.isNotEmpty) {
       currentUserFirstName =
           '${currentUserFirstName[0].toUpperCase()}${currentUserFirstName.substring(1).toLowerCase()}';
-      print('>>>>>>>>>> user name: $currentUserFirstName');
+      // print('>>>>>>>>>> user name: $currentUserFirstName');
     }
 
     return Scaffold(
@@ -133,7 +139,13 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         });
       }
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -152,7 +164,13 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         });
       }
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -264,7 +282,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
               alignment: Alignment.bottomLeft,
               child: Padding(
                 padding: EdgeInsets.only(top: currentDeviceHeight - 380),
-                child: Container(
+                // child: Container(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15, right: 23),
                     child: Column(children: [
@@ -284,7 +302,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                       ),
                     ]),
                   ),
-                ),
+                // ),
               ),
             ),
             searchSection(),
@@ -407,12 +425,12 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   Future<Widget> getOngoingServiceContent() async {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-    print(getActiveRequest["approvalStatus"]);
+    // print(getActiveRequest["approvalStatus"]);
     if (getActiveRequest["approvalStatus"] == "pending" ||
-        getActiveRequest["approvalStatus"] == "hired" ||  getActiveRequest["progress"] == "omw" ||
-            getActiveRequest["progress"] == "arrived" ||
-            getActiveRequest["progress"] == "inprogress" ||
-            getActiveRequest["progress"] == "completion" ||
+        getActiveRequest["approvalStatus"] == "hired" ||  getActiveRequest["approvalStatus"] == "omw" ||
+            getActiveRequest["approvalStatus"] == "arrived" ||
+            getActiveRequest["approvalStatus"] == "inprogress" ||
+            getActiveRequest["approvalStatus"] == "completion" ||
         getActiveRequest["approvalStatus"] == "rating") {
       return OngoingRequestCard(
         title: getActiveRequest['title'],

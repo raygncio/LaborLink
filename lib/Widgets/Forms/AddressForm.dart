@@ -62,7 +62,7 @@ class AddressFormState extends State<AddressForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Container(
       decoration: BoxDecoration(

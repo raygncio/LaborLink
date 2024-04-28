@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
+// import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
 
@@ -52,7 +52,7 @@ class LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Form(
         key: _formKey,

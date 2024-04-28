@@ -13,7 +13,7 @@ class HandymanForApprovalPage extends StatefulWidget {
 class _HandymanForApprovalPageState extends State<HandymanForApprovalPage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: AppColors.white,

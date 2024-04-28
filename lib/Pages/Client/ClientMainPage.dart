@@ -7,7 +7,7 @@ import 'package:laborlink/Pages/Client/Activity/ClientActivityPage.dart';
 import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Profile/ProfilePage.dart';
 import 'package:laborlink/Pages/Report/IssuesReportedPage.dart';
-import 'package:laborlink/Pages/LoadingPage.dart';
+// import 'package:laborlink/Pages/LoadingPage.dart';
 import 'package:laborlink/Widgets/NavBars/BottomNavBar.dart';
 import 'package:laborlink/services/analytics_service.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
@@ -31,15 +31,15 @@ class _ClientMainPageState extends State<ClientMainPage> {
   bool firstTime = true;
 
   _login() async {
-    print('>>>>>>>${_auth.currentUser!.uid}');
-    print('>>>>>>>registered phone:${_auth.currentUser!.phoneNumber}');
+    // print('>>>>>>>${_auth.currentUser!.uid}');
+    // print('>>>>>>>registered phone:${_auth.currentUser!.phoneNumber}');
     await _analytics.setUserProperties(
         userId: _auth.currentUser!.uid, userRole: 'client');
   }
 
   @override
   void initState() {
-    // TODO: implement initState
+    
     _login();
     super.initState();
   }

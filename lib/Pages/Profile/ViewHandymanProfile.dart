@@ -33,12 +33,18 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   void getReviews() async {
     try {
       results = await service.getHandymanReviews(widget.handymanInfo["ActiveUserId"], widget.handymanInfo["userRole"]);
-      print(results);
+      // print(results);
       setState(() {
         results = results;
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

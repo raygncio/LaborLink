@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:laborlink/Widgets/Badge.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/TextWithIcon.dart';
+// import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+// import 'package:laborlink/Widgets/TextWithIcon.dart';
 import 'package:laborlink/styles.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/report.dart';
 import 'package:laborlink/models/client.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../dummyDatas.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
+// import '../../dummyDatas.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -53,15 +53,16 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
     try {
       Client clientInfo = await service.getUserData(widget.userId);
 
-      fullName = clientInfo.firstName +
-          ' ' +
-          (clientInfo.middleName ?? "") +
-          ' ' +
-          clientInfo.lastName +
-          ' ' +
-          (clientInfo.suffix ?? "");
+      fullName = '${clientInfo.firstName} ${clientInfo.middleName ?? ""} ${clientInfo.lastName} ${clientInfo.suffix ?? ""}';
+
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -71,7 +72,13 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
       List<Report> reports = await service.getAllReportData(widget.userId);
       return reports;
     } catch (error) {
-      print('Error fetching user data 2: $error');
+      // print('Error fetching user data 2: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
       // Return an empty list in case of an error
       return [];
     }
@@ -144,7 +151,7 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                             radius: 27,
                                             backgroundColor: AppColors.white,
                                             foregroundImage:
-                                                FileImage(defaultAvatar! ),
+                                               defaultAvatar != null ? FileImage(defaultAvatar!) : null,
                                           ),
                                         ),
                                         Column(
@@ -152,7 +159,7 @@ class _IssuesReportedPageState extends State<IssuesReportedPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              fullName ?? '',
+                                              fullName,
                                               style: getTextStyle(
                                                   textColor:
                                                       AppColors.secondaryBlue,

@@ -12,14 +12,14 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
-final _firebase = FirebaseAuth.instance;
-final _firestore = FirebaseFirestore.instance;
+// final _firebase = FirebaseAuth.instance;
+// final _firestore = FirebaseFirestore.instance;
 final DatabaseService service = DatabaseService();
 
 class ClientHomePage extends StatefulWidget {
@@ -134,7 +134,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       searchText = searchText.substring(4);
     }
 
-    print('>>>>>>>>>>>>>>>>>$searchText');
+    // print('>>>>>>>>>>>>>>>>>$searchText');
 
     try {
       List<Map<String, dynamic>> results =
@@ -158,7 +158,14 @@ class _ClientHomePageState extends State<ClientHomePage> {
         _searchResults = results;
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Error fetching user data'),
+            backgroundColor: Color.fromARGB(255, 245, 27, 11),
+          ),
+        );
     }
   }
 
@@ -177,7 +184,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     // DatabaseService service = DatabaseService();
 
     if (requestFormKey.currentState!.validateForm()) {
-      print('>>>> IN open request proceed');
+      // print('>>>> IN open request proceed');
 
       // Get form data from RequestForm
       Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
@@ -235,7 +242,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   _getTotalFee(double fee) {
     setState(() {
       _totalFee = fee;
-      print('>>>>>>>>>>>$_totalFee');
+      // print('>>>>>>>>>>>$_totalFee');
     });
   }
 
@@ -484,7 +491,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     } else {
       text = selectedLaborName;
     }
-    print('Labor selected in main code: $text');
+    // print('Labor selected in main code: $text');
 
     updateDirectRequestTabContent('btn-${text.toLowerCase()}');
   }

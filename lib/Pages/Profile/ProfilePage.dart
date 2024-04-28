@@ -7,7 +7,7 @@ import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +15,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-final _firebase = FirebaseAuth.instance;
+// final _firebase = FirebaseAuth.instance;
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -106,7 +106,13 @@ class _ProfilePageState extends State<ProfilePage> {
         _addressController.text = address;
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -578,14 +584,21 @@ class _ProfilePageState extends State<ProfilePage> {
       'address': _addressController.text,
     };
     updateUserInformation(updatedData, widget.userId);
+     setState(() {});
   }
 
   void updateUserInformation(Map<String, dynamic> updatedData, String userId) async {
   try {
     await service.userInfoUpdate(updatedData, userId);
-    print('User information updated successfully!');
+    // print('User information updated successfully!');
   } catch (error) {
-    print('Error updating user information: $error');
+    // print('Error updating user information: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating user information."),
+          backgroundColor: Colors.red,
+        ),
+      );
   }
 }
 

@@ -63,7 +63,7 @@ class AccountDetailsFormState extends State<AccountDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Container(
       decoration: BoxDecoration(

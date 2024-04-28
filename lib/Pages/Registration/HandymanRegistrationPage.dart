@@ -1,29 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
+// import 'package:laborlink/Pages/Registration/FaceDetectionPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Forms/AccountDetailsForm.dart';
 import 'package:laborlink/Widgets/Forms/AddressForm.dart';
 import 'package:laborlink/Widgets/Forms/BasicInformationForm.dart';
-import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
+// import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
 import 'package:laborlink/Widgets/Forms/HandymanRequirementForm.dart';
 import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/providers/registration_data_provider.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:laborlink/styles.dart';
-import 'package:uuid/uuid.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:laborlink/models/database_service.dart';
-import 'package:laborlink/models/client.dart';
-import 'package:laborlink/models/handyman.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
+// import 'package:uuid/uuid.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:laborlink/models/database_service.dart';
+// import 'package:laborlink/models/client.dart';
+// import 'package:laborlink/models/handyman.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'dart:io';
 import 'dart:core';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final _firebase = FirebaseAuth.instance;
-final _firestore = FirebaseFirestore.instance;
+// final _firebase = FirebaseAuth.instance;
+// final _firestore = FirebaseFirestore.instance;
 
 class HandymanRegistrationPage extends ConsumerStatefulWidget {
   const HandymanRegistrationPage({Key? key}) : super(key: key);
@@ -265,7 +265,7 @@ class _HandymanRegistrationPageState
           _toIdVerification(fileAttachments);
         } catch (e) {
           // Handle errors during user creation
-          print("Error creating user: $e");
+          // print("Error creating user: $e");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Error creating user"),

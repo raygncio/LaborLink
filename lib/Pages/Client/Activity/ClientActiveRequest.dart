@@ -84,7 +84,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       requestInfo =
           await service.getRequestsData(widget.requestDetail["clientId"]);
 
-      print('progress: ${requestInfo!.progress}');
+      // print('progress: ${requestInfo!.progress}');
 
       if (requestInfo!.progress == 'completion') {
         currentProgress = 4;
@@ -109,7 +109,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
         _requestCompleted = currentProgress == 4;
       });
     } catch (error) {
-      print('Error fetching get user data: $error');
+      // print('Error fetching get user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -165,9 +171,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                             Container(
                               width: 150,
                               child: Text(
-                                "Request ID: " +
-                                        widget.requestDetail["requestId"] ??
-                                    '',
+                                "Request ID: ${widget.requestDetail["requestId"]}",
                                 overflow: TextOverflow.ellipsis,
                                 softWrap: false,
                                 style: getTextStyle(
@@ -337,7 +341,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
         // Handle error if unable to launch the SMS app
       }
     } catch (e) {
-      print('Error launching SMS: $e');
+      // print('Error launching SMS: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error launching SMS."),
+          backgroundColor: Colors.red,
+        ),
+      );
       // Handle error
     }
   }
@@ -346,7 +356,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     try {
       await service.updateRequest(widget.requestDetail["clientId"]);
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     Navigator.of(context).push(MaterialPageRoute(

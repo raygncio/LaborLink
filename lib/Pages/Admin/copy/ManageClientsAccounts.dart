@@ -16,8 +16,8 @@ class _ManageClientsAccountsState extends State<ManageClientsAccounts> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
+    // final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,

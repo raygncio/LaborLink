@@ -12,14 +12,14 @@ import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
 import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/models/review.dart';
-import 'package:laborlink/services/analytics_service.dart';
+// import 'package:laborlink/services/analytics_service.dart';
 
 class DatabaseService {
   // INITIALIZE
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final AnalyticsService _analytics = AnalyticsService();
+  // final AnalyticsService _analytics = AnalyticsService();
 
   // PATHS
 
@@ -436,9 +436,6 @@ class DatabaseService {
       'roofing',
       'pest control',
     ];
-    // Future.delayed(Duration(seconds: 1), () {
-    //   print(searchText.toLowerCase());
-    // });
 
     if (categoriesToCheck.contains(searchText.toLowerCase())) {
       // Query 'request' collection using userId
@@ -617,7 +614,7 @@ class DatabaseService {
       for (var userDoc in userQuery.docs) {
         final userData = userDoc.data();
         combinedData.addAll(userData);
-        // print(handymanId);
+
         // Query 'review' using key from userData
         final reviewsQuery = await _db
             .collection('review')
@@ -633,7 +630,7 @@ class DatabaseService {
         rates = count > 0 ? rating / count : 0;
         combinedData.addAll({'rates': rates});
       }
-      // print(combinedData);
+     
 
       resultList.add(combinedData);
     }
@@ -693,7 +690,7 @@ class DatabaseService {
         }
         rates = count > 0 ? rating / count : 0;
         combinedData.addAll({'rates': rates});
-        print(rates);
+   
       }
       resultList.add(combinedData);
     }
@@ -827,7 +824,7 @@ class DatabaseService {
         for (var userDoc in userQuery.docs) {
           final userData = userDoc.data();
           combinedData.addAll(userData);
-          print(">>>>>>>>>>>>>>>>>>>>$userData");
+
           // Query 'review' using key from userData
           final reviewsQuery = await _db
               .collection('review')
@@ -842,7 +839,7 @@ class DatabaseService {
           }
         }
         rates = count > 0 ? rating / count : 0;
-        print('Ratse fs $rates');
+       
         resultMap.addAll({'rates': rates});
       }
 
@@ -874,7 +871,7 @@ class DatabaseService {
         'userId': userId,
         'handymanId': handymanId,
       };
-      print("Active Request ::::::::::: $requestId ");
+   
 
       final userQuery = await _db
           .collection('user')
@@ -1338,7 +1335,6 @@ class DatabaseService {
   // Update the request to hired and assign the handyman selected
   Future<void> updateRequestProgressHandyman(
       String requestId, int progress) async {
-    print(">>>>>>>>>>>>>>> $progress");
     String update = " ";
     if (progress == 1) {
       update = "omw";
@@ -1542,7 +1538,7 @@ class DatabaseService {
         final clientId = requestData['userId'];
         final desc = requestData['description'];
         final handymanId = requestData['handymanId'];
-        print(1);
+      
         Map<String, dynamic> groupData = {
           ...requestData,
           'requestId': requestId,
@@ -1626,7 +1622,7 @@ class DatabaseService {
           for (var handymanDoc in handymanQuery.docs) {
             final handymanData = handymanDoc.data();
             resultMap.addAll(handymanData);
-            // print(">>>>>>>>>>>>>$groupData");
+            
             final userID = handymanData['handymanId'];
 
             final userQuery = await _db
@@ -1676,7 +1672,7 @@ class DatabaseService {
           for (var offerDoc in offerQuery.docs) {
             final offerData = offerDoc.data();
             resultMap.addAll(offerData);
-            // print(">>>>>>>>>>>>>$groupData");
+            
             final userID = offerData['userId'];
 
             final userQuery = await _db
@@ -1719,7 +1715,7 @@ class DatabaseService {
         }
       }
     }
-    // print(">>>>>>>>>>>>>$resultMap");
+ 
     return resultMap;
   }
 
@@ -1794,17 +1790,19 @@ class DatabaseService {
         }
       }
     }
-    // print(">>>>>>>>>>>>>$resultMap");
+   
     return resultMap;
   }
 
   Future<Map<String, dynamic>> getActiveRequestClient(String handymanId) async {
     Map<String, dynamic> resultMap = {};
+    
 
     final requestQuery = await _db
         .collection('request')
         .where('handymanId', isEqualTo: handymanId)
         .where('progress', whereIn: [
+          'pending',
       'hired',
       'omw',
       'arrived',
@@ -1817,6 +1815,7 @@ class DatabaseService {
       final requestData = requestDoc.data();
       final requestId = requestDoc.id;
       final userId = requestData['userId'];
+    
       final handymanId = requestData['handymanId'];
       Map<String, dynamic> groupData = {
         ...requestData,
@@ -1826,6 +1825,9 @@ class DatabaseService {
       };
 
       resultMap.addAll(groupData);
+      double rating = 0;
+      double count = 0;
+      double rates = 0;
 
       final userQuery =
           await _db.collection('user').where('userId', isEqualTo: userId).get();
@@ -1843,7 +1845,7 @@ class DatabaseService {
         // Process 'user' query results
         for (var handymanDoc in handymanQuery.docs) {
           final handymanData = handymanDoc.data();
-          print(handymanData);
+     
           resultMap.addAll(handymanData);
           final reviewQuery = await _db
               .collection('review')
@@ -1853,12 +1855,17 @@ class DatabaseService {
           // Process 'review' query results
           for (var reviewDoc in reviewQuery.docs) {
             final reviewData = reviewDoc.data();
+            rating += reviewData['rating'];
+              count++;
             resultMap.addAll(reviewData);
           }
         }
       }
+      rates = count > 0 ? rating / count : 0;
+      resultMap.addAll({'rates': rates});
+
     }
-    // print(">>>>>>>>>>>>>$resultMap");
+
     return resultMap;
   }
 
@@ -1877,7 +1884,7 @@ class DatabaseService {
         final offerDesc = offerData['description'];
         final offerPic = offerData['attachment'];
         final requestId = offerData["requestId"];
-        // print('>>>>>>>>>>>>$offerData');
+       
         resultMap.addAll({
           'approvalStatus': offerStatus,
           'hasOffer': true,
@@ -1887,7 +1894,7 @@ class DatabaseService {
         });
 
         resultMap.addAll(offerData);
-        // print(">>>>>>>>>>>>>>>>>>>$offerDesc");
+       
 
         // Query 'request' using key from userData
         final requestQuery =
@@ -2003,15 +2010,16 @@ class DatabaseService {
       'omw',
       'arrived',
       'inprogress',
-      'completion'
+      'completion',
+      'rating'
     ]).get();
 
     for (var requestDoc in requestQuery.docs) {
       final requestData = requestDoc.data();
-      final ActiveRequestId = requestDoc.id;
+      final activeRequestId = requestDoc.id;
       final stats = requestData['progress'];
       resultMap.addAll({
-          'approvalStatus': stats,  'activeRequestId': ActiveRequestId, ...requestData});
+          'approvalStatus': stats,  'activeRequestId': activeRequestId, ...requestData});
      
       final userQuery =
           await _db.collection('user').where('userId', isEqualTo: userId).get();
@@ -2097,7 +2105,7 @@ class DatabaseService {
           ...offerData,
           'handymanId': offerData["userId"],
         };
-        print(requestId);
+        
         // Query 'handyman' collection using userId from 'offer'
         final handymanQuery = await _db
             .collection('handyman')
@@ -2165,7 +2173,7 @@ class DatabaseService {
     List<Map<String, dynamic>> resultList = [];
 
     
-    final requestQuery;
+    final QuerySnapshot<Map<String, dynamic>> requestQuery;
     if (userRole == "client") {
       requestQuery =
         await _db.collection('request').where('progress', isEqualTo: 'completed').where('userId', isEqualTo: userId).get();

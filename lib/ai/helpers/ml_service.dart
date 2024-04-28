@@ -17,7 +17,7 @@ class MLService {
     int minDist = 999;
     double threshold = 0.9;
     var dist = euclideanDistance(predictedArray, predictedArray_2);
-    print('************************************************************$dist');
+    // print('************************************************************$dist');
     if (dist <= threshold && dist < minDist) {
       return 'match';
     } else {
@@ -176,8 +176,8 @@ class MLService {
       final int uvRowStride = image.planes[1].bytesPerRow;
       final int uvPixelStride = image.planes[1].bytesPerPixel!;
 
-      print("uvRowStride: " + uvRowStride.toString());
-      print("uvPixelStride: " + uvPixelStride.toString());
+      // print("uvRowStride: " + uvRowStride.toString());
+      // print("uvPixelStride: " + uvPixelStride.toString());
 
       // imgLib -> Image package from https://pub.dartlang.org/packages/image
       var img = img_lib.Image(width, height); // Create Image buffer

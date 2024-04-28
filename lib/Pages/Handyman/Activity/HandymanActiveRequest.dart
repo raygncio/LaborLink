@@ -187,8 +187,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
                                 icon: const Icon(Icons.local_offer_rounded,
                                     size: 17, color: AppColors.accentOrange),
                                 text: widget.requestDetail["suggestedPrice"]
-                                        .toString() ??
-                                    '',
+                                        .toString(),
                                 fontSize: 12,
                                 contentPadding: 19,
                               ),
@@ -303,7 +302,7 @@ class _HandymanActiveRequestState extends State<HandymanActiveRequest> {
         _currentProgress,
       );
     } else {
-      print(widget.requestDetail["activeRequestId"]);
+      // print(widget.requestDetail["activeRequestId"]);
       attachServiceProofDialog(context, widget.clientDetail,
           widget.requestDetail["activeRequestId"]);
     }
