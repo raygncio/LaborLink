@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Admin/ReportGenerationPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
-import 'package:laborlink/charts/bar graph/anomaly_bar_graph.dart';
-import 'package:laborlink/charts/bar graph/face_bar_graph.dart';
+import 'package:laborlink/charts/bar%20graph/category1_bar_graph.dart';
+import 'package:laborlink/charts/bar%20graph/category2_bar_graph.dart';
+import 'package:laborlink/charts/pie%20chart/anomaly_pie_chart.dart';
+import 'package:laborlink/charts/pie%20chart/client_handyman_pie_chart.dart';
+import 'package:laborlink/charts/pie%20chart/face_pie_chart.dart';
+import 'package:laborlink/charts/pie%20chart/request_pie_chart.dart';
+import 'package:laborlink/models/client.dart';
 import 'package:laborlink/models/database_service.dart';
+import 'package:laborlink/models/handyman.dart';
+import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/request.dart';
 import 'package:laborlink/models/results/anomaly_results.dart';
 import 'package:laborlink/models/results/face_results.dart';
@@ -27,11 +34,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
   List<FaceResults> faceResults = [];
   List<Request> completedRequests = [];
 
+  // non-reports
+  List<Client> usersList = [];
+  List<Handyman> handymenList = [];
+  List<Request> allRequestsList = [];
+  List<HandymanApproval> allApprovalsList = [];
+
   _loadData() async {
     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOADING DATA');
     anomalyResults = await service.getAllAnomalyResults();
     faceResults = await service.getAllFaceResults();
     completedRequests = await service.getAllCompletedRequests();
+
+    // non-reports
+    usersList = await service.getAllClientHandyman();
+    handymenList = await service.getAllHandyman();
+    allRequestsList = await service.getAllRequests();
+    allApprovalsList = await service.getAllApprovals();
+
     setState(() {});
   }
 
@@ -82,7 +102,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   SizedBox(
                     height: 200,
-                    child: AnomalyBarGraph(
+                    child: AnomalyPieChart(
                       anomalyResults: anomalyResults,
                     ),
                   ),
@@ -102,8 +122,78 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   SizedBox(
                     height: 200,
-                    child: FaceBarGraph(
+                    child: FacePieChart(
                       faceResults: faceResults,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Users',
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: ClientHandymanPieChart(
+                      usersList: usersList,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Requests',
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: RequestPieChart(
+                      requestsList: allRequestsList,
+                      approvalsList: allApprovalsList,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Categories',
+                    style: getTextStyle(
+                        textColor: AppColors.primaryBlue,
+                        fontFamily: AppFonts.montserrat,
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: Category1BarGraph(
+                      handymenList: handymenList,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: Category2BarGraph(
+                      handymenList: handymenList,
                     ),
                   ),
                   const Padding(

@@ -191,6 +191,58 @@ class DatabaseService {
     return completedRequestsList;
   }
 
+  //
+
+  Future<List<Client>> getAllClientHandyman() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('user')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<Client> usersList = querySnapshot.docs.map((doc) {
+      return Client.fromFireStore(doc);
+    }).toList();
+
+    return usersList;
+  }
+
+  Future<List<Handyman>> getAllHandyman() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('handyman')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<Handyman> handymenList = querySnapshot.docs.map((doc) {
+      return Handyman.fromFireStore(doc);
+    }).toList();
+
+    return handymenList;
+  }
+
+  Future<List<Request>> getAllRequests() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('request')
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<Request> requestsList = querySnapshot.docs.map((doc) {
+      return Request.fromFireStore(doc);
+    }).toList();
+
+    return requestsList;
+  }
+
+  Future<List<HandymanApproval>> getAllApprovals() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _db.collection('handymanApproval').get();
+
+    List<HandymanApproval> approvalsList = querySnapshot.docs.map((doc) {
+      return HandymanApproval.fromFireStore(doc);
+    }).toList();
+
+    return approvalsList;
+  }
+
   // USERS
 
   addUser(Client userData) async {
