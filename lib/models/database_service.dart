@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 
 import 'package:laborlink/models/client.dart';
+import 'package:laborlink/models/transaction.dart' as lb;
 import 'package:laborlink/models/handyman.dart';
 import 'package:laborlink/models/handyman_approval.dart';
 import 'package:laborlink/models/offer.dart';
@@ -2373,5 +2374,99 @@ class DatabaseService {
       print('Error retrieving email from username: $e');
       return null;
     }
+  }
+
+  // CREDITSS
+  addTransaction(lb.Transaction transactionData) async {
+    await _db
+        .collection('transaction')
+        .doc(transactionData.transactionId)
+        .set(transactionData.toFirestore());
+  }
+
+  Future<List<lb.Transaction>> getAllTransactionsOfHandyman(
+      String userId) async {
+    // Get handyman id
+    Handyman handyman = await getHandymanData(userId);
+    String? handymanId = handyman.handymanId;
+
+    // If the userId is not a handyman
+    if (handymanId == null) return [];
+
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+        .collection('transaction')
+        .where('handymanId', isEqualTo: handymanId)
+        .orderBy("createdAt", descending: true)
+        .get();
+
+    List<lb.Transaction> transactionsList = querySnapshot.docs.map((doc) {
+      return lb.Transaction.fromFireStore(doc);
+    }).toList();
+
+    return transactionsList;
+  }
+
+  Future<lb.Transaction?> parseTransactionDetails(String requestId) async {
+    final requestQS = await _db
+        .collection('request')
+        .where('progress', isEqualTo: 'completed')
+        .where('requestId', isEqualTo: requestId)
+        .get();
+
+    if (requestQS.docs.isEmpty) {
+      // Handle the case where no documents are found.
+      // You might want to return null or throw an exception.
+      return null;
+    }
+
+    // final offerQS = await _db
+    //     .collection('offer')
+    //     .where('status', isEqualTo: 'completed')
+    //     .where('requestId', isEqualTo: 'requestId')
+    //     .get();
+
+    // if (offerQS.docs.isEmpty) {
+    //   // Handle the case where no documents are found.
+    //   // You might want to return null or throw an exception.
+    //   return null;
+    // }
+
+    // Assuming there's 1 per qs
+    Request request = Request.fromFireStore(requestQS.docs.first);
+    //Offer offer = Offer.fromFireStore(offerQS.docs.first);
+
+    // Compute credit balance
+    double serviceFee = request.suggestedPrice * 0.1;
+
+    // Set desription
+    String description = 'credit_reqId-${request.requestId}';
+
+    return lb.Transaction(
+      amount: '+$serviceFee',
+      description: description,
+      handymanId: request.handymanId!,
+    );
+  }
+
+  Future<double> computeCreditBalance(String userId) async {
+    List<lb.Transaction> transactionHistory = [];
+
+    double balance = 0.0;
+
+    transactionHistory = await getAllTransactionsOfHandyman(userId);
+    if (transactionHistory.isNotEmpty) {
+      for (lb.Transaction transaction in transactionHistory) {
+        double amount = double.parse(transaction.amount.substring(1));
+        if (transaction.amount.startsWith('+')) {
+          balance += amount;
+        } else if (transaction.amount.startsWith('-')) {
+          balance -= amount;
+        }
+      }
+    }
+
+    print('transactionhistory::$transactionHistory');
+
+    return balance;
   }
 }
