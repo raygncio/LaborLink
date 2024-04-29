@@ -33,7 +33,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   void getReviews() async {
     try {
       results = await service.getHandymanReviews(widget.handymanInfo["ActiveUserId"], widget.handymanInfo["userRole"]);
-      // print(results);
+      print("testing");
       setState(() {
         results = results;
       });
@@ -128,7 +128,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                     if (currentReview['suffix'] != null) {
                       fullName += currentReview['suffix'] + ' ';
                     }
-                    DateTime? createdAt = currentReview['createdAt']?.toDate();
+                    DateTime? createdAt = currentReview['actualDate']?.toDate();
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 7),

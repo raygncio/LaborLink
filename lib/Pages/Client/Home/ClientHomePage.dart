@@ -351,7 +351,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
             borderRadius: 8,
             height: 46,
             errorBorder: null,
-            hintText: "Search category or handyman name",
+            hintText: "Search by category or by handyman's first name",
             hintTextStyle: getTextStyle(
                 textColor: AppColors.grey,
                 fontFamily: AppFonts.montserrat,

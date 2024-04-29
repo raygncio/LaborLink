@@ -313,8 +313,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
      Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
-    if (getActiveRequest["approvalStatus"] == "pending" ||
-        getActiveRequest["approvalStatus"] == "hired" ||
+    if (getActiveRequest["approvalStatus"] == "hired" ||
         getActiveRequest["approvalStatus"] == "rating") {
       // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(
@@ -386,8 +385,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
 
-    if (getActiveRequest["approvalStatus"] == "pending" ||
-        getActiveRequest["approvalStatus"] == "hired" ||
+    if (getActiveRequest["approvalStatus"] == "hired" ||
         getActiveRequest["approvalStatus"] == "rating") {
       // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(

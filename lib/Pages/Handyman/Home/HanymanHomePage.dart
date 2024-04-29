@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:laborlink/Widgets/Cards/DirectRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OngoingRequestCard.dart';
 import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
@@ -38,7 +39,8 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
   Handyman? handyman;
 
   int _selectedTabIndex = 0;
-
+  int directRequestCount = 0;
+  List<Map<String, dynamic>> directRequestResults = [];
   bool _showSearchResult = false;
 
   late double currentDeviceHeight; // get current device height
@@ -50,8 +52,32 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     
     getUserData();
     displayRequest();
+    updateDirectRequestCount();
+    loadDirectRequestData();
     super.initState();
   }
+
+  void updateDirectRequestCount() async {
+    try {
+      List<Map<String, dynamic>> results =
+          await service.getDirectRequestOfHandyman(widget.userId);
+      setState(() {
+        directRequestCount = results.length;
+      });
+    } catch (e) {
+      print("Error updating direct request count: $e");
+    }
+  }
+
+  void loadDirectRequestData() async {
+    try {
+      directRequestResults =
+          await service.getDirectRequestOfHandyman(widget.userId);
+    } catch (e) {
+      print("Error loading direct request data: $e");
+    }
+  }
+
 
   getUserData() async {
     Client userData =
@@ -69,6 +95,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
         specialization = handyman!.specialization;
         updateFindLaborTabContent(specialization);
       }
+
     } catch (e) {
       // print(e);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -108,7 +135,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
                     AppTabNavBar(
                         selectedTabIndex: _selectedTabIndex,
                         leftLabel: "Find Labor",
-                        rightLabel: "Direct Request",
+                        rightLabel: "Direct Request ($directRequestCount)",
                         onChanged: updateSelectedTab),
                   ],
                 ),
@@ -155,13 +182,25 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
     try {
       List<Map<String, dynamic>> results =
           await service.getUserAndRequestBaseOnSearch(searchText.toLowerCase());
+      // Filter the results based on handyman's specialization
+      List<Map<String, dynamic>> filteredResults = results.where((result) => result['specialization'] == specialization).toList();
 
       // Check if the widget is still mounted before updating the state
       if (mounted) {
         setState(() {
-          _showSearchResult = results.isNotEmpty;
-          _searchResults = results;
+          _showSearchResult = filteredResults.isNotEmpty;
+          _searchResults = filteredResults;
         });
+      }
+
+       if (filteredResults.isEmpty) {
+        Fluttertoast.showToast(
+          msg: "No Request Found",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          textColor: Colors.white,
+          fontSize: 16.0);
       }
     } catch (error) {
       // print('Error fetching user data: $error');
@@ -253,7 +292,7 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
             borderRadius: 8,
             height: 46,
             errorBorder: null,
-            hintText: "Search for labor",
+            hintText: "Search by category or client's first name",
             hintTextStyle: getTextStyle(
                 textColor: AppColors.grey,
                 fontFamily: AppFonts.montserrat,
@@ -360,52 +399,40 @@ class _HandymanHomePageState extends State<HandymanHomePage> {
       );
 
   Widget directRequestTab() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: service.getDirectRequestOfHandyman(widget.userId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text("Error: ${snapshot.error}");
-        } else {
-          List<Map<String, dynamic>> results = snapshot.data ?? [];
-          return Padding(
-            padding: const EdgeInsets.only(top: 54),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 26, top: 21),
-                    child: Text("Request addressed to you",
-                        style: getTextStyle(
-                          textColor: AppColors.secondaryBlue,
-                          fontFamily: AppFonts.montserrat,
-                          fontWeight: AppFontWeights.regular,
-                          fontSize: 10,
-                        )),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 9),
-                        child: DirectRequestCard(
-                          userId: widget.userId,
-                          requestInfo: results[index],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 54),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 26, top: 21),
+              child: Text("Request addressed to you",
+                  style: getTextStyle(
+                    textColor: AppColors.secondaryBlue,
+                    fontFamily: AppFonts.montserrat,
+                    fontWeight: AppFontWeights.regular,
+                    fontSize: 10,
+                  )),
             ),
-          );
-        }
-      },
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: directRequestResults.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 9),
+                  child: DirectRequestCard(
+                    userId: widget.userId,
+                    requestInfo: directRequestResults[index],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 

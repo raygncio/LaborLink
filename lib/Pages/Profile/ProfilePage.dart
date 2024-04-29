@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     fetchUserData();
     _loadDefaultAvatar();
-    _getCreditBalance();
+    // _getCreditBalance();
   }
 
   _getCreditBalance() async {
@@ -155,6 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       Client clientInfo = await service.getUserData(widget.userId);
       getUserInfo = await service.getUserInfo(widget.userId); // this is the code that gets the user info
+      print(getUserInfo['specialization']);
       String fullName =
           '${clientInfo.firstName[0].toUpperCase()}${clientInfo.firstName.substring(1).toLowerCase()} ${clientInfo.middleName ?? " "} ${clientInfo.lastName[0].toUpperCase()}${clientInfo.lastName.substring(1).toLowerCase()} ${clientInfo.suffix ?? ""}';
 
@@ -171,6 +172,9 @@ class _ProfilePageState extends State<ProfilePage> {
         _phoneNumberController.text = clientInfo.phoneNumber;
         _addressController.text = address;
         _userRole = clientInfo.userRole;
+        if(_userRole == 'handyman') {
+          _getCreditBalance();
+        }
       });
     } catch (error) {
       print('Error fetching user data: $error');
@@ -316,8 +320,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _userRole == 'handyman'
-                                  ? Padding(
+                              if (_userRole == 'handyman')
+                                 Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 20),
                                       child: Column(
@@ -379,13 +383,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ],
                                       ),
-                                    )
-                                  : const Center(
-                                      child: CircularProgressIndicator(
-                                        color: AppColors.secondaryBlue,
-                                        strokeWidth: 4,
-                                      ),
                                     ),
+                                  // : const Center(
+                                  //     child: CircularProgressIndicator(
+                                  //       color: AppColors.secondaryBlue,
+                                  //       strokeWidth: 4,
+                                  //     ),
+                                  //   ),
                               Text(
                                 "My Information",
                                 style: getTextStyle(

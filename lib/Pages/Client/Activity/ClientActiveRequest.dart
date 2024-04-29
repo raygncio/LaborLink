@@ -58,6 +58,8 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     }
     _requestCompleted = _currentProgress == 4;
 
+    print('progress: ${widget.requestDetail['finalRequestId']}');
+
     if (widget.requestDetail["progress"] != 'completion') {
       //check email verification status every 3 sec
       timer = Timer.periodic(
@@ -84,7 +86,6 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       requestInfo =
           await service.getRequestsData(widget.requestDetail["clientId"]);
 
-      // print('progress: ${requestInfo!.progress}');
 
       if (requestInfo!.progress == 'completion') {
         currentProgress = 4;
@@ -109,13 +110,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
         _requestCompleted = currentProgress == 4;
       });
     } catch (error) {
-      // print('Error fetching get user data: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error fetching user data."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('Error fetching get user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     }
   }
 
@@ -327,9 +328,10 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
   }
 
   Future<void> sendMessage(String phoneNumber, String message) async {
+    String phone = '+63$phoneNumber';
     final Uri url = Uri(
       scheme: 'sms',
-      path: phoneNumber,
+      path: phone,
       queryParameters: {'body': message},
     );
 
@@ -356,13 +358,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     try {
       await service.updateRequest(widget.requestDetail["clientId"]);
     } catch (error) {
-      // print('Error fetching user data: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error fetching user data."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('Error fetching user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     }
 
     Navigator.of(context).push(MaterialPageRoute(

@@ -110,7 +110,7 @@ class _RequestCompleteSuccessPageState
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) =>
-            RatingsPage(ratings: widget.details, user: 'client', requestId: widget.details["requestId"]),
+            RatingsPage(ratings: widget.details, user: 'client', requestId: widget.details["finalRequestId"]),
       ));
     }
   }

@@ -79,13 +79,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         getDirectRequest();
       }
     } catch (error) {
-      // print('Error fetching get user data: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Error fetching get user data."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('Error fetching get user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching get user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
 
     }
   }
@@ -134,6 +134,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   Future<Map<String, dynamic>> getTheActiveRequest() async {
     try {
       return await service.getActiveRequest(widget.userId);
+      
     } catch (error) {
       // print('Error fetching active request: $error');
       ScaffoldMessenger.of(context).showSnackBar(
