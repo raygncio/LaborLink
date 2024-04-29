@@ -42,7 +42,7 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
     yesCancelDialog(context, "Are you sure you want to log out?").then((value) {
       if (value == "yes") {
         ref.invalidate(currentUserProvider);
-        FirebaseAuth.instance.signOut();
+        // FirebaseAuth.instance.signOut();
 
         // Navigator.of(context).pop();
 
@@ -53,13 +53,15 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
         //   (route) => false,
         // );
 
-        // Navigator.of(context).pushReplacement(
-        //   MaterialPageRoute(
-        //     builder: (ctx) => const LandingPage(),
-        //   ),
-        // );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => const LandingPage(),
+          ),
+        );
 
-        //Navigator.of(context).popUntil((route) => false);
+        // Navigator.of(context).popUntil((route) => false);
+
+        FirebaseAuth.instance.signOut();
       }
     });
   }
