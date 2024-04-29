@@ -7,7 +7,7 @@ import 'package:laborlink/Widgets/Buttons/LogoutButton.dart';
 import 'package:laborlink/Widgets/Buttons/OutlinedButton.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/styles.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +25,59 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
+enum AuthStatus {
+  successful,
+  wrongPassword,
+  emailAlreadyExists,
+  invalidEmail,
+  weakPassword,
+  unknown,
+}
+
+class AuthExceptionHandler {
+  static handleAuthException(FirebaseAuthException e) {
+    AuthStatus status;
+    switch (e.code) {
+      case "invalid-email":
+        status = AuthStatus.invalidEmail;
+        break;
+      case "wrong-password":
+        status = AuthStatus.wrongPassword;
+        break;
+      case "weak-password":
+        status = AuthStatus.weakPassword;
+        break;
+      case "email-already-in-use":
+        status = AuthStatus.emailAlreadyExists;
+        break;
+      default:
+        status = AuthStatus.unknown;
+    }
+    return status;
+  }
+  static String generateErrorMessage(error) {
+    String errorMessage;
+    switch (error) {
+      case AuthStatus.invalidEmail:
+        errorMessage = "Your email address appears to be malformed.";
+        break;
+      case AuthStatus.weakPassword:
+        errorMessage = "Your password should be at least 6 characters.";
+        break;
+      case AuthStatus.wrongPassword:
+        errorMessage = "Your email or password is wrong.";
+        break;
+      case AuthStatus.emailAlreadyExists:
+        errorMessage =
+            "The email address is already in use by another account.";
+        break;
+      default:
+        errorMessage = "An error occured. Please try again later.";
+    }
+    return errorMessage;
+  }
+}
+
 class _ProfilePageState extends State<ProfilePage> {
   final _fullNameController = TextEditingController();
   final _birthdateController = TextEditingController();
@@ -32,6 +85,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
   Map<String, dynamic> getUserInfo = {};
+  FirebaseAuth _auth = FirebaseAuth.instance; // Define FirebaseAuth object
+  AuthStatus _status = AuthStatus.unknown;
 
   File? defaultAvatar;
   final _labelTextStyle = getTextStyle(
@@ -83,6 +138,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return file;
   }
+  
+
 
   Future<void> fetchUserData() async {
     DatabaseService service = DatabaseService();
@@ -96,13 +153,13 @@ class _ProfilePageState extends State<ProfilePage> {
           DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
 
       String address =
-          '${clientInfo.streetAddress} ${clientInfo.city ?? " "} ${clientInfo.state} ${clientInfo.zipCode ?? ""}';
+          '${clientInfo.streetAddress}, ${clientInfo.city ?? " "}, ${clientInfo.state}, ${clientInfo.zipCode ?? ""}';
 
       setState(() {
         _fullNameController.text = fullName;
         _birthdateController.text = formattedDate;
         _emailController.text = clientInfo.emailAdd;
-        _phoneNumberController.text = '0${clientInfo.phoneNumber}';
+        _phoneNumberController.text = clientInfo.phoneNumber;
         _addressController.text = address;
       });
     } catch (error) {
@@ -602,7 +659,49 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-  void onChangePassword() {}
+void onChangePassword() async {
+  // Get the email of the current user
+  String email = _emailController.text;
+
+  // Call the resetPassword function
+  AuthStatus status = await resetPassword(email: email);
+
+  // Handle the result of the password reset operation
+  if (status == AuthStatus.successful) {
+    // Password reset email sent successfully
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Password reset email sent successfully."),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } else {
+    // Password reset failed, show error message
+    String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+
+
+  Future<AuthStatus> resetPassword({required String email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      _status = AuthStatus.successful;
+    } catch (e) {
+       if (e is FirebaseAuthException) {
+          return AuthExceptionHandler.handleAuthException(e);
+        } else {
+          // Handle other types of exceptions here if needed
+          return AuthStatus.unknown;
+      }
+    }
+    return _status;
+  }
 
   void onReportAnIssue() => Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => ReportIssuePage(userId: widget.userId),

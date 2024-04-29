@@ -1130,6 +1130,8 @@ class DatabaseService {
       DateTime birthdate = DateFormat('MMMM d, y').parse(birthdateString);
       String fullName = updatedData["fullName"];
       List<String> nameParts = fullName.split(' ');
+      String address = updatedData["address"];
+      List<String> newAddress = address.split(', ');
 
       String firstName = '';
       String middleName = '';
@@ -1150,11 +1152,34 @@ class DatabaseService {
         lastName = nameParts[1];
       } 
 
+      String street = '';
+      String city = '';
+      String state = '';
+      int code = 0;
+
+      if (newAddress.length >= 4) {
+        street = newAddress[0];
+        city = newAddress[1];
+        state = newAddress[2];
+        code = int.parse(newAddress[3]);
+      } else if (newAddress.length == 3) {
+        street = newAddress[0];
+        city = newAddress[1];
+        state = newAddress[2];
+      } else if (newAddress.length == 2) {
+        street = newAddress[0];
+        city = newAddress[1];
+      } 
+
       await doc.reference.update({
       'firstName': firstName,
       'middleName': middleName,
       'lastName': lastName,
       'suffix': suffix,
+      'streetAddress': street,
+      'city': city,
+      'state': state,
+      'zipCode': code,
         'dob':Timestamp.fromDate(birthdate),
         'phoneNumber': updatedData["phoneNumber"],
       });
