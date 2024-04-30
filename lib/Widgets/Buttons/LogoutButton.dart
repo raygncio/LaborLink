@@ -49,7 +49,6 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
               builder: (context) => const LandingPage(),
             ),
             (route) => route.isFirst);
-        
         FirebaseAuth.instance.signOut();
 
         // Navigator.of(context).pop();
@@ -68,6 +67,7 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
         // );
 
         //Navigator.of(context).popUntil((route) => false);
+        
       }
     });
   }
