@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/LandingPage.dart';
 // import 'package:laborlink/Pages/LoginPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/Dialogs.dart';
@@ -42,6 +43,13 @@ class _LogoutButtonState extends ConsumerState<LogoutButton> {
     yesCancelDialog(context, "Are you sure you want to log out?").then((value) {
       if (value == "yes") {
         ref.invalidate(currentUserProvider);
+
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const LandingPage(),
+            ),
+            (route) => route.isFirst);
+        
         FirebaseAuth.instance.signOut();
 
         // Navigator.of(context).pop();
