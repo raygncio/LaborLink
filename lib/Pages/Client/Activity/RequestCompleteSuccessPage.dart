@@ -54,7 +54,7 @@ class _RequestCompleteSuccessPageState
                 child: Text(
                   successPagePhase == 1
                       ? "Please prepare to give the discussed  amount to the handyman. Thank you!"
-                      : "We keep your completed requestsin the activity history",
+                      : "We keep your completed requests in the activity history",
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.visible,
                   style: getTextStyle(
@@ -110,7 +110,7 @@ class _RequestCompleteSuccessPageState
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) =>
-            RatingsPage(ratings: widget.details, user: 'client'),
+            RatingsPage(ratings: widget.details, user: 'client', requestId: widget.details["finalRequestId"]),
       ));
     }
   }

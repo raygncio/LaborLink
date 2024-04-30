@@ -13,8 +13,8 @@ class IssuesForApprovalPage extends StatefulWidget {
 class _IssuesForApprovalPageState extends State<IssuesForApprovalPage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
+    // final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,
@@ -35,10 +35,10 @@ class _IssuesForApprovalPageState extends State<IssuesForApprovalPage> {
                       padding:
                           EdgeInsets.only(top: 13, bottom: index == 9 ? 13 : 0),
                       child: IssueCard(
-                          issueStatus: IssueStatus.pending,
+                          issueStatus: IssueStatus.pending.toString(),
                           reporterUserType: index % 2 == 0
-                              ? AppUserType.client
-                              : AppUserType.handyman),
+                              ? AppUserType.client.toString()
+                              : AppUserType.handyman.toString()),
                     );
                   },
                 ),

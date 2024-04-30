@@ -12,8 +12,8 @@ class ReviewedRequestsPage extends StatefulWidget {
 class _ReviewedRequestsPageState extends State<ReviewedRequestsPage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final deviceHeight = MediaQuery.of(context).size.height;
+    // final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.secondaryBlue,

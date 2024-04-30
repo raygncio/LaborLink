@@ -12,7 +12,8 @@ import 'package:laborlink/Pages/Client/ClientMainPage.dart';
 class RatingsPage extends StatefulWidget {
   final Map<String, dynamic> ratings;
   final String user;
-  const RatingsPage({Key? key, required this.ratings, required this.user})
+  final String requestId;
+  const RatingsPage({Key? key, required this.ratings, required this.user, required this.requestId})
       : super(key: key);
 
   @override
@@ -326,11 +327,15 @@ class _RatingsPageState extends State<RatingsPage> {
     } else {
       DatabaseService service = DatabaseService();
       try {
+         String userId = widget.user == 'client'
+          ? widget.ratings["clientId"]
+          : widget.ratings["handymanId"];
+
         Review reviews = Review(
           rating: selectedRating,
           comment: review,
-          userId: widget.ratings["userId"],
-          requestId: widget.ratings["requestId"],
+          userId: userId,
+          requestId: widget.requestId,
         );
 
         await service.addReviews(reviews);
@@ -343,14 +348,14 @@ class _RatingsPageState extends State<RatingsPage> {
         );
 
         if (widget.user == 'client') {
-          Future.delayed(Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 1), () {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) =>
                   ClientMainPage(userId: widget.ratings["clientId"]),
             ));
           });
         } else {
-          Future.delayed(Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 1), () {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) =>
                   HandymanMainPage(userId: widget.ratings["handymanId"]),

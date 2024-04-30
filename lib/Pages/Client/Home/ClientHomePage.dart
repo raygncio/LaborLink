@@ -12,14 +12,14 @@ import 'package:laborlink/Widgets/NavBars/TabNavBar.dart';
 import 'package:laborlink/Widgets/TextFormFields/NormalTextFormField.dart';
 import 'package:laborlink/models/client.dart';
 import 'package:laborlink/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/models/request.dart';
 import '../../../Widgets/Cards/NoOngoingRequestCard.dart';
 
-final _firebase = FirebaseAuth.instance;
-final _firestore = FirebaseFirestore.instance;
+// final _firebase = FirebaseAuth.instance;
+// final _firestore = FirebaseFirestore.instance;
 final DatabaseService service = DatabaseService();
 
 class ClientHomePage extends StatefulWidget {
@@ -44,6 +44,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
 
   String currentUserFirstName = '';
   Client? clientInfo;
+  bool _hasPendingOrOngoingRequest = false;
 
   getUserData() async {
     Client userData =
@@ -53,9 +54,18 @@ class _ClientHomePageState extends State<ClientHomePage> {
     setState(() {});
   }
 
+  // Function to check if there is any pending or ongoing request
+  Future<void> checkPendingOrOngoingRequest() async {
+    Request? requestInfo = await service.getRequestsData(widget.userId);
+    setState(() {
+      _hasPendingOrOngoingRequest = requestInfo != null;
+    });
+  }
+
   @override
   void initState() {
     getUserData();
+    checkPendingOrOngoingRequest();
     super.initState();
   }
 
@@ -98,9 +108,19 @@ class _ClientHomePageState extends State<ClientHomePage> {
   }
 
   void updateSelectedTab(int selectedTabIndex) {
-    setState(() {
-      _selectedTabIndex = selectedTabIndex;
-    });
+     if (selectedTabIndex == 1 && _hasPendingOrOngoingRequest) {
+      // Optionally, provide feedback to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("You cannot create a new request while you have a pending or ongoing request."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedTabIndex = selectedTabIndex;
+      });
+    }
   }
 
   void updateDirectRequestTabContent(String? searchText) async {
@@ -114,7 +134,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       searchText = searchText.substring(4);
     }
 
-    print('>>>>>>>>>>>>>>>>>$searchText');
+    // print('>>>>>>>>>>>>>>>>>$searchText');
 
     try {
       List<Map<String, dynamic>> results =
@@ -138,7 +158,14 @@ class _ClientHomePageState extends State<ClientHomePage> {
         _searchResults = results;
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Error fetching user data'),
+            backgroundColor: Color.fromARGB(255, 245, 27, 11),
+          ),
+        );
     }
   }
 
@@ -157,7 +184,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     // DatabaseService service = DatabaseService();
 
     if (requestFormKey.currentState!.validateForm()) {
-      print('>>>> IN open request proceed');
+      // print('>>>> IN open request proceed');
 
       // Get form data from RequestForm
       Map<String, dynamic> formData = requestFormKey.currentState!.getFormData;
@@ -215,7 +242,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   _getTotalFee(double fee) {
     setState(() {
       _totalFee = fee;
-      print('>>>>>>>>>>>$_totalFee');
+      // print('>>>>>>>>>>>$_totalFee');
     });
   }
 
@@ -324,7 +351,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
             borderRadius: 8,
             height: 46,
             errorBorder: null,
-            hintText: "Search category or handyman name",
+            hintText: "Search by category or by handyman's first name",
             hintTextStyle: getTextStyle(
                 textColor: AppColors.grey,
                 fontFamily: AppFonts.montserrat,
@@ -464,7 +491,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
     } else {
       text = selectedLaborName;
     }
-    print('Labor selected in main code: $text');
+    // print('Labor selected in main code: $text');
 
     updateDirectRequestTabContent('btn-${text.toLowerCase()}');
   }

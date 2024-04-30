@@ -44,7 +44,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
     try {
       getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
       getClientRequest = await service.getActiveRequestClient(widget.userId);
-      print("testingggggggg ${getActiveRequest['activeRequestId']}");
+      // print("testingggggggg ${getActiveRequest['activeRequestId']}");
       setState(() {
         if (getActiveRequest["approvalStatus"] == "pending") {
           _forApproval = true;
@@ -233,17 +233,22 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Text(
-                          getActiveRequest['title'],
-                          style: getTextStyle(
-                              textColor: AppColors.tertiaryBlue,
-                              fontFamily: AppFonts.montserrat,
-                              fontWeight: AppFontWeights.bold,
-                              fontSize: 17),
-                        ),
-                      ),
+                      // Wrap the Text widget with Container for fixed width
+                Container(
+                  width: 170, // Set your specific width here
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Text(
+                      getActiveRequest['title'],
+                      style: getTextStyle(
+                          textColor: AppColors.tertiaryBlue,
+                          fontFamily: AppFonts.montserrat,
+                          fontWeight: AppFontWeights.bold,
+                          fontSize: 17),
+                    ),
+                  ),
+                ),
                       const AppBadge(
                           label: "Waiting for approval",
                           type: BadgeType.blocked,
@@ -253,12 +258,12 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                           height: 20,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 2),
-                          text: "Cancel Request",
+                          text: "Cancel request",
                           textStyle: getTextStyle(
                               textColor: AppColors.accentOrange,
                               fontFamily: AppFonts.montserrat,
                               fontWeight: AppFontWeights.bold,
-                              fontSize: 9),
+                              fontSize: 8),
                           color: AppColors.accentOrange,
                           command: onCancelRequest,
                           borderRadius: 8,
@@ -417,7 +422,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 54),
-            child: ClientInfoCard(clientInfo: getActiveRequest),
+            child: ClientInfoCard(clientInfo: getClientRequest),
           ),
         ],
       );
@@ -435,7 +440,7 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
                 clientDetail: getClientRequest),
           );
         } else {
-          // You can return a loading indicator or an empty container while waiting
+          // Return a loading indicator or an empty container while waiting
           return const CircularProgressIndicator();
         }
       },
@@ -456,9 +461,15 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           await service.getCancelledRequestHandyman(widget.userId);
       //print('*************************COMPLETED REQUEST $completedRequest');
 
-      print('*************************CANCELLED REQUEST $cancelledRequest');
+      // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching interested laborers."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     if (completedRequest.isNotEmpty) {
@@ -763,10 +774,10 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
 
       try {
         await service.cancelApproval(widget.userId);
-        print('Document updated successfully');
+        // print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Your request has been successfully cancelled'),
             duration: Duration(seconds: 2),
             backgroundColor: AppColors.tertiaryBlue,
@@ -776,7 +787,13 @@ class _HandymanActivityPageState extends State<HandymanActivityPage> {
           builder: (context) => HandymanMainPage(userId: widget.userId),
         ));
       } catch (e) {
-        print('Error updating document: $e');
+        // print('Error updating document: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating document."),
+          backgroundColor: Colors.red,
+        ),
+      );
       }
     }
   }

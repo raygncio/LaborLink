@@ -55,7 +55,7 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
 
       String progress = requestInfo!.progress;
       String? handymanId = requestInfo?.handymanId;
-      print('progress: $progress');
+      // print('progress: $progress');
 
       setState(() {
         if (progress == "pending" && handymanId != null) {
@@ -80,6 +80,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       }
     } catch (error) {
       print('Error fetching get user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching get user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
+
     }
   }
 
@@ -91,7 +98,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
         getDirectInfo = getDirectInfo;
       });
     } catch (error) {
-      print('Error fetching interested laborers: 1 $error');
+      // print('Error fetching interested laborers: 1 $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching interested laborers."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -101,7 +114,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
           await service.getInterestedHandymanAndOffer(widget.userId);
       // print(interestedLaborerWithOffer);
     } catch (error) {
-      print('Error fetching interested laborers: 2 $error');
+      // print('Error fetching interested laborers: 2 $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching interested laborers."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     if (interestedLaborerWithOffer.isNotEmpty) {
@@ -115,8 +134,15 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
   Future<Map<String, dynamic>> getTheActiveRequest() async {
     try {
       return await service.getActiveRequest(widget.userId);
+      
     } catch (error) {
-      print('Error fetching active request: $error');
+      // print('Error fetching active request: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching active request."),
+          backgroundColor: Colors.red,
+        ),
+      );
       return {};
     }
   }
@@ -127,7 +153,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       // print(
       //     "*************************CHECK THE INTERESTED LABORER $interestedLaborer");
     } catch (error) {
-      print('Error fetching interested laborers: 3 $error');
+      // print('Error fetching interested laborers: 3 $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching interested laborers."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     if (interestedLaborer.isNotEmpty) {
@@ -147,7 +179,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
     try {
       clientInfo = await service.getUserData(widget.userId);
     } catch (error) {
-      print('Error fetching user data 2: $error');
+      // print('Error fetching user data 2: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
     // print(clientInfo);
 
@@ -480,8 +518,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                 itemBuilder: (context, index) {
                   Map<String, dynamic> currentHandyman =
                       combinedInterestedLaborers[index];
-                  print(
-                      "*************************CHECK THE CURRENT HANDYMAN ${combinedInterestedLaborers.length}");
+                  // print(
+                  //     "*************************CHECK THE CURRENT HANDYMAN ${combinedInterestedLaborers.length}");
 
                   // Check if the current handyman has an offer
                   bool hasOffer = currentHandyman.containsKey('bidPrice');
@@ -491,8 +529,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                   if (hasOffer) {
                     return HandymanProposalCard(handymanInfo: currentHandyman);
                   } else if (currentHandyman.containsKey('suggestedPrice')) {
-                    print("checking");
-                    print(currentHandyman['specialization']);
+                    // print("checking");
+                    // print(currentHandyman['specialization']);
                     return HandymanHireCard(
                         handymanInfo: currentHandyman,
                         requestId: widget.userId);
@@ -533,7 +571,13 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
       //print('*************************COMPLETED REQUEST $completedRequest');
       // print('*************************CANCELLED REQUEST $cancelledRequest');
     } catch (error) {
-      print('Error fetching interested laborers: 4 $error');
+      // print('Error fetching interested laborers: 4 $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching interested laborers."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     if (completedRequest.isNotEmpty) {
@@ -597,8 +641,8 @@ class _ClientActivityPageState extends State<ClientActivityPage> {
                             itemBuilder: (context, index) {
                               Map<String, dynamic> currentRequest =
                                   completedRequest[index];
-                              print(
-                                  ">>>>>>>>>>>>${currentRequest['validRequestId']}");
+                              // print(
+                              //     ">>>>>>>>>>>>${currentRequest['validRequestId']}");
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 18),

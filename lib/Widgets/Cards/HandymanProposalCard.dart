@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/ViewHandymanProposal.dart';
-import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
+// import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
@@ -128,11 +128,9 @@ class HandymanProposalCardState extends State<HandymanProposalCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   AppBadge(
-                    label: "Offered ₱ " +
-                            widget.handymanInfo["bidPrice"].toString() ??
-                        '',
+                    label: "Offered ₱ ${widget.handymanInfo["bidPrice"] ?? ""}",
                     type: BadgeType.offer,
-                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                   ),
                   SizedBox(
                     width: 85,

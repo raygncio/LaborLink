@@ -58,6 +58,8 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
     }
     _requestCompleted = _currentProgress == 4;
 
+    print('progress: ${widget.requestDetail['finalRequestId']}');
+
     if (widget.requestDetail["progress"] != 'completion') {
       //check email verification status every 3 sec
       timer = Timer.periodic(
@@ -84,7 +86,6 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       requestInfo =
           await service.getRequestsData(widget.requestDetail["clientId"]);
 
-      print('progress: ${requestInfo!.progress}');
 
       if (requestInfo!.progress == 'completion') {
         currentProgress = 4;
@@ -110,6 +111,12 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       });
     } catch (error) {
       print('Error fetching get user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     }
   }
 
@@ -165,9 +172,7 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
                             Container(
                               width: 150,
                               child: Text(
-                                "Request ID: " +
-                                        widget.requestDetail["requestId"] ??
-                                    '',
+                                "Request ID: ${widget.requestDetail["requestId"]}",
                                 overflow: TextOverflow.ellipsis,
                                 softWrap: false,
                                 style: getTextStyle(
@@ -315,16 +320,18 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
   }
 
   void onMessageButtonClick() {
+    String phoneNumber = '+63${widget.requestDetail['phoneNumber']}';
     sendMessage(
-      '09171792602',
+      phoneNumber,
       'Hello, this is a test message!', // Your desired message content
     );
   }
 
   Future<void> sendMessage(String phoneNumber, String message) async {
+    String phone = '+63$phoneNumber';
     final Uri url = Uri(
       scheme: 'sms',
-      path: phoneNumber,
+      path: phone,
       queryParameters: {'body': message},
     );
 
@@ -336,7 +343,13 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
         // Handle error if unable to launch the SMS app
       }
     } catch (e) {
-      print('Error launching SMS: $e');
+      // print('Error launching SMS: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error launching SMS."),
+          backgroundColor: Colors.red,
+        ),
+      );
       // Handle error
     }
   }
@@ -346,6 +359,12 @@ class _ClientActiveRequestState extends State<ClientActiveRequest> {
       await service.updateRequest(widget.requestDetail["clientId"]);
     } catch (error) {
       print('Error fetching user data: $error');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Error fetching user data."),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     }
 
     Navigator.of(context).push(MaterialPageRoute(

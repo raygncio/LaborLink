@@ -1,15 +1,15 @@
 import 'dart:async';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/LoginPage.dart';
 import 'package:laborlink/Pages/Registration/TermsAndConditionPage.dart';
-import 'package:laborlink/ai/screens/dummy.dart';
-import 'package:laborlink/ai/screens/splash_one.dart';
+// import 'package:laborlink/ai/screens/dummy.dart';
+// import 'package:laborlink/ai/screens/splash_one.dart';
 import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/models/handyman.dart';
-import 'package:laborlink/models/results/anomaly_results.dart';
-import 'package:laborlink/models/results/face_results.dart';
+// import 'package:laborlink/models/results/anomaly_results.dart';
+// import 'package:laborlink/models/results/face_results.dart';
 import 'package:laborlink/services/analytics_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

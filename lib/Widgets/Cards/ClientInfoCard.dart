@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
+// import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
-import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/RateWidget.dart';
+// import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
+// import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -74,7 +74,7 @@ class ClientInfoCardState extends State<ClientInfoCard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 3),
                     child: RatingBar.builder(
-                        initialRating: 3, // input
+                        initialRating: widget.clientInfo["rates"] ?? 0, // input
                         itemCount: 5,
                         itemSize: 15,
                         ignoreGestures: true,

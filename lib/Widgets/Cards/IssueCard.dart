@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
+// import 'package:laborlink/Pages/Handyman/Home/OfferSumbittedPage.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
@@ -13,8 +13,8 @@ import '../Dialogs.dart';
 enum IssueStatus { approved, returned, resolved, pending }
 
 class IssueCard extends StatefulWidget {
-  final issueStatus;
-  final reporterUserType;
+  final String issueStatus;
+  final String reporterUserType;
   const IssueCard(
       {Key? key, required this.issueStatus, required this.reporterUserType})
       : super(key: key);
@@ -64,7 +64,7 @@ class _IssueCardState extends State<IssueCard> {
                                   fontWeight: AppFontWeights.bold,
                                   fontSize: 15),
                             ),
-                            widget.reporterUserType == AppUserType.client
+                            widget.reporterUserType == AppUserType.client.toString()
                                 ? const Padding(
                                     padding: EdgeInsets.only(top: 1.27),
                                     child: AppBadge(
@@ -115,7 +115,7 @@ class _IssueCardState extends State<IssueCard> {
                 Positioned(
                   top: 11.35,
                   right: 0,
-                  child: widget.issueStatus == IssueStatus.pending
+                  child: widget.issueStatus == IssueStatus.pending.toString()
                       ? Column(
                           children: [
                             SizedBox(
@@ -165,27 +165,27 @@ class _IssueCardState extends State<IssueCard> {
                               AppFilledButton(
                                   height: 19.27,
                                   text:
-                                      widget.issueStatus == IssueStatus.approved
+                                      widget.issueStatus == IssueStatus.approved.toString()
                                           ? "Resolve"
                                           : widget.issueStatus ==
-                                                  IssueStatus.resolved
+                                                  IssueStatus.resolved.toString()
                                               ? "Resolved"
                                               : "Returned",
                                   fontSize: 9,
                                   fontFamily: AppFonts.montserrat,
                                   color:
-                                      widget.issueStatus == IssueStatus.approved
+                                      widget.issueStatus == IssueStatus.approved.toString()
                                           ? AppColors.accentOrange
                                           : widget.issueStatus ==
-                                                  IssueStatus.resolved
+                                                  IssueStatus.resolved.toString()
                                               ? AppColors.green
                                               : AppColors.dirtyWhite,
                                   textColor:
-                                      widget.issueStatus != IssueStatus.returned
+                                      widget.issueStatus != IssueStatus.returned.toString()
                                           ? null
                                           : AppColors.black,
                                   command:
-                                      widget.issueStatus == IssueStatus.approved
+                                      widget.issueStatus == IssueStatus.approved.toString()
                                           ? () {
                                               yesCancelDialog(context,
                                                   "Are you sure this report has been resolved?");
@@ -225,7 +225,7 @@ class _IssueCardState extends State<IssueCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.reporterUserType == AppUserType.client
+                                widget.reporterUserType == AppUserType.client.toString()
                                     ? "Handyman Name"
                                     : "Client Name",
                                 style: getTextStyle(
@@ -245,7 +245,7 @@ class _IssueCardState extends State<IssueCard> {
                     ),
                     SizedBox(
                       width: columnWidth,
-                      child: widget.reporterUserType == AppUserType.client
+                      child: widget.reporterUserType == AppUserType.client.toString()
                           ? Row(
                               children: [
                                 Padding(

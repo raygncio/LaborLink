@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laborlink/Pages/Client/Activity/ViewHandymanProposal.dart';
-import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
+// import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
 import 'package:laborlink/Widgets/RateWidget.dart';
@@ -24,7 +24,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
     String suffix = widget.handymanInfo['suffix'] ?? '';
 
     String fullname = '$firstName $middleName $lastName $suffix';
-    print("GET THE DIRECT INFO: $fullname");
+    // print("GET THE DIRECT INFO: $fullname");
     bool hasBidPrice = widget.handymanInfo.containsKey('bidPrice');
     return Container(
       decoration: const BoxDecoration(
@@ -97,7 +97,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                     AppBadge(
                       label: "Offered ₱ ${widget.handymanInfo["bidPrice"]}",
                       type: BadgeType.offer,
-                      padding: EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                     ),
                     SizedBox(
                       width: 85,
@@ -120,7 +120,7 @@ class HandymanSelectedCardState extends State<HandymanSelectedCard> {
                 ),
               )
             else
-              Align(
+              const Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: EdgeInsets.only(top: 7),

@@ -5,18 +5,18 @@ import 'package:laborlink/Widgets/Forms/AddressForm.dart';
 import 'package:laborlink/Widgets/Forms/BasicInformationForm.dart';
 import 'package:laborlink/Widgets/Forms/ClientRequirementForm.dart';
 import 'package:laborlink/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-import 'package:laborlink/ai/screens/id_verification.dart';
+// import 'package:laborlink/ai/screens/id_verification.dart';
 import 'package:laborlink/ai/screens/id_client.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/providers/registration_data_provider.dart';
 
-final _firebase = FirebaseAuth.instance;
-final _firestore = FirebaseFirestore.instance;
+// final _firebase = FirebaseAuth.instance;
+// final _firestore = FirebaseFirestore.instance;
 
 class ClientRegistrationPage extends ConsumerStatefulWidget {
   const ClientRegistrationPage({Key? key}) : super(key: key);

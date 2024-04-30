@@ -31,15 +31,20 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
   }
 
   void getReviews() async {
-    print(widget.handymanInfo["rates"]);
     try {
-      results = await service.getHandymanReviews(widget.handymanInfo["userId"]);
-      print(results);
+      results = await service.getHandymanReviews(widget.handymanInfo["ActiveUserId"], widget.handymanInfo["userRole"]);
+      print("testing");
       setState(() {
         results = results;
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      // print('Error fetching user data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error fetching user data."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -123,7 +128,7 @@ class _ViewHandymanProfileState extends State<ViewHandymanProfile> {
                     if (currentReview['suffix'] != null) {
                       fullName += currentReview['suffix'] + ' ';
                     }
-                    DateTime? createdAt = currentReview['createdAt']?.toDate();
+                    DateTime? createdAt = currentReview['actualDate']?.toDate();
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 7),

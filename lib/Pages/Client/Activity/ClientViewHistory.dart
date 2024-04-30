@@ -32,7 +32,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
         convenienceFee = completedRequest['suggestedPrice'] - serviceFee;
 
         // Schedule the completion proof to be shown after a delay
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 1), () {
           setState(() {
             showCompletionProof = true;
           });
@@ -49,7 +49,14 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
           await service.getClientHistory(widget.userId, widget.userRole);
       // print(double.parse(completedRequest["rates"] ?? 0).toStringAsFixed(2));
     } catch (error) {
-      print('Error fetching interested laborers: $error');
+      // print('Error fetching interested laborers: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Error fetching interested laborers'),
+            backgroundColor: Color.fromARGB(255, 245, 27, 11),
+          ),
+        );
     }
 
     return completedRequest;
@@ -87,7 +94,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
-                            padding: EdgeInsets.only(bottom: 26),
+                            padding: const EdgeInsets.only(bottom: 26),
                             child: ReportIssueButton(userId: widget.userId),
                           )),
                     ],
@@ -320,7 +327,7 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                         ),
                         const Spacer(),
                         Text(
-                          completedRequest['suggestedPrice'].toString() ?? '',
+                          completedRequest['suggestedPrice'].toString(),
                           style: getTextStyle(
                               textColor: AppColors.secondaryBlue,
                               fontFamily: AppFonts.montserrat,
@@ -389,21 +396,21 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 15, top: 18),
+                padding: const EdgeInsets.only(left: 15, top: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextWithIcon(
-                      icon: Icon(Icons.place,
+                      icon: const Icon(Icons.place,
                           size: 17, color: AppColors.accentOrange),
                       text: completedRequest['address'] ?? '',
                       fontSize: 12,
                       contentPadding: 19,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.calendar_month_rounded,
+                        icon: const Icon(Icons.calendar_month_rounded,
                             size: 17, color: AppColors.accentOrange),
                         text: completedRequest['date'] ?? '',
                         fontSize: 12,
@@ -411,9 +418,9 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.watch_later,
+                        icon: const Icon(Icons.watch_later,
                             size: 17, color: AppColors.accentOrange),
                         text: completedRequest['time'] ?? '',
                         fontSize: 12,
@@ -421,12 +428,12 @@ class _ClientViewHistoryState extends State<ClientViewHistory> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 12),
                       child: TextWithIcon(
-                        icon: Icon(Icons.local_offer_rounded,
+                        icon: const Icon(Icons.local_offer_rounded,
                             size: 17, color: AppColors.accentOrange),
                         text:
-                            completedRequest['suggestedPrice'].toString() ?? '',
+                            completedRequest['suggestedPrice'].toString(),
                         fontSize: 12,
                         contentPadding: 19,
                       ),

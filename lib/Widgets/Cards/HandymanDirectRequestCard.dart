@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Client/Home/ClientHomePage.dart';
 import 'package:laborlink/Pages/Client/Home/DirectRequestFormPage.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Widgets/Badge.dart';
@@ -7,6 +8,7 @@ import 'package:laborlink/Widgets/RateWidget.dart';
 import 'package:laborlink/styles.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:laborlink/models/request.dart';
 import 'dart:io';
 
 class HandymanDirectRequestCard extends StatefulWidget {
@@ -28,11 +30,21 @@ class HandymanDirectRequestCard extends StatefulWidget {
 class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
   late String fullname;
   File? defaultAvatar;
+  bool _hasPendingOrOngoingRequest = false;
+
+  // Function to check if there is any pending or ongoing request
+  Future<void> checkPendingOrOngoingRequest() async {
+    Request? requestInfo = await service.getRequestsData(widget.userId);
+    setState(() {
+      _hasPendingOrOngoingRequest = requestInfo != null;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     // Call an async function to fetch data
+    checkPendingOrOngoingRequest();
     _loadDefaultAvatar();
   }
 
@@ -167,18 +179,30 @@ class _HandymanDirectRequestCardState extends State<HandymanDirectRequestCard> {
   }
 
   void onDirectRequest() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(
-      builder: (context) => DirectRequestFormPage(
-          handymanInfo: widget.handymanInfo, userId: widget.userId),
-    ))
-        .then((value) {
-      if (value == null) return;
+    // Check if there are pending or ongoing requests
+    if (_hasPendingOrOngoingRequest) {
+      // Provide feedback to the user that the request cannot be made
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("You cannot make another request while you have a pending or ongoing request."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      // Allow the user to proceed with the request
+      Navigator.of(context)
+          .push(MaterialPageRoute(
+            builder: (context) => DirectRequestFormPage(
+                handymanInfo: widget.handymanInfo, userId: widget.userId),
+          ))
+          .then((value) {
+        if (value == null) return;
 
-      if (value == "submit") {
-        widget.submitRequest("direct");
-      }
-    });
+        if (value == "submit") {
+          widget.submitRequest("direct");
+        }
+      });
+    }
   }
 
   void onViewProfile() {

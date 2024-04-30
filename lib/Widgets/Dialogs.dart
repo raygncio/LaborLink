@@ -3,15 +3,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
+// import 'package:laborlink/Pages/Client/Home/SuccessPage.dart';
 import 'package:laborlink/Pages/RatingsPage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
-import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
+// import 'package:laborlink/Widgets/Cards/OpenRequestCard.dart';
 import 'package:laborlink/Widgets/FilePickers/ChooseFilePicker.dart';
 import 'package:laborlink/Widgets/SuggestedFee.dart';
 import 'package:laborlink/Widgets/TextFormFields/TextAreaFormField.dart';
 import 'package:laborlink/models/database_service.dart';
 import 'package:laborlink/Widgets/FilePickers/UploadFilePicker.dart';
+import 'package:laborlink/models/transaction.dart';
 import 'package:laborlink/styles.dart';
 
 Future<String?> confirmationDialog(BuildContext context) => showDialog<String>(
@@ -211,7 +212,7 @@ Future<String?> makeOfferDialog(
   TextEditingController descriptionController = TextEditingController();
 
   _sendData() {
-    print('>>>>>>>>>${descriptionController.text}');
+    // print('>>>>>>>>>${descriptionController.text}');
     String text;
     if (descriptionKey.currentState!.validate()) {
       File offerAttachment = filePickerKey.currentState!.getFile;
@@ -475,11 +476,16 @@ Future<String?> attachServiceProofDialog(BuildContext context,
                                     clientDetails['userId'], _selectedImage!);
                             await service.updateRequestCompletion(
                                 requestId, completionUrl);
+
+                            // Credit balance
+                            Transaction? transactionData = await service
+                                .parseTransactionDetails(requestId);
+                            await service.addTransaction(transactionData!);
                           } catch (e) {
-                            // Handle errors during user creation
+                            // Handle errors
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Error creating user"),
+                                content: Text("Error completing request"),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -488,7 +494,7 @@ Future<String?> attachServiceProofDialog(BuildContext context,
                               .pushReplacement(MaterialPageRoute(
                             builder: (context) => RatingsPage(
                               ratings: clientDetails,
-                              user: 'handyman',
+                              user: 'handyman', requestId: requestId
                             ),
                           ));
                         },

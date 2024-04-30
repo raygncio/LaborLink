@@ -13,7 +13,7 @@ class VerificationRejectedPage extends StatefulWidget {
 class _VerificationRejectedPageState extends State<VerificationRejectedPage> {
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: AppColors.white,

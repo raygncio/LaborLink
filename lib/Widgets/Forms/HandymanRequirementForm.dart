@@ -98,7 +98,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
+    // final deviceWidth = MediaQuery.of(context).size.width;
 
     return Container(
       decoration: BoxDecoration(
@@ -163,7 +163,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                                 borderRadius:
                                     BorderRadius.circular(_borderRadius),
                                 borderSide:
-                                    BorderSide(color: AppColors.red, width: 1),
+                                    const BorderSide(color: AppColors.red, width: 1),
                               ),
                               filled: true,
                               fillColor: AppColors.white,
@@ -208,8 +208,8 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                         items: validIds.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value),
                             enabled: value == 'NBI',
+                            child: Text(value),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {
@@ -241,7 +241,7 @@ class HandymanRequirementFormState extends State<HandymanRequirementForm> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(_borderRadius),
                             borderSide:
-                                BorderSide(color: AppColors.red, width: 1),
+                                const BorderSide(color: AppColors.red, width: 1),
                           ),
                           filled: true,
                           fillColor: AppColors.white,

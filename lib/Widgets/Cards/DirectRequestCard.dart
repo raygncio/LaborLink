@@ -86,12 +86,11 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                                 fontSize: 15),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top: 1.27),
+                            padding: const EdgeInsets.only(top: 1.27),
                             child: AppBadge(
-                              label: "Request ID: " +
-                                  widget.requestInfo["ActiveRequestId"],
+                              label: "Request ID: ${widget.requestInfo["ActiveRequestId"]}",
                               type: BadgeType.normal,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 1),
                             ),
                           ),
@@ -226,7 +225,7 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
                           padding: const EdgeInsets.only(right: 4.5),
                           child: Image.network(
                             widget.requestInfo["attachment"],
-                            height: 151,
+                            height: 171,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -311,13 +310,12 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
   void onAccept() async {
     // Accept the request, update the request
     // direct to home page
-    Map<String, dynamic> getActiveRequest = {};
+     Map<String, dynamic> getActiveRequest = {};
     getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
-    print('drgtdrgd ${getActiveRequest["approvalStatus"]}');
-    if (getActiveRequest["approvalStatus"] != "completed" &&
-        getActiveRequest["approvalStatus"] != "cancelled" &&
-        getActiveRequest["approvalStatus"] == null) {
-      // Handle errors during accepting request
+
+    if (getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
+      // Handle errors during request accept
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Invalid. You can only accept one request at a time."),
@@ -325,7 +323,6 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         ),
       );
     } else {
-      print('updaterequest');
       try {
         await service.updateRequestProgress(
             widget.requestInfo["ActiveRequestId"], widget.userId);
@@ -338,16 +335,15 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
           ),
         );
       }
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => HandymanMainPage(userId: widget.userId)));
     }
 
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => HandymanMainPage(userId: widget.userId)));
   }
 
   _getTotalFee(double fee) {
     setState(() {
       _totalOffer = fee;
-      print('>>>>>>>makeoffer: $_totalOffer');
     });
   }
 
@@ -363,8 +359,6 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
       // Create a user in Firebase Authentication
       String imageUrl =
           await service.uploadOfferAttachment(widget.userId, _offerAttachment!);
-
-      print('>>>>>>>>>>>>submitoffer>>$_totalOffer,$_offerDesc,$imageUrl');
 
       Offer offers = Offer(
         bidPrice: _totalOffer,
@@ -387,8 +381,21 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
     }
   }
 
-  void onMakeOffer() {
-    makeOfferDialog(context, _getTotalFee, _getOfferData).then(
+  void onMakeOffer() async {
+    Map<String, dynamic> getActiveRequest = {};
+    getActiveRequest = await service.getActiveRequestHandyman(widget.userId);
+
+    if (getActiveRequest["approvalStatus"] == "hired" ||
+        getActiveRequest["approvalStatus"] == "rating") {
+      // Handle errors during request accept
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid. You can only make one offer at a time."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      makeOfferDialog(context, _getTotalFee, _getOfferData).then(
       (value) {
         if (value == null) return;
 
@@ -399,13 +406,15 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         }
       },
     );
+    }
+    
   }
 
   void onDecline() async {
     DatabaseService service = DatabaseService();
     try {
       await service.declineDirectRequest(widget.requestInfo["ActiveRequestId"]);
-      Future.delayed(Duration(milliseconds: 400), () {
+      Future.delayed(const Duration(milliseconds: 400), () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Direct Request declined succesfully."),
@@ -414,7 +423,12 @@ class _DirectRequestCardState extends State<DirectRequestCard> {
         );
       });
     } catch (e) {
-      print('Error updating document: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating document."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
 
     Navigator.of(context).push(MaterialPageRoute(

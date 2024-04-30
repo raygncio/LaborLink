@@ -61,7 +61,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
 
     // Concatenate non-null values
     fullname = '$firstName $middleName $lastName $suffix';
-    print("*************************CHECK THE FULL NAME $fullname");
+    // print("*************************CHECK THE FULL NAME $fullname");
     return Container(
       height: 81,
       decoration: const BoxDecoration(
@@ -164,15 +164,15 @@ class HandymanHireCardState extends State<HandymanHireCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Hiring'),
-          content: Text('Are you sure you want to hire this handyman?'),
+          title: const Text('Confirm Hiring'),
+          content: const Text('Are you sure you want to hire this handyman?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 // Perform action on 'No' button press
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -180,7 +180,7 @@ class HandymanHireCardState extends State<HandymanHireCard> {
                 // Perform action on 'Yes' button press
                 hireHandyman();
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
           ],
         );
@@ -197,22 +197,22 @@ class HandymanHireCardState extends State<HandymanHireCard> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Hire Handyman'),
-              content: Text('Are you sure you want to hire this handyman?'),
+              title: const Text('Hire Handyman'),
+              content: const Text('Are you sure you want to hire this handyman?'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context)
                         .pop(false); // Return false when cancel is pressed
                   },
-                  child: Text('No'),
+                  child: const Text('No'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context)
                         .pop(true); // Return true when confirm is pressed
                   },
-                  child: Text('Yes'),
+                  child: const Text('Yes'),
                 ),
               ],
             );
@@ -221,10 +221,10 @@ class HandymanHireCardState extends State<HandymanHireCard> {
         false;
 
     if (confirmHire == true) {
-      print(widget.handymanInfo['userId']);
-      print(widget.handymanInfo['activeRequestId']);
-      print(widget.requestId);
-      print(widget.handymanInfo['handymanId']);
+      // print(widget.handymanInfo['userId']);
+      // print(widget.handymanInfo['activeRequestId']);
+      // print(widget.requestId);
+      // print(widget.handymanInfo['handymanId']);
       try {
         await service.hiredHandyman(widget.handymanInfo['userId'],
             widget.handymanInfo['activeRequestId']);
@@ -232,10 +232,10 @@ class HandymanHireCardState extends State<HandymanHireCard> {
             widget.handymanInfo['activeRequestId'],
             widget.handymanInfo['handymanId']);
 
-        print('Document updated successfully');
+        // print('Document updated successfully');
         // Show SnackBar when request is successfully cancelled
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Handyman hired successfully'),
             duration: Duration(seconds: 2),
             backgroundColor: AppColors.tertiaryBlue,
@@ -245,7 +245,13 @@ class HandymanHireCardState extends State<HandymanHireCard> {
           builder: (context) => ClientMainPage(userId: widget.requestId),
         ));
       } catch (e) {
-        print('Error updating document: $e');
+        // print('Error updating document: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating document."),
+          backgroundColor: Colors.red,
+        ),
+      );
       }
     }
   }

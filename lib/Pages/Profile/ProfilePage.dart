@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laborlink/Pages/Profile/CreditBalancePage.dart';
 import 'package:laborlink/Pages/Profile/ViewHandymanProfile.dart';
 import 'package:laborlink/Pages/Report/ReportIssuePage.dart';
 import 'package:laborlink/Widgets/Buttons/FilledButton.dart';
@@ -14,7 +15,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-final _firebase = FirebaseAuth.instance;
+// final _firebase = FirebaseAuth.instance;
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -24,13 +25,72 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
+enum AuthStatus {
+  successful,
+  wrongPassword,
+  emailAlreadyExists,
+  invalidEmail,
+  weakPassword,
+  unknown,
+}
+
+class AuthExceptionHandler {
+  static handleAuthException(FirebaseAuthException e) {
+    AuthStatus status;
+    switch (e.code) {
+      case "invalid-email":
+        status = AuthStatus.invalidEmail;
+        break;
+      case "wrong-password":
+        status = AuthStatus.wrongPassword;
+        break;
+      case "weak-password":
+        status = AuthStatus.weakPassword;
+        break;
+      case "email-already-in-use":
+        status = AuthStatus.emailAlreadyExists;
+        break;
+      default:
+        status = AuthStatus.unknown;
+    }
+    return status;
+  }
+  static String generateErrorMessage(error) {
+    String errorMessage;
+    switch (error) {
+      case AuthStatus.invalidEmail:
+        errorMessage = "Your email address appears to be malformed.";
+        break;
+      case AuthStatus.weakPassword:
+        errorMessage = "Your password should be at least 6 characters.";
+        break;
+      case AuthStatus.wrongPassword:
+        errorMessage = "Your email or password is wrong.";
+        break;
+      case AuthStatus.emailAlreadyExists:
+        errorMessage =
+            "The email address is already in use by another account.";
+        break;
+      default:
+        errorMessage = "An error occured. Please try again later.";
+    }
+    return errorMessage;
+  }
+}
+
 class _ProfilePageState extends State<ProfilePage> {
+  DatabaseService service = DatabaseService();
   final _fullNameController = TextEditingController();
   final _birthdateController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _addressController = TextEditingController();
+  String? _userRole;
+  double? balance;
+
   Map<String, dynamic> getUserInfo = {};
+  FirebaseAuth _auth = FirebaseAuth.instance; // Define FirebaseAuth object
+  AuthStatus _status = AuthStatus.unknown;
 
   File? defaultAvatar;
   final _labelTextStyle = getTextStyle(
@@ -64,6 +124,12 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     fetchUserData();
     _loadDefaultAvatar();
+    // _getCreditBalance();
+  }
+
+  _getCreditBalance() async {
+    balance = await service.computeCreditBalance(widget.userId);
+    setState(() {});
   }
 
   Future<void> _loadDefaultAvatar() async {
@@ -82,12 +148,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return file;
   }
+  
+
 
   Future<void> fetchUserData() async {
-    DatabaseService service = DatabaseService();
     try {
       Client clientInfo = await service.getUserData(widget.userId);
-      getUserInfo = await service.getUserInfo(widget.userId);
+      getUserInfo = await service.getUserInfo(widget.userId); // this is the code that gets the user info
+      print(getUserInfo['specialization']);
       String fullName =
           '${clientInfo.firstName[0].toUpperCase()}${clientInfo.firstName.substring(1).toLowerCase()} ${clientInfo.middleName ?? " "} ${clientInfo.lastName[0].toUpperCase()}${clientInfo.lastName.substring(1).toLowerCase()} ${clientInfo.suffix ?? ""}';
 
@@ -95,18 +163,34 @@ class _ProfilePageState extends State<ProfilePage> {
           DateFormat('MMMM d, y').format(clientInfo.dob!); // Format the date
 
       String address =
-          '${clientInfo.streetAddress} ${clientInfo.city ?? " "} ${clientInfo.state} ${clientInfo.zipCode ?? ""}';
+          '${clientInfo.streetAddress}, ${clientInfo.city ?? " "}, ${clientInfo.state}, ${clientInfo.zipCode ?? ""}';
 
       setState(() {
         _fullNameController.text = fullName;
         _birthdateController.text = formattedDate;
         _emailController.text = clientInfo.emailAdd;
-        _phoneNumberController.text = '0${clientInfo.phoneNumber}';
+        _phoneNumberController.text = clientInfo.phoneNumber;
         _addressController.text = address;
+        _userRole = clientInfo.userRole;
+        if(_userRole == 'handyman') {
+          _getCreditBalance();
+        }
       });
     } catch (error) {
       print('Error fetching user data: $error');
     }
+  }
+
+  void payCreditBalance() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          return CreditBalancePage(
+            userId: widget.userId,
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -224,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 12),
                   child: Container(
                     width: deviceWidth,
                     color: AppColors.white,
@@ -232,10 +316,80 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
-                              left: 34, right: 52, top: 31),
+                              left: 34, right: 52, top: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (_userRole == 'handyman')
+                                 Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Credit Balance",
+                                            style: getTextStyle(
+                                                textColor: AppColors.black,
+                                                fontFamily: AppFonts.montserrat,
+                                                fontWeight: AppFontWeights.bold,
+                                                fontSize: 14),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 16, left: 18),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 35,
+                                                  child: Stack(
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          AppFilledButton(
+                                                            text: balance == 0.0
+                                                                ? 'No balance'
+                                                                : 'Php${balance.toString()}',
+                                                            fontFamily: AppFonts
+                                                                .montserrat,
+                                                            fontSize: 12,
+                                                            color: AppColors
+                                                                .secondaryBlue,
+                                                            command:
+                                                                payCreditBalance,
+                                                            borderRadius: 8,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 20),
+                                                            child: Icon(
+                                                              Icons.payment,
+                                                              color: AppColors
+                                                                  .white,
+                                                            )),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  // : const Center(
+                                  //     child: CircularProgressIndicator(
+                                  //       color: AppColors.secondaryBlue,
+                                  //       strokeWidth: 4,
+                                  //     ),
+                                  //   ),
                               Text(
                                 "My Information",
                                 style: getTextStyle(
@@ -276,7 +430,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               width: 16,
                                             ),
                                             () {
-                                              print("Edit icon clicked");
+                                              onEditIconClicked();
                                             },
                                           ),
                                         ),
@@ -314,7 +468,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -353,7 +507,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -361,7 +515,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           inputTextStyle: _inputTextStyle,
                                           textAlign: TextAlign.center,
                                           defaultBorder: _defaultBorder,
-                                          errorBorder: _defaultBorder),
+                                          errorBorder: _defaultBorder,),
+                                          
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
@@ -392,7 +547,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -431,7 +586,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 width: 16,
                                               ),
                                               () {
-                                                print("Edit icon clicked");
+                                                onEditIconClicked();
                                               },
                                             ),
                                           ),
@@ -568,7 +723,75 @@ class _ProfilePageState extends State<ProfilePage> {
     ));
   }
 
-  void onChangePassword() {}
+  void onEditIconClicked() {
+    Map<String, dynamic> updatedData = {
+      'fullName': _fullNameController.text,
+      'birthdate': _birthdateController.text,
+      'phoneNumber': _phoneNumberController.text,
+      'address': _addressController.text,
+    };
+    updateUserInformation(updatedData, widget.userId);
+     setState(() {});
+  }
+
+  void updateUserInformation(Map<String, dynamic> updatedData, String userId) async {
+  try {
+    await service.userInfoUpdate(updatedData, userId);
+    // print('User information updated successfully!');
+  } catch (error) {
+    // print('Error updating user information: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating user information."),
+          backgroundColor: Colors.red,
+        ),
+      );
+  }
+}
+
+void onChangePassword() async {
+  // Get the email of the current user
+  String email = _emailController.text;
+
+  // Call the resetPassword function
+  AuthStatus status = await resetPassword(email: email);
+
+  // Handle the result of the password reset operation
+  if (status == AuthStatus.successful) {
+    // Password reset email sent successfully
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Password reset email sent successfully."),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } else {
+    // Password reset failed, show error message
+    String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+
+
+  Future<AuthStatus> resetPassword({required String email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      _status = AuthStatus.successful;
+    } catch (e) {
+       if (e is FirebaseAuthException) {
+          return AuthExceptionHandler.handleAuthException(e);
+        } else {
+          // Handle other types of exceptions here if needed
+          return AuthStatus.unknown;
+      }
+    }
+    return _status;
+  }
 
   void onReportAnIssue() => Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => ReportIssuePage(userId: widget.userId),

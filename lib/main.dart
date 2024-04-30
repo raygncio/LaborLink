@@ -3,13 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:laborlink/Pages/Admin/AdminDashboard.dart';
-import 'package:laborlink/Pages/Client/ClientMainPage.dart';
-import 'package:laborlink/Pages/Handyman/HandymanMainPage.dart';
-import 'package:laborlink/ai/style.dart';
 import 'package:laborlink/otp/verify_email_page.dart';
-import 'package:laborlink/providers/current_user_provider.dart';
 import 'package:laborlink/splash/splash_handyman.dart';
-import 'package:laborlink/splash/splash_loading.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laborlink/Pages/LandingPage.dart';
@@ -51,12 +46,12 @@ class MyApp extends ConsumerWidget {
           // bool isLoadingLoginData = false;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print('>>>>>>>>>>> connection state waiting');
+            
             return const SplashHandymanPage();
           }
 
           if (snapshot.hasData) {
-            print('>>>>>>>>>>> snapshot has data');
+            
 
             // ADMIN
             if (FirebaseAuth.instance.currentUser!.email ==
@@ -76,7 +71,6 @@ class MyApp extends ConsumerWidget {
             // }
           }
 
-          print('>>>>>>>>>>> no login data');
           return const LandingPage();
         },
       ),
