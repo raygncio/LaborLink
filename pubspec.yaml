@@ -96,6 +96,7 @@ flutter:
     - assets/animations/check.json
     - assets/animations/face.json
     - assets/animations/face-2.json
+    - assets/animations/face-3.json
     - assets/animations/id-verification.json
     - assets/animations/wrong.json
     - assets/animations/handyman.json
