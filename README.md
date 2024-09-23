@@ -15,6 +15,7 @@ In today's fast-paced world, finding the time for essential home repairs can be 
    <img src="https://github.com/user-attachments/assets/99e5a844-b30b-441e-a2b4-c68dca56e9fc" width="200" />
    <img src="https://github.com/user-attachments/assets/ec2d38d9-55e4-498f-8d90-c63042bdbb6d" width="200" />
 </p>
+
 2. Implement a user-centric and standardized interface for prioritizing updates, transparency, feedback, and communication for users,
 <p align="center">
    <img src="https://github.com/user-attachments/assets/504102ac-3f6c-405a-9556-9207ba56d445" width="200" />
