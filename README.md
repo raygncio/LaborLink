@@ -15,17 +15,19 @@ In today's fast-paced world, finding the time for essential home repairs can be 
    <img src="https://github.com/user-attachments/assets/99e5a844-b30b-441e-a2b4-c68dca56e9fc" width="200" />
    <img src="https://github.com/user-attachments/assets/ec2d38d9-55e4-498f-8d90-c63042bdbb6d" width="200" />
 </p>
-2. Implement a user-centric and standardized interface for prioritizing updates, transparency, feedback, and communication for users,
+
+2. Implement a user-centric and standardized interface for prioritizing updates, transparency, feedback, and communication for users
 <p align="center">
    <img src="https://github.com/user-attachments/assets/504102ac-3f6c-405a-9556-9207ba56d445" width="200" />
    <img src="https://github.com/user-attachments/assets/128925ed-c0ae-409a-8ff0-ff7598e4a4f9" width="200" />
-   <img src="https://github.com/user-attachments/assets/e606223f-d33f-4a45-908a-71632114e688" width="200" />
+   <img src="https://github.com/user-attachments/assets/89a0f777-0967-49ed-a720-34a78294c0fe" width="200" />
 </p>
 
 3. Utilize a “buyer/client-determined” reversed auction mechanism
 <p align="center">
    <img src="https://github.com/user-attachments/assets/a195a8a0-857f-417f-8548-534f4dfc5870" width="200" />
    <img src="https://github.com/user-attachments/assets/7c5ed693-0c8f-44be-b147-b8d26578f971" width="200" />
+   <img src="https://github.com/user-attachments/assets/2335d6de-8b55-4991-899e-091f3b87d6ff" width="200" />
 </p>
 
 4. Identify and authenticate end-users through ID Verification using Convolutional Neural Networks for Anomaly Detection and Computer Vision for Face Detection and ID Matching.
@@ -44,7 +46,7 @@ The ID verification has two parts: Document anomaly detection and face verificat
 - FirebaseVision and ML Kit were used along with Regula Face SDK API and some flutter packages useful for image handling for the face verification. 
 
 ## Known Issues
-- [ ] Reading and writing data and Uploading and loading media files can be slow at times (Firebase Spark/Free plan)
+- [ ] Reading and writing data and uploading and loading media files can be slow at times (Firebase Spark/Free plan)
 - [ ] ID verification process, specifically document anomaly detection, appears to be intermittent when using mobile data
 
 ## Future Features
